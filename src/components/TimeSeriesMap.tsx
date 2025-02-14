@@ -1,10 +1,17 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Tooltip } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { composerEvents } from '../data/events';
-import { format, parseISO, differenceInDays, addDays } from 'date-fns';
+import {
+  format,
+  parseISO,
+  differenceInDays,
+  addDays,
+  addYears,
+  addMonths,
+} from 'date-fns';
 
 import L from 'leaflet';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
@@ -15,7 +22,8 @@ L.Icon.Default.mergeOptions({
   iconUrl: markerIcon,
   iconRetinaUrl: markerIcon2x,
   shadowUrl: markerShadow,
-})
+});
+
 const TimeSeriesMap = () => {
   // 日付の範囲設定
   const MIN = parseISO('1700-01-01');
@@ -26,29 +34,40 @@ const TimeSeriesMap = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const animationRef = useRef<NodeJS.Timeout | null>(null);
 
-  // 選択された日付までのイベントをフィルタリング
+  // 選択された日付
   const selectedDate = addDays(MIN, currentDay);
-  const filteredEvents = composerEvents.filter(
-    (event) => parseISO(event.date) <= selectedDate
-  );
+
+  // ±dN年の範囲を定義（ここでは ±5年）
+  const YEAR_MARGIN = 5;
+  const lowerBound = addYears(selectedDate, -YEAR_MARGIN);
+  const upperBound = addYears(selectedDate, YEAR_MARGIN);
+
+  // 選択された日付の前後 ±dN年内のイベントをフィルタリング
+  const filteredEvents = composerEvents.filter((event) => {
+    const eventDate = parseISO(event.date);
+    return eventDate >= lowerBound && eventDate <= upperBound;
+  });
 
   const handlePlayPause = () => {
     setIsPlaying(!isPlaying);
   };
 
-  // アニメーションの効果
+  // アニメーションの効果（月単位で進める）
   useEffect(() => {
     if (isPlaying) {
       animationRef.current = setInterval(() => {
         setCurrentDay((prevDay) => {
-          if (prevDay >= TOTAL_DAYS) {
+          const currentDate = addDays(MIN, prevDay);
+          const nextDate = addMonths(currentDate, 1);
+          const nextDayCount = differenceInDays(nextDate, MIN);
+          if (nextDayCount > TOTAL_DAYS) {
             clearInterval(animationRef.current!);
             setIsPlaying(false);
             return prevDay;
           }
-          return prevDay + 1;
+          return nextDayCount;
         });
-      }, 100); // アニメーション速度を調整（ミリ秒）
+      }, 5); // アニメーション速度を調整（ミリ秒）
     } else if (animationRef.current) {
       clearInterval(animationRef.current);
     }
@@ -69,7 +88,7 @@ const TimeSeriesMap = () => {
       <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
         <button onClick={handlePlayPause}>{isPlaying ? '停止' : '再生'}</button>
         <div style={{ flexGrow: 1, marginLeft: '20px' }}>
-          {/* react-range の代わりにシンプルな range input を使用 */}
+          {/* シンプルな range input を使用 */}
           <input
             type="range"
             min={0}
@@ -81,7 +100,7 @@ const TimeSeriesMap = () => {
           />
         </div>
         <div style={{ marginLeft: '10px' }}>
-          {format(selectedDate, 'yyyy-MM-dd')}
+          {format(selectedDate, 'yyyy')}
         </div>
       </div>
 
@@ -97,10 +116,14 @@ const TimeSeriesMap = () => {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         {filteredEvents.map((event) => (
-          <Marker
-            key={event.id}
-            position={event.location}
-          >
+          <Marker key={event.id} position={event.location}>
+            <Tooltip direction="top" offset={[0, -20]} permanent>
+              <div>
+                <strong>{event.composer}</strong>
+                <br />
+                {event.composition}
+              </div>
+            </Tooltip>
             <Popup>
               <strong>{event.composer}</strong>
               <br />
