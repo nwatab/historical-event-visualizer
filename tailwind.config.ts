@@ -13,6 +13,9 @@ export default {
         foreground: "var(--foreground)",
       },
     },
+    fontFamily: {
+      sans: ['var(--font-noto-sans-jp)'],
+    },
   },
   plugins: [],
 } satisfies Config;
