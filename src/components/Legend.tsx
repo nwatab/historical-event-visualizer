@@ -32,6 +32,23 @@ export function Legend({ hiddenDomains, highlighted, onHover, onToggle, onShowAl
   const isVisible = (domain: Domain) => !hiddenDomains.includes(domain);
   const allHidden = DOMAINS.every((domain) => !isVisible(domain));
 
+  /** 非表示の分類があるときだけ出す（押しても何も起きない状態では置かない）。描画するのは常に1箇所だけ。 */
+  const showAllButton = (
+    <button
+      type="button"
+      className="text-left"
+      style={{
+        ...textStyle.caption,
+        marginTop: SPACE[8],
+        textDecoration: "underline",
+        color: GRAY.weak,
+      }}
+      onClick={onShowAll}
+    >
+      すべて表示
+    </button>
+  );
+
   return (
     <nav aria-label="分類の凡例とフィルタ" style={surfaceStyle}>
       <button
@@ -49,10 +66,14 @@ export function Legend({ hiddenDomains, highlighted, onHover, onToggle, onShowAl
           ))}
         </span>
       </button>
-      {/* 地図に何も出ない理由を示す。折りたたみ中の狭い画面でも見えるよう、折りたたむ部分の外に置く。 */}
+      {/*
+        地図に何も出ない理由を示す。折りたたみ中の狭い画面でも見えるよう、折りたたむ部分の外に置く。
+        全分類が非表示のときは、その場で戻せるよう「すべて表示」もここに置く（折りたたみの中には置かない）。
+      */}
       <p role="status" style={{ ...textStyle.caption, color: GRAY.weak }}>
         {allHidden ? "すべての分類が非表示です" : ""}
       </p>
+      {allHidden && showAllButton}
       <div
         id="legend-items"
         className={expanded ? "block" : "hidden sm:block"}
@@ -95,22 +116,8 @@ export function Legend({ hiddenDomains, highlighted, onHover, onToggle, onShowAl
             );
           })}
         </ul>
-        {/* 非表示の分類があるときだけ出す（押しても何も起きない状態では置かない） */}
-        {hiddenDomains.length > 0 && (
-          <button
-            type="button"
-            className="text-left"
-            style={{
-              ...textStyle.caption,
-              marginTop: SPACE[8],
-              textDecoration: "underline",
-              color: GRAY.weak,
-            }}
-            onClick={onShowAll}
-          >
-            すべて表示
-          </button>
-        )}
+        {/* 一部だけ非表示のときはここに置く（全分類が非表示のときは折りたたみの外に出す） */}
+        {hiddenDomains.length > 0 && !allHidden && showAllButton}
       </div>
     </nav>
   );
