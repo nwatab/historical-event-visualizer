@@ -2,8 +2,11 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { sampleEvents } from "@/data/events.sample";
+import { SCREEN_INSET, SLIDER_PANEL_MAX_WIDTH } from "@/lib/design";
 import { INITIAL_YEAR, YEAR_MAX, YEAR_MIN, instantEventMarkers } from "@/lib/timeline";
 import { clampYear } from "@/lib/year";
+import type { Domain } from "@/types/event";
+import { Legend } from "./Legend";
 import { WorldMapClient } from "./WorldMapClient";
 import { YearSlider } from "./YearSlider";
 
@@ -24,6 +27,9 @@ const yearStepFromKey = (event: KeyboardEvent): number => {
 
 export function EventMapApp() {
   const [year, setYear] = useState(INITIAL_YEAR);
+  const [hoveredDomain, setHoveredDomain] = useState<Domain | null>(null);
+  const [pinnedDomain, setPinnedDomain] = useState<Domain | null>(null);
+  const highlightedDomain = hoveredDomain ?? pinnedDomain;
   const markers = useMemo(() => instantEventMarkers(sampleEvents, year), [year]);
 
   useEffect(() => {
@@ -39,9 +45,23 @@ export function EventMapApp() {
 
   return (
     <div className="relative h-full w-full">
-      <WorldMapClient markers={markers} />
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 p-4">
-        <div className="pointer-events-auto mx-auto max-w-4xl">
+      <WorldMapClient markers={markers} highlightedDomain={highlightedDomain} />
+      <div className="absolute" style={{ top: SCREEN_INSET, left: SCREEN_INSET }}>
+        <Legend
+          highlighted={highlightedDomain}
+          pinned={pinnedDomain}
+          onHover={setHoveredDomain}
+          onTogglePin={(domain) => setPinnedDomain((current) => (current === domain ? null : domain))}
+        />
+      </div>
+      <div
+        className="pointer-events-none absolute inset-x-0 bottom-0"
+        style={{ padding: SCREEN_INSET }}
+      >
+        <div
+          className="pointer-events-auto mx-auto"
+          style={{ maxWidth: SLIDER_PANEL_MAX_WIDTH }}
+        >
           <YearSlider
             year={year}
             min={YEAR_MIN}

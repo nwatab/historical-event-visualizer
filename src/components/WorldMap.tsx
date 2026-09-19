@@ -6,6 +6,7 @@ import {
   Map as MapLibreMap,
   Popup,
   setWorkerUrl,
+  type ExpressionSpecification,
   type GeoJSONSource,
   type MapLayerMouseEvent,
   type StyleSpecification,
@@ -13,15 +14,41 @@ import {
 } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { publicPath } from "@/lib/config";
+import { DOMAIN_COLORS, GRAY, MAP_COLORS, MARKER, SPACE, swatchStyle, textStyle } from "@/lib/design";
+import { DOMAINS, DOMAIN_LABELS } from "@/lib/domain";
 import type { EventMarkerCollection } from "@/lib/timeline";
-
-const OCEAN_COLOR = "#a8c8e0";
-const LAND_COLOR = "#e8e0c8";
-const COASTLINE_COLOR = "#7a7060";
-const EVENT_COLOR = "#b3261e";
+import type { Domain } from "@/types/event";
 
 const EVENTS_SOURCE_ID = "events";
 const EVENTS_LAYER_ID = "events-circle";
+
+/** domain プロパティから分類色を引く式 */
+const markerColor: ExpressionSpecification = [
+  "match",
+  ["get", "domain"],
+  ...DOMAINS.flatMap((domain) => [domain, DOMAIN_COLORS[domain]]),
+  GRAY.weak,
+] as unknown as ExpressionSpecification;
+
+/**
+ * 強調中の分類は不透明度に下限を設けて見つけやすくし、それ以外は下げる。
+ * null なら年の差によるフェードのみ。
+ */
+const markerOpacity = (highlighted: Domain | null): ExpressionSpecification =>
+  highlighted === null
+    ? ["get", "opacity"]
+    : [
+        "case",
+        ["==", ["get", "domain"], highlighted],
+        ["max", ["get", "opacity"], MARKER.highlightMinOpacity],
+        ["*", ["get", "opacity"], MARKER.dimFactor],
+      ];
+
+/** 重要度の高いもの・強調中の分類を上に描く */
+const markerSortKey = (highlighted: Domain | null): ExpressionSpecification =>
+  highlighted === null
+    ? ["get", "importance"]
+    : ["+", ["get", "importance"], ["case", ["==", ["get", "domain"], highlighted], 10, 0]];
 
 const createStyle = (landUrl: string, markers: EventMarkerCollection): StyleSpecification => ({
   version: 8,
@@ -33,31 +60,34 @@ const createStyle = (landUrl: string, markers: EventMarkerCollection): StyleSpec
     {
       id: "ocean",
       type: "background",
-      paint: { "background-color": OCEAN_COLOR },
+      paint: { "background-color": MAP_COLORS.ocean },
     },
     {
       id: "land-fill",
       type: "fill",
       source: "land",
-      paint: { "fill-color": LAND_COLOR },
-    },
-    {
-      id: "land-outline",
-      type: "line",
-      source: "land",
-      paint: { "line-color": COASTLINE_COLOR, "line-width": 0.5 },
+      paint: { "fill-color": MAP_COLORS.land },
     },
     {
       id: EVENTS_LAYER_ID,
       type: "circle",
       source: EVENTS_SOURCE_ID,
+      layout: { "circle-sort-key": markerSortKey(null) },
       paint: {
-        "circle-color": EVENT_COLOR,
-        "circle-radius": ["match", ["get", "importance"], 3, 8, 2, 6, 4],
-        "circle-opacity": ["get", "opacity"],
-        "circle-stroke-color": "#ffffff",
-        "circle-stroke-width": 1,
-        "circle-stroke-opacity": ["get", "opacity"],
+        "circle-color": markerColor,
+        "circle-radius": [
+          "match",
+          ["get", "importance"],
+          3,
+          MARKER.radius[3],
+          2,
+          MARKER.radius[2],
+          MARKER.radius[1],
+        ],
+        "circle-opacity": markerOpacity(null),
+        "circle-stroke-color": MARKER.strokeColor,
+        "circle-stroke-width": MARKER.strokeWidth,
+        "circle-stroke-opacity": markerOpacity(null),
       },
     },
   ],
@@ -75,30 +105,72 @@ const constrainCenterOnly: TransformConstrainFunction = (lngLat, zoom) => ({
   zoom,
 });
 
-/** カーソル位置に重なっているマーカーのタイトル（重複除去）。 */
-const titlesAt = (event: MapLayerMouseEvent): readonly string[] => [
-  ...new Set((event.features ?? []).map((f) => String(f.properties?.title ?? ""))),
-];
+interface PopupItem {
+  readonly title: string;
+  readonly domain: Domain;
+}
 
-const popupContent = (titles: readonly string[]): HTMLElement => {
+/** カーソル位置に重なっているマーカー（タイトルで重複除去）。 */
+const itemsAt = (event: MapLayerMouseEvent): readonly PopupItem[] => {
+  const items = (event.features ?? []).map((f) => ({
+    title: String(f.properties?.title ?? ""),
+    domain: f.properties?.domain as Domain,
+  }));
+  return items.filter((item, i) => items.findIndex((other) => other.title === item.title) === i);
+};
+
+const px = (value: number): string => `${value}px`;
+
+/** ポップアップの中身。分類は色に頼らずテキストでも示す。 */
+const popupContent = (items: readonly PopupItem[]): HTMLElement => {
   const root = document.createElement("div");
-  root.className = "text-sm leading-snug";
-  titles.forEach((title) => {
-    const line = document.createElement("div");
-    line.textContent = title;
-    root.append(line);
+  Object.assign(root.style, { display: "flex", flexDirection: "column", gap: px(SPACE[8]) });
+  items.forEach(({ title, domain }) => {
+    const label = document.createElement("div");
+    Object.assign(label.style, {
+      display: "flex",
+      alignItems: "center",
+      gap: px(SPACE[4]),
+      fontSize: px(textStyle.caption.fontSize),
+      color: textStyle.caption.color,
+    });
+    const swatch = document.createElement("span");
+    const swatchCss = swatchStyle(domain);
+    Object.assign(swatch.style, {
+      display: "inline-block",
+      width: px(Number(swatchCss.width)),
+      height: px(Number(swatchCss.height)),
+      borderRadius: px(Number(swatchCss.borderRadius)),
+      backgroundColor: String(swatchCss.backgroundColor),
+    });
+    const labelText = document.createElement("span");
+    labelText.textContent = DOMAIN_LABELS[domain] ?? "";
+    label.append(swatch, labelText);
+
+    const titleEl = document.createElement("div");
+    Object.assign(titleEl.style, {
+      fontSize: px(textStyle.body.fontSize),
+      color: textStyle.body.color,
+    });
+    titleEl.textContent = title;
+
+    const item = document.createElement("div");
+    item.append(label, titleEl);
+    root.append(item);
   });
   return root;
 };
 
 interface WorldMapProps {
   readonly markers: EventMarkerCollection;
+  readonly highlightedDomain: Domain | null;
 }
 
-export function WorldMap({ markers }: WorldMapProps) {
+export function WorldMap({ markers, highlightedDomain }: WorldMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const markersRef = useRef(markers);
+  const highlightRef = useRef(highlightedDomain);
   const popupsRef = useRef<readonly Popup[]>([]);
 
   useEffect(() => {
@@ -123,24 +195,25 @@ export function WorldMap({ markers }: WorldMapProps) {
         [-180, -60],
         [180, 80],
       ],
-      { padding: 16, animate: false },
+      { padding: SPACE[16], animate: false },
     );
     mapRef.current = map;
 
-    // style 読み込み前に年が変わっていた場合に備え、読み込み完了時に最新データを反映する。
+    // style 読み込み前に年や強調が変わっていた場合に備え、読み込み完了時に最新の状態を反映する。
     map.on("load", () => {
       map.getSource<GeoJSONSource>(EVENTS_SOURCE_ID)?.setData(markersRef.current);
+      applyHighlight(map, highlightRef.current);
     });
 
-    const hoverPopup = new Popup({ closeButton: false, closeOnClick: false, offset: 10 });
-    const clickPopup = new Popup({ closeButton: true, offset: 10 });
+    const hoverPopup = new Popup({ closeButton: false, closeOnClick: false, offset: SPACE[12] });
+    const clickPopup = new Popup({ closeButton: true, offset: SPACE[12] });
     popupsRef.current = [hoverPopup, clickPopup];
 
     map.on("mouseenter", EVENTS_LAYER_ID, () => {
       map.getCanvas().style.cursor = "pointer";
     });
     map.on("mousemove", EVENTS_LAYER_ID, (e) => {
-      hoverPopup.setLngLat(e.lngLat).setDOMContent(popupContent(titlesAt(e))).addTo(map);
+      hoverPopup.setLngLat(e.lngLat).setDOMContent(popupContent(itemsAt(e))).addTo(map);
     });
     map.on("mouseleave", EVENTS_LAYER_ID, () => {
       map.getCanvas().style.cursor = "";
@@ -149,7 +222,7 @@ export function WorldMap({ markers }: WorldMapProps) {
     // タッチ端末向けにクリックでも表示する。
     map.on("click", EVENTS_LAYER_ID, (e) => {
       hoverPopup.remove();
-      clickPopup.setLngLat(e.lngLat).setDOMContent(popupContent(titlesAt(e))).addTo(map);
+      clickPopup.setLngLat(e.lngLat).setDOMContent(popupContent(itemsAt(e))).addTo(map);
     });
 
     return () => {
@@ -166,12 +239,25 @@ export function WorldMap({ markers }: WorldMapProps) {
     mapRef.current?.getSource<GeoJSONSource>(EVENTS_SOURCE_ID)?.setData(markers);
   }, [markers]);
 
+  useEffect(() => {
+    highlightRef.current = highlightedDomain;
+    const map = mapRef.current;
+    if (map?.getLayer(EVENTS_LAYER_ID)) applyHighlight(map, highlightedDomain);
+  }, [highlightedDomain]);
+
   // 縦長画面では世界の外側（上下）も見えるため、コンテナ自体も海の色で塗る。
   return (
     <div
       ref={containerRef}
       className="h-full w-full"
-      style={{ backgroundColor: OCEAN_COLOR }}
+      style={{ backgroundColor: MAP_COLORS.ocean }}
     />
   );
 }
+
+const applyHighlight = (map: MapLibreMap, highlighted: Domain | null): void => {
+  const opacity = markerOpacity(highlighted);
+  map.setPaintProperty(EVENTS_LAYER_ID, "circle-opacity", opacity);
+  map.setPaintProperty(EVENTS_LAYER_ID, "circle-stroke-opacity", opacity);
+  map.setLayoutProperty(EVENTS_LAYER_ID, "circle-sort-key", markerSortKey(highlighted));
+};

@@ -1,1 +1,92 @@
 @import "tailwindcss";
+
+/* 値はすべて src/lib/design.ts の cssVariables から来る。ここに直接数値・色を書かない。 */
+
+html {
+  font-family: var(--hv-font-family);
+  line-height: var(--hv-line-height);
+  color: var(--hv-gray-text);
+}
+
+/* ── 年スライダー：地図より控えめに（薄いトラック、弱いグレーのつまみ） ── */
+.hv-range {
+  appearance: none;
+  background: transparent;
+  height: var(--hv-space-24);
+  cursor: pointer;
+}
+.hv-range:focus {
+  outline: none;
+}
+.hv-range:focus-visible {
+  outline: var(--hv-focus-ring-width) solid var(--hv-gray-text);
+  outline-offset: var(--hv-space-4);
+  border-radius: var(--hv-radius-small);
+}
+.hv-range::-webkit-slider-runnable-track {
+  height: var(--hv-space-4);
+  border-radius: var(--hv-radius-small);
+  background: var(--hv-gray-line);
+}
+.hv-range::-moz-range-track {
+  height: var(--hv-space-4);
+  border-radius: var(--hv-radius-small);
+  background: var(--hv-gray-line);
+}
+.hv-range::-webkit-slider-thumb {
+  appearance: none;
+  width: var(--hv-space-16);
+  height: var(--hv-space-16);
+  /* つまみの中心をトラック中心に合わせる: (4 - 16) / 2 */
+  margin-top: calc((var(--hv-space-4) - var(--hv-space-16)) / 2);
+  border: none;
+  border-radius: var(--hv-radius-medium);
+  background: var(--hv-gray-weak);
+}
+.hv-range::-moz-range-thumb {
+  width: var(--hv-space-16);
+  height: var(--hv-space-16);
+  border: none;
+  border-radius: var(--hv-radius-medium);
+  background: var(--hv-gray-weak);
+}
+
+/* ── MapLibre のポップアップを共通の「面」に揃える ── */
+.maplibregl-map {
+  font-family: var(--hv-font-family);
+}
+.maplibregl-popup-content {
+  background: var(--hv-gray-surface);
+  border-radius: var(--hv-radius-medium);
+  box-shadow: var(--hv-shadow);
+  padding: var(--hv-space-12);
+  font-size: var(--hv-font-body);
+  line-height: var(--hv-line-height);
+  color: var(--hv-gray-text);
+}
+.maplibregl-popup-anchor-top .maplibregl-popup-tip,
+.maplibregl-popup-anchor-top-left .maplibregl-popup-tip,
+.maplibregl-popup-anchor-top-right .maplibregl-popup-tip {
+  border-bottom-color: var(--hv-gray-surface);
+}
+.maplibregl-popup-anchor-bottom .maplibregl-popup-tip,
+.maplibregl-popup-anchor-bottom-left .maplibregl-popup-tip,
+.maplibregl-popup-anchor-bottom-right .maplibregl-popup-tip {
+  border-top-color: var(--hv-gray-surface);
+}
+.maplibregl-popup-anchor-left .maplibregl-popup-tip {
+  border-right-color: var(--hv-gray-surface);
+}
+.maplibregl-popup-anchor-right .maplibregl-popup-tip {
+  border-left-color: var(--hv-gray-surface);
+}
+.maplibregl-popup-close-button {
+  padding: 0 var(--hv-space-8);
+  border-radius: 0 var(--hv-radius-medium) 0 0;
+  font-size: var(--hv-font-emphasis);
+  color: var(--hv-gray-weak);
+}
+.maplibregl-popup-close-button:hover {
+  background: transparent;
+  color: var(--hv-gray-text);
+}

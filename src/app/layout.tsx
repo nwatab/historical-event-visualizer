@@ -1,4 +1,6 @@
+import type { CSSProperties } from "react";
 import type { Metadata } from "next";
+import { cssVariables } from "@/lib/design";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -12,7 +14,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ja">
+    <html lang="ja" style={cssVariables as CSSProperties}>
       <body className="antialiased">{children}</body>
     </html>
   );
