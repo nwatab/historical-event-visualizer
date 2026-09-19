@@ -1,9 +1,9 @@
-import { WorldMapClient } from "@/components/WorldMapClient";
+import { EventMapApp } from "@/components/EventMapApp";
 
 export default function Home() {
   return (
     <main className="h-dvh w-screen">
-      <WorldMapClient />
+      <EventMapApp />
     </main>
   );
 }
