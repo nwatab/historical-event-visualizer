@@ -30,6 +30,7 @@ const legendSwatch = (domain: Domain, visible: boolean) => ({
 export function Legend({ hiddenDomains, highlighted, onHover, onToggle, onShowAll }: LegendProps) {
   const [expanded, setExpanded] = useState(false);
   const isVisible = (domain: Domain) => !hiddenDomains.includes(domain);
+  const allHidden = DOMAINS.every((domain) => !isVisible(domain));
 
   return (
     <nav aria-label="分類の凡例とフィルタ" style={surfaceStyle}>
@@ -48,6 +49,10 @@ export function Legend({ hiddenDomains, highlighted, onHover, onToggle, onShowAl
           ))}
         </span>
       </button>
+      {/* 地図に何も出ない理由を示す。折りたたみ中の狭い画面でも見えるよう、折りたたむ部分の外に置く。 */}
+      <p role="status" style={{ ...textStyle.caption, color: GRAY.weak }}>
+        {allHidden ? "すべての分類が非表示です" : ""}
+      </p>
       <div
         id="legend-items"
         className={expanded ? "block" : "hidden sm:block"}
@@ -90,20 +95,22 @@ export function Legend({ hiddenDomains, highlighted, onHover, onToggle, onShowAl
             );
           })}
         </ul>
-        <button
-          type="button"
-          className="text-left"
-          style={{
-            ...textStyle.caption,
-            marginTop: SPACE[8],
-            textDecoration: "underline",
-            color: hiddenDomains.length === 0 ? GRAY.line : GRAY.weak,
-          }}
-          disabled={hiddenDomains.length === 0}
-          onClick={onShowAll}
-        >
-          すべて表示
-        </button>
+        {/* 非表示の分類があるときだけ出す（押しても何も起きない状態では置かない） */}
+        {hiddenDomains.length > 0 && (
+          <button
+            type="button"
+            className="text-left"
+            style={{
+              ...textStyle.caption,
+              marginTop: SPACE[8],
+              textDecoration: "underline",
+              color: GRAY.weak,
+            }}
+            onClick={onShowAll}
+          >
+            すべて表示
+          </button>
+        )}
       </div>
     </nav>
   );
