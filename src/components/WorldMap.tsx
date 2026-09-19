@@ -14,7 +14,16 @@ import {
 } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { publicPath } from "@/lib/config";
-import { DOMAIN_COLORS, GRAY, MAP_COLORS, MARKER, SPACE, swatchStyle, textStyle } from "@/lib/design";
+import {
+  DOMAIN_COLORS,
+  GRAY,
+  MAP_COLORS,
+  MAP_LINE,
+  MARKER,
+  SPACE,
+  swatchStyle,
+  textStyle,
+} from "@/lib/design";
 import { DOMAINS, DOMAIN_LABELS } from "@/lib/domain";
 import type { EventMarkerCollection } from "@/lib/timeline";
 import type { Domain } from "@/types/event";
@@ -31,18 +40,20 @@ const markerColor: ExpressionSpecification = [
 ] as unknown as ExpressionSpecification;
 
 /**
- * 強調中の分類は不透明度に下限を設けて見つけやすくし、それ以外は下げる。
- * null なら年の差によるフェードのみ。
+ * マーカーは常に不透明度 1（縁取りも含む）。凡例で分類を強調しているときだけ、それ以外を下げる。
+ * 年の差は不透明度ではなく半径（markerRadius）で表す。
  */
-const markerOpacity = (highlighted: Domain | null): ExpressionSpecification =>
+const markerOpacity = (highlighted: Domain | null): ExpressionSpecification | number =>
   highlighted === null
-    ? ["get", "opacity"]
-    : [
-        "case",
-        ["==", ["get", "domain"], highlighted],
-        ["max", ["get", "opacity"], MARKER.highlightMinOpacity],
-        ["*", ["get", "opacity"], MARKER.dimFactor],
-      ];
+    ? 1
+    : ["case", ["==", ["get", "domain"], highlighted], 1, MARKER.dimOpacity];
+
+/** importance による基準半径 × 年の差による倍率（fade） */
+const markerRadius: ExpressionSpecification = [
+  "*",
+  ["match", ["get", "importance"], 3, MARKER.radius[3], 2, MARKER.radius[2], MARKER.radius[1]],
+  ["get", "fade"],
+];
 
 /** 重要度の高いもの・強調中の分類を上に描く */
 const markerSortKey = (highlighted: Domain | null): ExpressionSpecification =>
@@ -69,21 +80,19 @@ const createStyle = (landUrl: string, markers: EventMarkerCollection): StyleSpec
       paint: { "fill-color": MAP_COLORS.land },
     },
     {
+      id: "coastline",
+      type: "line",
+      source: "land",
+      paint: { "line-color": MAP_LINE.coastlineColor, "line-width": MAP_LINE.coastlineWidth },
+    },
+    {
       id: EVENTS_LAYER_ID,
       type: "circle",
       source: EVENTS_SOURCE_ID,
       layout: { "circle-sort-key": markerSortKey(null) },
       paint: {
         "circle-color": markerColor,
-        "circle-radius": [
-          "match",
-          ["get", "importance"],
-          3,
-          MARKER.radius[3],
-          2,
-          MARKER.radius[2],
-          MARKER.radius[1],
-        ],
+        "circle-radius": markerRadius,
         "circle-opacity": markerOpacity(null),
         "circle-stroke-color": MARKER.strokeColor,
         "circle-stroke-width": MARKER.strokeWidth,

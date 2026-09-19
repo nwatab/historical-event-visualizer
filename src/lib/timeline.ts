@@ -9,21 +9,25 @@ export const INITIAL_YEAR: Year = 1687;
 /** instant イベントを表示する窓幅。|start - 現在年| がこの値以下なら表示する。 */
 export const EVENT_WINDOW_YEARS = 20;
 
-/** 窓の端（差 = EVENT_WINDOW_YEARS）での不透明度。差 0 で 1。 */
-export const EVENT_EDGE_OPACITY = 0.15;
+/**
+ * 窓の端（差 = EVENT_WINDOW_YEARS）でのマーカーの大きさの倍率。差 0 で 1。
+ * 年の差は不透明度ではなく大きさで表す（不透明度を下げると色の識別性とコントラストが失われるため）。
+ */
+export const EVENT_EDGE_SCALE = 0.5;
 
 export interface EventMarkerProperties {
   readonly id: string;
   readonly title: string;
   readonly domain: Domain;
   readonly importance: HistEvent["importance"];
-  readonly opacity: number;
+  /** 年の差に応じた大きさの倍率（EVENT_EDGE_SCALE〜1） */
+  readonly fade: number;
 }
 
 export type EventMarkerCollection = FeatureCollection<Point, EventMarkerProperties>;
 
-/** 現在年との差から不透明度を求める。窓の外なら null。 */
-export const eventOpacity = (
+/** 現在年との差から大きさの倍率を求める。窓の外なら null。 */
+export const eventFade = (
   start: Year,
   year: Year,
   windowYears: number = EVENT_WINDOW_YEARS,
@@ -31,7 +35,7 @@ export const eventOpacity = (
   const distance = Math.abs(start - year);
   if (distance > windowYears) return null;
   if (windowYears === 0) return 1;
-  return 1 - (1 - EVENT_EDGE_OPACITY) * (distance / windowYears);
+  return 1 - (1 - EVENT_EDGE_SCALE) * (distance / windowYears);
 };
 
 /** 現在年に表示すべき instant イベントを、places の全点ぶんのマーカーに展開する。 */
@@ -43,8 +47,8 @@ export const instantEventMarkers = (
   features: events
     .filter((event) => event.kind === "instant")
     .flatMap((event) => {
-      const opacity = eventOpacity(event.start, year);
-      if (opacity === null) return [];
+      const fade = eventFade(event.start, year);
+      if (fade === null) return [];
       return event.places.map((place) => ({
         type: "Feature" as const,
         geometry: { type: "Point" as const, coordinates: [place.lon, place.lat] },
@@ -53,7 +57,7 @@ export const instantEventMarkers = (
           title: event.title.ja,
           domain: event.domain,
           importance: event.importance,
-          opacity,
+          fade,
         },
       }));
     }),
