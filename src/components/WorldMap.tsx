@@ -20,16 +20,20 @@ import {
   MAP_COLORS,
   MAP_LINE,
   MARKER,
+  MARKER_HIT_TOLERANCE,
+  SELECTION_RING,
   SPACE,
   swatchStyle,
   textStyle,
 } from "@/lib/design";
 import { DOMAINS, DOMAIN_LABELS } from "@/lib/domain";
+import { markerFilter } from "@/lib/mapFilters";
 import type { EventMarkerCollection } from "@/lib/timeline";
 import type { Domain } from "@/types/event";
 
 const EVENTS_SOURCE_ID = "events";
 const EVENTS_LAYER_ID = "events-circle";
+const SELECTED_LAYER_ID = "events-selected";
 
 /** domain プロパティから分類色を引く式 */
 const markerColor: ExpressionSpecification = [
@@ -93,6 +97,7 @@ const createStyle = (landUrl: string, markers: EventMarkerCollection): StyleSpec
       id: EVENTS_LAYER_ID,
       type: "circle",
       source: EVENTS_SOURCE_ID,
+      filter: markerFilter([]),
       layout: { "circle-sort-key": markerSortKey(null) },
       paint: {
         "circle-color": markerColor,
@@ -103,8 +108,25 @@ const createStyle = (landUrl: string, markers: EventMarkerCollection): StyleSpec
         "circle-stroke-opacity": markerOpacity(null),
       },
     },
+    {
+      // 選択中のマーカーに、白い縁取りの外側の輪を付ける
+      id: SELECTED_LAYER_ID,
+      type: "circle",
+      source: EVENTS_SOURCE_ID,
+      filter: selectedFilter([], []),
+      paint: {
+        "circle-radius": ["+", markerRadius, MARKER.strokeWidth],
+        "circle-opacity": 0,
+        "circle-stroke-color": SELECTION_RING.color,
+        "circle-stroke-width": SELECTION_RING.width,
+      },
+    },
   ],
 });
+
+/** 選択中のイベント（表示条件を満たすもの）だけに輪を付けるための filter */
+const selectedFilter = (hiddenDomains: readonly Domain[], selectedIds: readonly string[]) =>
+  markerFilter(hiddenDomains, ["in", ["get", "id"], ["literal", [...selectedIds]]]);
 
 const clamp = (value: number, min: number, max: number): number =>
   Math.min(max, Math.max(min, value));
@@ -177,14 +199,33 @@ const popupContent = (items: readonly PopupItem[]): HTMLElement => {
 interface WorldMapProps {
   readonly markers: EventMarkerCollection;
   readonly highlightedDomain: Domain | null;
+  readonly hiddenDomains: readonly Domain[];
+  /** 詳細パネルで選択中のイベント（地図上で輪を付ける） */
+  readonly selectedIds: readonly string[];
+  /** マーカーをクリックしたとき。重なっていれば複数の id が渡る。 */
+  readonly onSelectEvents: (eventIds: readonly string[]) => void;
 }
 
-export function WorldMap({ markers, highlightedDomain }: WorldMapProps) {
+/** 地図に反映する表示状態 */
+interface MapViewState {
+  readonly highlightedDomain: Domain | null;
+  readonly hiddenDomains: readonly Domain[];
+  readonly selectedIds: readonly string[];
+}
+
+export function WorldMap({
+  markers,
+  highlightedDomain,
+  hiddenDomains,
+  selectedIds,
+  onSelectEvents,
+}: WorldMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const markersRef = useRef(markers);
-  const highlightRef = useRef(highlightedDomain);
-  const popupsRef = useRef<readonly Popup[]>([]);
+  const viewRef = useRef<MapViewState>({ highlightedDomain, hiddenDomains, selectedIds });
+  const onSelectRef = useRef(onSelectEvents);
+  const hoverPopupRef = useRef<Popup | null>(null);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -215,12 +256,11 @@ export function WorldMap({ markers, highlightedDomain }: WorldMapProps) {
     // style 読み込み前に年や強調が変わっていた場合に備え、読み込み完了時に最新の状態を反映する。
     map.on("load", () => {
       map.getSource<GeoJSONSource>(EVENTS_SOURCE_ID)?.setData(markersRef.current);
-      applyHighlight(map, highlightRef.current);
+      applyViewState(map, viewRef.current);
     });
 
     const hoverPopup = new Popup({ closeButton: false, closeOnClick: false, offset: SPACE[12] });
-    const clickPopup = new Popup({ closeButton: true, offset: SPACE[12] });
-    popupsRef.current = [hoverPopup, clickPopup];
+    hoverPopupRef.current = hoverPopup;
 
     map.on("mouseenter", EVENTS_LAYER_ID, () => {
       map.getCanvas().style.cursor = "pointer";
@@ -232,15 +272,24 @@ export function WorldMap({ markers, highlightedDomain }: WorldMapProps) {
       map.getCanvas().style.cursor = "";
       hoverPopup.remove();
     });
-    // タッチ端末向けにクリックでも表示する。
-    map.on("click", EVENTS_LAYER_ID, (e) => {
+    // クリック（タップ）で詳細パネルを開く。小さいマーカーも選べるよう、判定に余裕を持たせる。
+    map.on("click", (e) => {
+      const t = MARKER_HIT_TOLERANCE;
+      const features = map.queryRenderedFeatures(
+        [
+          [e.point.x - t, e.point.y - t],
+          [e.point.x + t, e.point.y + t],
+        ],
+        { layers: [EVENTS_LAYER_ID] },
+      );
+      if (features.length === 0) return;
       hoverPopup.remove();
-      clickPopup.setLngLat(e.lngLat).setDOMContent(popupContent(itemsAt(e))).addTo(map);
+      onSelectRef.current(features.map((f) => String(f.properties?.id ?? "")));
     });
 
     return () => {
       mapRef.current = null;
-      popupsRef.current = [];
+      hoverPopupRef.current = null;
       map.remove();
     };
   }, []);
@@ -248,15 +297,20 @@ export function WorldMap({ markers, highlightedDomain }: WorldMapProps) {
   useEffect(() => {
     markersRef.current = markers;
     // 年が変わると表示中のマーカーが入れ替わるため、古いタイトルのポップアップは閉じる。
-    popupsRef.current.forEach((popup) => popup.remove());
+    hoverPopupRef.current?.remove();
     mapRef.current?.getSource<GeoJSONSource>(EVENTS_SOURCE_ID)?.setData(markers);
   }, [markers]);
 
   useEffect(() => {
-    highlightRef.current = highlightedDomain;
+    onSelectRef.current = onSelectEvents;
+  }, [onSelectEvents]);
+
+  useEffect(() => {
+    const view = { highlightedDomain, hiddenDomains, selectedIds };
+    viewRef.current = view;
     const map = mapRef.current;
-    if (map?.getLayer(EVENTS_LAYER_ID)) applyHighlight(map, highlightedDomain);
-  }, [highlightedDomain]);
+    if (map?.getLayer(EVENTS_LAYER_ID)) applyViewState(map, view);
+  }, [highlightedDomain, hiddenDomains, selectedIds]);
 
   // 縦長画面では世界の外側（上下）も見えるため、コンテナ自体も海の色で塗る。
   return (
@@ -268,9 +322,11 @@ export function WorldMap({ markers, highlightedDomain }: WorldMapProps) {
   );
 }
 
-const applyHighlight = (map: MapLibreMap, highlighted: Domain | null): void => {
-  const opacity = markerOpacity(highlighted);
+const applyViewState = (map: MapLibreMap, view: MapViewState): void => {
+  const opacity = markerOpacity(view.highlightedDomain);
   map.setPaintProperty(EVENTS_LAYER_ID, "circle-opacity", opacity);
   map.setPaintProperty(EVENTS_LAYER_ID, "circle-stroke-opacity", opacity);
-  map.setLayoutProperty(EVENTS_LAYER_ID, "circle-sort-key", markerSortKey(highlighted));
+  map.setLayoutProperty(EVENTS_LAYER_ID, "circle-sort-key", markerSortKey(view.highlightedDomain));
+  map.setFilter(EVENTS_LAYER_ID, markerFilter(view.hiddenDomains));
+  map.setFilter(SELECTED_LAYER_ID, selectedFilter(view.hiddenDomains, view.selectedIds));
 };

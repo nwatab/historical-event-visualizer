@@ -74,6 +74,13 @@ R1 では `instant` のみを表示する。
   - OKLab 距離を報告するときは 0〜1 のスケールのまま書き、×100 しない（R2 前半の PR #3 で報告した「ΔE 7.5」などは ×100 した値で、0〜1 スケールでは 0.075）。
 - **色だけに頼らない**: 小さな円の色で個々の分類を特定させない。分類名はポップアップにテキストで出し、凡例のホバー／タップで該当分類だけを強調して照合できるようにする。
 
+## 画面の状態と表示の制御
+
+- 共有したい画面の状態（年・非表示の分類・詳細パネルの選択）は `src/lib/appState.ts` の `AppState` に集め、純粋な reducer で更新する。R7 で URL クエリに載せる前提。ホバー中の分類のような一時的な状態は含めない。localStorage は使わない。
+- 凡例はフィルタを兼ねる。クリック（Enter / Space）で表示／非表示、ホバー・フォーカスで強調。
+- 表示件数は、importance とズームレベルで絞る。閾値は `src/lib/timeline.ts` の `MIN_ZOOM_BY_IMPORTANCE`、MapLibre の filter 式は `src/lib/mapFilters.ts`（ズームを変えても GeoJSON は作り直さない）。
+- 画面下部（年スライダー、R5 の年表）は地図の上の UI の下段として確保し、詳細パネルなどは上段に置く。
+
 ## basePath
 
 - GitHub Pages のプロジェクトページで配信するため、basePath は `/historical-event-visualizer`。

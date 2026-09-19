@@ -1,29 +1,38 @@
 "use client";
 
 import { useState } from "react";
-import { FONT_WEIGHT, GRAY, SPACE, surfaceStyle, swatchStyle, textStyle } from "@/lib/design";
+import { GRAY, SPACE, surfaceStyle, swatchStyle, textStyle } from "@/lib/design";
 import { DOMAINS, DOMAIN_LABELS } from "@/lib/domain";
 import type { Domain } from "@/types/event";
 
 interface LegendProps {
-  /** 現在強調中の分類（ホバー中または固定中） */
+  /** 非表示にしている分類 */
+  readonly hiddenDomains: readonly Domain[];
+  /** 現在強調中の分類（ホバー・フォーカス中） */
   readonly highlighted: Domain | null;
-  /** 固定中の分類（クリック・タップで切り替え） */
-  readonly pinned: Domain | null;
   readonly onHover: (domain: Domain | null) => void;
-  readonly onTogglePin: (domain: Domain) => void;
+  readonly onToggle: (domain: Domain) => void;
+  readonly onShowAll: () => void;
 }
 
+/** 色見本。非表示の分類は GRAY.line で塗る。 */
+const legendSwatch = (domain: Domain, visible: boolean) => ({
+  ...swatchStyle(domain),
+  ...(visible ? {} : { backgroundColor: GRAY.line }),
+});
+
 /**
- * 分類の凡例。項目にホバー（またはフォーカス）するとその分類のマーカーだけを強調する。
- * タッチ端末ではホバーできないため、クリック・タップで強調を固定／解除できる。
+ * 分類の凡例兼フィルタ。
+ * - クリック（タップ、Enter / Space）で、その分類の表示／非表示を切り替える
+ * - ホバー・フォーカスで、その分類のマーカーを強調する（表示中の分類のみ）
  * 狭い画面では折りたたみ、色見本の列だけを表示する。
  */
-export function Legend({ highlighted, pinned, onHover, onTogglePin }: LegendProps) {
+export function Legend({ hiddenDomains, highlighted, onHover, onToggle, onShowAll }: LegendProps) {
   const [expanded, setExpanded] = useState(false);
+  const isVisible = (domain: Domain) => !hiddenDomains.includes(domain);
 
   return (
-    <nav aria-label="分類の凡例" style={surfaceStyle}>
+    <nav aria-label="分類の凡例とフィルタ" style={surfaceStyle}>
       <button
         type="button"
         className="flex items-center sm:hidden"
@@ -35,46 +44,67 @@ export function Legend({ highlighted, pinned, onHover, onTogglePin }: LegendProp
         <span>凡例</span>
         <span className="flex" style={{ gap: SPACE[4] }} aria-hidden>
           {DOMAINS.map((domain) => (
-            <span key={domain} style={swatchStyle(domain)} />
+            <span key={domain} style={legendSwatch(domain, isVisible(domain))} />
           ))}
         </span>
       </button>
-      <p className="hidden sm:block" style={{ ...textStyle.caption, marginBottom: SPACE[4] }}>
-        分類
-      </p>
-      <ul
+      <div
         id="legend-items"
-        className={expanded ? "flex flex-col" : "hidden sm:flex sm:flex-col"}
+        className={expanded ? "block" : "hidden sm:block"}
         style={{ marginTop: expanded ? SPACE[8] : 0 }}
       >
-        {DOMAINS.map((domain) => {
-          const dimmed = highlighted !== null && highlighted !== domain;
-          return (
-            <li key={domain}>
-              <button
-                type="button"
-                className="flex w-full items-center text-left"
-                style={{
-                  gap: SPACE[8],
-                  paddingBlock: SPACE[4],
-                  ...textStyle.body,
-                  color: dimmed ? GRAY.weak : GRAY.text,
-                  fontWeight: pinned === domain ? FONT_WEIGHT.bold : FONT_WEIGHT.regular,
-                }}
-                aria-pressed={pinned === domain}
-                onPointerEnter={() => onHover(domain)}
-                onPointerLeave={() => onHover(null)}
-                onFocus={() => onHover(domain)}
-                onBlur={() => onHover(null)}
-                onClick={() => onTogglePin(domain)}
-              >
-                <span style={swatchStyle(domain)} aria-hidden />
-                <span>{DOMAIN_LABELS[domain]}</span>
-              </button>
-            </li>
-          );
-        })}
-      </ul>
+        <p className="hidden sm:block" style={{ ...textStyle.caption, marginBottom: SPACE[4] }}>
+          分類（クリックで表示／非表示）
+        </p>
+        <ul className="flex flex-col">
+          {DOMAINS.map((domain) => {
+            const visible = isVisible(domain);
+            const dimmed = highlighted !== null && highlighted !== domain;
+            return (
+              <li key={domain}>
+                <button
+                  type="button"
+                  className="flex w-full items-center text-left"
+                  style={{
+                    gap: SPACE[8],
+                    paddingBlock: SPACE[4],
+                    ...textStyle.body,
+                    color: !visible || dimmed ? GRAY.weak : GRAY.text,
+                    textDecoration: visible ? "none" : "line-through",
+                  }}
+                  aria-pressed={visible}
+                  onPointerEnter={() => onHover(visible ? domain : null)}
+                  onPointerLeave={() => onHover(null)}
+                  onFocus={() => onHover(visible ? domain : null)}
+                  onBlur={() => onHover(null)}
+                  onClick={() => {
+                    // 非表示にした分類は強調しない。表示に戻した分類はそのまま強調する。
+                    onHover(visible ? null : domain);
+                    onToggle(domain);
+                  }}
+                >
+                  <span style={legendSwatch(domain, visible)} aria-hidden />
+                  <span>{DOMAIN_LABELS[domain]}</span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+        <button
+          type="button"
+          className="text-left"
+          style={{
+            ...textStyle.caption,
+            marginTop: SPACE[8],
+            textDecoration: "underline",
+            color: hiddenDomains.length === 0 ? GRAY.line : GRAY.weak,
+          }}
+          disabled={hiddenDomains.length === 0}
+          onClick={onShowAll}
+        >
+          すべて表示
+        </button>
+      </div>
     </nav>
   );
 }

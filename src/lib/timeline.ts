@@ -62,3 +62,14 @@ export const instantEventMarkers = (
       }));
     }),
 });
+
+/**
+ * importance ごとの表示を始めるズームレベル。ズームがこの値以上のときに表示する。
+ * 世界全体を表示する初期状態（幅の広い画面で zoom ≈ 1.3、縦長の画面で ≈ -0.6）では importance 3 のみ。
+ * 値を変えれば調整できる（-Infinity は常に表示）。
+ */
+export const MIN_ZOOM_BY_IMPORTANCE: Readonly<Record<HistEvent["importance"], number>> = {
+  3: -Infinity,
+  2: 2,
+  1: 3,
+};

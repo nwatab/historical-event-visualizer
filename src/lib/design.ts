@@ -96,6 +96,15 @@ export const MARKER = {
   dimOpacity: 0.15,
 } as const;
 
+/** 選択中のマーカーの輪（白い縁取りの外側に付ける）。既存の値を使う。 */
+export const SELECTION_RING = {
+  color: GRAY.strong,
+  width: MARKER.strokeWidth,
+} as const;
+
+/** マーカーのクリック判定の余裕 (px)。タッチでも小さいマーカーを選べるように。 */
+export const MARKER_HIT_TOLERANCE = SPACE[4];
+
 /** 地図の線 */
 export const MAP_LINE = {
   coastlineColor: GRAY.weak,
@@ -139,6 +148,14 @@ export const SCREEN_INSET = SPACE[16];
 /** 年スライダーのパネルの最大幅 */
 export const SLIDER_PANEL_MAX_WIDTH = 896;
 
+/** 詳細パネル */
+export const DETAIL_PANEL = {
+  /** 幅の広い画面で右側に置くときの幅 (px) */
+  width: 320,
+  /** 狭い画面で上部に出すシートの最大の高さ（地図を完全には塞がない） */
+  sheetMaxHeight: "50%",
+} as const;
+
 /** 年表示の最小幅（「紀元前3001年」が収まり、桁数の変化で揺れない幅） */
 export const YEAR_LABEL_MIN_WIDTH = 144;
 
@@ -166,4 +183,6 @@ export const cssVariables: Readonly<Record<`--${string}`, string>> = {
   "--hv-radius-medium": `${RADIUS.medium}px`,
   "--hv-shadow": SHADOW,
   "--hv-focus-ring-width": `${FOCUS_RING_WIDTH}px`,
+  "--hv-panel-width": `${DETAIL_PANEL.width}px`,
+  "--hv-sheet-max-height": DETAIL_PANEL.sheetMaxHeight,
 };
