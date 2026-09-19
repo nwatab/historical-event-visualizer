@@ -48,11 +48,15 @@ const markerOpacity = (highlighted: Domain | null): ExpressionSpecification | nu
     ? 1
     : ["case", ["==", ["get", "domain"], highlighted], 1, MARKER.dimOpacity];
 
-/** importance による基準半径 × 年の差による倍率（fade） */
+/** importance による基準半径 × 年の差による倍率（fade）。MARKER.minRadius を下回らない。 */
 const markerRadius: ExpressionSpecification = [
-  "*",
-  ["match", ["get", "importance"], 3, MARKER.radius[3], 2, MARKER.radius[2], MARKER.radius[1]],
-  ["get", "fade"],
+  "max",
+  [
+    "*",
+    ["match", ["get", "importance"], 3, MARKER.radius[3], 2, MARKER.radius[2], MARKER.radius[1]],
+    ["get", "fade"],
+  ],
+  MARKER.minRadius,
 ];
 
 /** 重要度の高いもの・強調中の分類を上に描く */

@@ -17,20 +17,22 @@ export const MAP_COLORS = {
 
 /**
  * 分類の7色。マーカーは白い縁取り（MARKER.strokeWidth）で囲むため、分類色が接する背景は白だけになる。
- * 要件は「白 #ffffff に対して WCAG コントラスト比 3:1 以上」。
- * Okabe-Ito（黒を除く7色）をそのまま使い、白に対して 3:1 に届かない3色（空色・黄・橙）だけ、
- * 色相を保ったまま OKLCH の明度を 3:1 に届くところまで下げた（彩度は色域に収まる範囲で維持）。
- * 白に対するコントラスト比: conflict 3.87, polity 3.06, science 5.19, technology 3.03,
- * economy 3.02, culture 3.01, population 3.42
+ * 要件は「白 #ffffff に対して WCAG コントラスト比 3:1 以上」。3:1 は下限であって目標値ではない。
+ * Okabe-Ito（黒を除く7色）を基に、白に対して 3:1 に届かない空色・黄・橙の明度を下げた。
+ * そのうえで黄・橙・朱の3色を互いに離すため、橙と朱をさらに下げている（色相は維持、
+ * 彩度は色域に収まる範囲で維持）。評価基準は21ペアの OKLab 距離の最小値（CLAUDE.md 参照）。
+ * 白に対するコントラスト比 / OKLCH L:
+ *   conflict 5.27 / 0.544, polity 3.06 / 0.679, science 5.19 / 0.532, technology 3.03 / 0.662,
+ *   economy 3.02 / 0.664, culture 4.03 / 0.600, population 3.42 / 0.620
  * マーカーは不透明度 1.0 で描く（不透明度を下げると実効コントラストが 3:1 を割る）。
  */
 export const DOMAIN_COLORS: Readonly<Record<Domain, string>> = {
-  conflict: "#D55E00", // vermillion（無調整）
+  conflict: "#b24e03", // vermillion #D55E00 の明度を下げたもの（L 0.621 → 0.544）
   polity: "#CC79A7", // reddish purple（無調整）
   science: "#0072B2", // blue（無調整）
-  technology: "#3d9dd1", // sky blue #56B4E9 の明度を下げたもの
-  economy: "#a19705", // yellow #F0E442 の明度を下げたもの
-  culture: "#c68908", // orange #E69F00 の明度を下げたもの
+  technology: "#3d9dd1", // sky blue #56B4E9 の明度を下げたもの（L 0.735 → 0.662）
+  economy: "#a19705", // yellow #F0E442 の明度を下げたもの（L 0.902 → 0.664）
+  culture: "#aa7400", // orange #E69F00 の明度を下げたもの（L 0.753 → 0.600）
   population: "#009E73", // bluish green（無調整）
 };
 
@@ -81,6 +83,12 @@ export const LINE_HEIGHT = 1.5;
 export const MARKER = {
   /** importance 1 / 2 / 3 の半径 (px)。年の差に応じてこれに fade（0.5〜1）を掛ける。 */
   radius: { 1: 4, 2: 6, 3: 8 },
+  /**
+   * 年の差で縮めたときの半径の下限 (px)。縁取りは円の外側に 2px 付くため、半径 2px まで縮むと
+   * 色の面積より白の面積が大きくなり「白い輪」に見える（importance 1 を窓の端で実測、色の面積比 8%）。
+   * 3px にすると 20〜26% になり、色の点として読める。
+   */
+  minRadius: 3,
   /** 白い縁取り（ハロー）。分類色が接する背景を白に統一するため 2px。 */
   strokeColor: GRAY.surface,
   strokeWidth: 2,
