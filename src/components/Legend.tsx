@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { GRAY, SPACE, surfaceStyle, swatchStyle, textStyle } from "@/lib/design";
+import { GRAY, SPACE, kindSwatchStyle, surfaceStyle, swatchStyle, textStyle } from "@/lib/design";
 import { DOMAINS, DOMAIN_LABELS } from "@/lib/domain";
 import type { Domain } from "@/types/event";
 
@@ -118,6 +118,16 @@ export function Legend({ hiddenDomains, highlighted, onHover, onToggle, onShowAl
         </ul>
         {/* 一部だけ非表示のときはここに置く（全分類が非表示のときは折りたたみの外に出す） */}
         {hiddenDomains.length > 0 && !allHidden && showAllButton}
+        {/* 時間種別の見分け方（形で区別する。色は分類にだけ使う） */}
+        <p
+          className="flex items-center"
+          style={{ gap: SPACE[4], marginTop: SPACE[8], ...textStyle.caption }}
+        >
+          <span style={kindSwatchStyle("instant")} aria-hidden />
+          <span>一時点の出来事</span>
+          <span style={{ ...kindSwatchStyle("period"), marginLeft: SPACE[8] }} aria-hidden />
+          <span>期間中の出来事</span>
+        </p>
       </div>
     </nav>
   );

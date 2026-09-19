@@ -94,6 +94,12 @@ export const MARKER = {
   strokeWidth: 2,
   /** 凡例で別の分類を強調しているときに、それ以外のマーカーに掛ける不透明度 */
   dimOpacity: 0.15,
+  /**
+   * period のマーカーは中抜きの輪にする（instant は塗りつぶしの円）。半径のうち内側のこの割合を白で抜く。
+   * 輪の色は内側も外側（白い縁取り）も白に接するので、白に対する 3:1 の要件はそのまま満たす。
+   * importance 1（半径 4px）でも輪の太さが 2px 残るよう 0.5 にしている。
+   */
+  periodHoleRatio: 0.5,
 } as const;
 
 /** 選択中のマーカーの輪（白い縁取りの外側に付ける）。既存の値を使う。 */
@@ -133,6 +139,21 @@ export const textStyle = {
   },
 } as const satisfies Record<string, CSSProperties>;
 
+/** 時間種別の見本（凡例用）。instant は塗りつぶしの円、period は中抜きの輪。分類色は使わずグレーで描く。 */
+export const kindSwatchStyle = (kind: "instant" | "period"): CSSProperties => ({
+  width: SPACE[8],
+  height: SPACE[8],
+  borderRadius: RADIUS.small,
+  boxSizing: "border-box",
+  flexShrink: 0,
+  ...(kind === "instant"
+    ? { backgroundColor: GRAY.weak }
+    : {
+        backgroundColor: GRAY.surface,
+        border: `${SPACE[8] * 0.5 * (1 - MARKER.periodHoleRatio)}px solid ${GRAY.weak}`,
+      }),
+});
+
 /** 分類の色見本（マーカーと同じ円）。直径 8px・角丸 4px。 */
 export const swatchStyle = (domain: Domain): CSSProperties => ({
   width: SPACE[8],
@@ -154,6 +175,28 @@ export const DETAIL_PANEL = {
   width: 320,
   /** 狭い画面で上部に出すシートの最大の高さ（地図を完全には塞がない） */
   sheetMaxHeight: "50%",
+} as const;
+
+/**
+ * 年スライダーと目盛り。目盛りは input の背後に重ねた別の要素で描く（擬似要素には子要素を置けないため）。
+ * - A 時間軸の目盛り（固定）: トラックの下側に、薄いグレー（GRAY.line）の短い線。紀元元年だけ太く長くする。
+ * - B イベントの目盛り（可変）: トラックの上側に、濃いグレー（GRAY.weak）の細い線。period は開始〜終了の帯。
+ * どちらもつまみ（直径 16px の GRAY.weak の円）より細く小さい。
+ */
+export const SLIDER = {
+  /** input の高さ。トラックはこの中央に描かれる。 */
+  height: SPACE[24],
+  trackHeight: SPACE[4],
+  /** つまみの直径。つまみの中心が動ける範囲は「トラックの幅 − この値」。 */
+  thumbDiameter: SPACE[16],
+  axisTick: { color: GRAY.line, width: 1, length: SPACE[4] },
+  /** 紀元元年（天文年 1）の目盛り。色は変えず、太さと長さで区別する。 */
+  epochTick: { color: GRAY.line, width: 2, length: SPACE[8] },
+  eventTick: { color: GRAY.weak, width: 1, length: SPACE[8] },
+  /** period の帯の太さ。B の領域の上端に、開始年から終了年まで横に引く。 */
+  periodBandThickness: 2,
+  /** 時間軸のラベルどうしの中心間隔の下限。「紀元前2000年」（約 70px）＋余白。これより詰まるなら間引く。 */
+  axisLabelMinSpacing: 96,
 } as const;
 
 /** 年表示の最小幅（「紀元前3001年」が収まり、桁数の変化で揺れない幅） */
@@ -185,4 +228,7 @@ export const cssVariables: Readonly<Record<`--${string}`, string>> = {
   "--hv-focus-ring-width": `${FOCUS_RING_WIDTH}px`,
   "--hv-panel-width": `${DETAIL_PANEL.width}px`,
   "--hv-sheet-max-height": DETAIL_PANEL.sheetMaxHeight,
+  "--hv-slider-height": `${SLIDER.height}px`,
+  "--hv-slider-track-height": `${SLIDER.trackHeight}px`,
+  "--hv-slider-thumb": `${SLIDER.thumbDiameter}px`,
 };

@@ -8,11 +8,12 @@ html {
   color: var(--hv-gray-text);
 }
 
-/* ── 年スライダー：地図より控えめに（薄いトラック、弱いグレーのつまみ） ── */
+/* ── 年スライダー：地図より控えめに（薄いトラック、弱いグレーのつまみ） ──
+   寸法は design.ts の SLIDER。目盛り（YearTicks）はこの寸法を前提に位置を計算する。 */
 .hv-range {
   appearance: none;
   background: transparent;
-  height: var(--hv-space-24);
+  height: var(--hv-slider-height);
   cursor: pointer;
 }
 .hv-range:focus {
@@ -24,28 +25,28 @@ html {
   border-radius: var(--hv-radius-small);
 }
 .hv-range::-webkit-slider-runnable-track {
-  height: var(--hv-space-4);
+  height: var(--hv-slider-track-height);
   border-radius: var(--hv-radius-small);
   background: var(--hv-gray-line);
 }
 .hv-range::-moz-range-track {
-  height: var(--hv-space-4);
+  height: var(--hv-slider-track-height);
   border-radius: var(--hv-radius-small);
   background: var(--hv-gray-line);
 }
 .hv-range::-webkit-slider-thumb {
   appearance: none;
-  width: var(--hv-space-16);
-  height: var(--hv-space-16);
+  width: var(--hv-slider-thumb);
+  height: var(--hv-slider-thumb);
   /* つまみの中心をトラック中心に合わせる: (4 - 16) / 2 */
-  margin-top: calc((var(--hv-space-4) - var(--hv-space-16)) / 2);
+  margin-top: calc((var(--hv-slider-track-height) - var(--hv-slider-thumb)) / 2);
   border: none;
   border-radius: var(--hv-radius-medium);
   background: var(--hv-gray-weak);
 }
 .hv-range::-moz-range-thumb {
-  width: var(--hv-space-16);
-  height: var(--hv-space-16);
+  width: var(--hv-slider-thumb);
+  height: var(--hv-slider-thumb);
   border: none;
   border-radius: var(--hv-radius-medium);
   background: var(--hv-gray-weak);
