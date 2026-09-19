@@ -2,7 +2,9 @@
 
 世界史のイベントを、時間とともに変化する世界地図の上に可視化するアプリです。
 
-現在は土台づくりの段階で、世界地図を全画面表示するところまで実装しています。
+現在（R1）は、画面下部の年スライダー（紀元前3001年〜2025年）で年を動かすと、その年の前後20年に起きた出来事が地図上にマーカーで表示されます。キーボードの ← / → でも1年ずつ（Shift 併用で10年ずつ）動かせます。データは手書きのサンプル約30件です。
+
+分類・スキーマ・年の扱いなどの規約は [CLAUDE.md](CLAUDE.md) にまとめています。
 
 公開 URL: https://nwatab.github.io/historical-event-visualizer/
 
@@ -49,6 +51,10 @@ MapLibre GL JS v6 は、ワーカーを別ファイル（`maplibre-gl-worker.mjs
 `public/maplibre/` は生成物なので git 管理外です。
 
 ## データ出典
+
+### イベントデータ — `src/data/events.sample.ts`
+
+手書きのサンプルデータです。各イベントの `source` に参照した Wikipedia の URL を付けています。`id` は Wikidata の QID です（該当する項目が無いものは slug）。
 
 ### 陸地形状 — `public/geo/ne_110m_land.geojson`
 
