@@ -18,3 +18,7 @@ export const formatYear = (year: Year): string =>
 /** 整数に丸めたうえで [min, max] に収める。 */
 export const clampYear = (year: number, min: Year, max: Year): Year =>
   Math.min(max, Math.max(min, Math.round(year)));
+
+/** 期間を表示用文字列にする。(1347, 1351) → 「1347年〜1351年」。 */
+export const formatYearRange = (start: Year, end: Year): string =>
+  `${formatYear(start)}〜${formatYear(end)}`;

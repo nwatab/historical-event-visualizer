@@ -28,12 +28,26 @@ import {
 } from "@/lib/design";
 import { DOMAINS, DOMAIN_LABELS } from "@/lib/domain";
 import { markerFilter } from "@/lib/mapFilters";
-import type { EventMarkerCollection } from "@/lib/timeline";
+import type { EventMarkerCollection, MarkerKind } from "@/lib/timeline";
 import type { Domain } from "@/types/event";
 
 const EVENTS_SOURCE_ID = "events";
 const EVENTS_LAYER_ID = "events-circle";
+const PERIOD_HALO_LAYER_ID = "events-period-halo";
+const PERIOD_LAYER_ID = "events-period";
 const SELECTED_LAYER_ID = "events-selected";
+
+/** クリック・ホバーの対象になるレイヤー */
+const INTERACTIVE_LAYER_IDS = [EVENTS_LAYER_ID, PERIOD_LAYER_ID];
+
+const kindIs = (kind: MarkerKind): ExpressionSpecification => ["==", ["get", "kind"], kind];
+
+/** マーカーのレイヤーと、それぞれが描く時間種別 */
+const MARKER_LAYERS: readonly { readonly id: string; readonly kind: MarkerKind }[] = [
+  { id: PERIOD_HALO_LAYER_ID, kind: "period" },
+  { id: PERIOD_LAYER_ID, kind: "period" },
+  { id: EVENTS_LAYER_ID, kind: "instant" },
+];
 
 /** domain プロパティから分類色を引く式 */
 const markerColor: ExpressionSpecification = [
@@ -62,6 +76,9 @@ const markerRadius: ExpressionSpecification = [
   ],
   MARKER.minRadius,
 ];
+
+/** period の輪の内側（白で抜く部分）の半径。輪の太さは markerRadius との差。 */
+const periodHoleRadius: ExpressionSpecification = ["*", markerRadius, MARKER.periodHoleRatio];
 
 /** 重要度の高いもの・強調中の分類を上に描く */
 const markerSortKey = (highlighted: Domain | null): ExpressionSpecification =>
@@ -93,11 +110,44 @@ const createStyle = (landUrl: string, markers: EventMarkerCollection): StyleSpec
       source: "land",
       paint: { "line-color": MAP_LINE.coastlineColor, "line-width": MAP_LINE.coastlineWidth },
     },
+    // period: 中抜きの輪。白い縁取り（下のレイヤー）の上に、白い中心と分類色の輪を描く。
+    // 外径は instant と同じ（半径 + 縁取り 2px）で、輪の色が接するのは白だけ。
+    {
+      id: PERIOD_HALO_LAYER_ID,
+      type: "circle",
+      source: EVENTS_SOURCE_ID,
+      filter: markerFilter([], kindIs("period")),
+      layout: { "circle-sort-key": markerSortKey(null) },
+      paint: {
+        "circle-color": MARKER.strokeColor,
+        "circle-radius": markerRadius,
+        "circle-opacity": markerOpacity(null),
+        "circle-stroke-color": MARKER.strokeColor,
+        "circle-stroke-width": MARKER.strokeWidth,
+        "circle-stroke-opacity": markerOpacity(null),
+      },
+    },
+    {
+      id: PERIOD_LAYER_ID,
+      type: "circle",
+      source: EVENTS_SOURCE_ID,
+      filter: markerFilter([], kindIs("period")),
+      layout: { "circle-sort-key": markerSortKey(null) },
+      paint: {
+        "circle-color": MARKER.strokeColor,
+        "circle-radius": periodHoleRadius,
+        "circle-opacity": markerOpacity(null),
+        "circle-stroke-color": markerColor,
+        "circle-stroke-width": ["-", markerRadius, periodHoleRadius],
+        "circle-stroke-opacity": markerOpacity(null),
+      },
+    },
+    // instant: 塗りつぶしの円。period より上に描く。
     {
       id: EVENTS_LAYER_ID,
       type: "circle",
       source: EVENTS_SOURCE_ID,
-      filter: markerFilter([]),
+      filter: markerFilter([], kindIs("instant")),
       layout: { "circle-sort-key": markerSortKey(null) },
       paint: {
         "circle-color": markerColor,
@@ -262,13 +312,13 @@ export function WorldMap({
     const hoverPopup = new Popup({ closeButton: false, closeOnClick: false, offset: SPACE[12] });
     hoverPopupRef.current = hoverPopup;
 
-    map.on("mouseenter", EVENTS_LAYER_ID, () => {
+    map.on("mouseenter", INTERACTIVE_LAYER_IDS, () => {
       map.getCanvas().style.cursor = "pointer";
     });
-    map.on("mousemove", EVENTS_LAYER_ID, (e) => {
+    map.on("mousemove", INTERACTIVE_LAYER_IDS, (e) => {
       hoverPopup.setLngLat(e.lngLat).setDOMContent(popupContent(itemsAt(e))).addTo(map);
     });
-    map.on("mouseleave", EVENTS_LAYER_ID, () => {
+    map.on("mouseleave", INTERACTIVE_LAYER_IDS, () => {
       map.getCanvas().style.cursor = "";
       hoverPopup.remove();
     });
@@ -280,7 +330,7 @@ export function WorldMap({
           [e.point.x - t, e.point.y - t],
           [e.point.x + t, e.point.y + t],
         ],
-        { layers: [EVENTS_LAYER_ID] },
+        { layers: INTERACTIVE_LAYER_IDS },
       );
       if (features.length === 0) return;
       hoverPopup.remove();
@@ -324,9 +374,11 @@ export function WorldMap({
 
 const applyViewState = (map: MapLibreMap, view: MapViewState): void => {
   const opacity = markerOpacity(view.highlightedDomain);
-  map.setPaintProperty(EVENTS_LAYER_ID, "circle-opacity", opacity);
-  map.setPaintProperty(EVENTS_LAYER_ID, "circle-stroke-opacity", opacity);
-  map.setLayoutProperty(EVENTS_LAYER_ID, "circle-sort-key", markerSortKey(view.highlightedDomain));
-  map.setFilter(EVENTS_LAYER_ID, markerFilter(view.hiddenDomains));
+  MARKER_LAYERS.forEach(({ id, kind }) => {
+    map.setPaintProperty(id, "circle-opacity", opacity);
+    map.setPaintProperty(id, "circle-stroke-opacity", opacity);
+    map.setLayoutProperty(id, "circle-sort-key", markerSortKey(view.highlightedDomain));
+    map.setFilter(id, markerFilter(view.hiddenDomains, kindIs(kind)));
+  });
   map.setFilter(SELECTED_LAYER_ID, selectedFilter(view.hiddenDomains, view.selectedIds));
 };

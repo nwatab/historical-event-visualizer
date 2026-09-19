@@ -1,7 +1,7 @@
 import type { HistEvent } from "@/types/event";
 import { bce } from "@/lib/year";
 
-// R1 用の手書きサンプル。座標は概略値。
+// 手書きのサンプル（R1 で34件、R3 で period を4件追加）。座標は概略値。
 // id は Wikidata 項目が「その出来事自体」または「その出来事で生まれた作品・構造物」を指す場合に QID を使い、
 // 人物項目しか無い場合などは slug にしている。
 // 年はおおよそ（「頃」）のものを含む。紀元前は bce() で天文年に変換する。
@@ -133,11 +133,16 @@ export const sampleEvents: readonly HistEvent[] = [
   {
     id: "Q821711",
     title: { ja: "ユスティニアヌスのペスト", en: "Plague of Justinian" },
-    description: { ja: "東ローマ帝国で流行したペスト。542年に首都コンスタンティノープルに到達した。" },
+    description: {
+      ja: "541年にエジプトに到達し、549年まで地中海全域・ヨーロッパ・近東で流行したペスト。542年には首都コンスタンティノープルで猛威を振るった。",
+    },
     domain: "population",
     tags: ["population"],
-    kind: "instant",
-    start: 542,
+    // 本来は diffusion（地中海全域に伝播）。diffusion は R6 で実装するため、それまで period として扱う。
+    // 年は出典（英語版の冒頭 "AD 541–549"）で確認。
+    kind: "period",
+    start: 541,
+    end: 549,
     places: [{ lon: 28.98, lat: 41.01, label: "コンスタンティノープル" }],
     importance: 2,
     source: "https://en.wikipedia.org/wiki/Plague_of_Justinian",
@@ -182,12 +187,18 @@ export const sampleEvents: readonly HistEvent[] = [
   },
   {
     id: "Q42005",
-    title: { ja: "黒死病のヨーロッパ到達", en: "Black Death reaches Europe" },
-    description: { ja: "1347年にシチリアのメッシーナへ到達し、ヨーロッパ全域に拡大した。" },
+    title: { ja: "ヨーロッパの黒死病流行", en: "Black Death in Europe" },
+    description: {
+      ja: "1347年にシチリアのメッシーナなどへ到達し、1351年にかけてヨーロッパ全域で流行が頂点に達した。",
+    },
     domain: "population",
     tags: ["population", "economy"],
-    kind: "instant",
+    // 本来は diffusion（ヨーロッパ全域に伝播）。diffusion は R6 で実装するため、それまで period として扱う。
+    // 年は出典（日本語版の冒頭「ヨーロッパでは1347年から1351年にかけてピークに達した」）で確認。
+    // パンデミック全体（1346〜1353年）ではなく、この項目のタイトルどおりヨーロッパでの流行期間にしている。
+    kind: "period",
     start: 1347,
+    end: 1351,
     places: [{ lon: 15.55, lat: 38.19, label: "メッシーナ" }],
     importance: 3,
     source: "https://ja.wikipedia.org/wiki/黒死病",
@@ -330,11 +341,14 @@ export const sampleEvents: readonly HistEvent[] = [
     description: { ja: "ジャガイモ疫病による大飢饉。大量の死者と北米などへの移民を生んだ。" },
     domain: "population",
     tags: ["population", "economy"],
-    kind: "instant",
+    kind: "period",
+    // 年は英語版の冒頭 "from 1845 to 1852"（Wikidata の P580/P582 も 1845/1852）。
+    // 日本語版は本文中で 1845〜1849年・1845〜1851年と書き分けていて期間を1つに定めていないため、出典は英語版にしている。
     start: 1845,
+    end: 1852,
     places: [{ lon: -7.92, lat: 53.35, label: "アイルランド" }],
     importance: 2,
-    source: "https://ja.wikipedia.org/wiki/ジャガイモ飢饉",
+    source: "https://en.wikipedia.org/wiki/Great_Famine_(Ireland)",
   },
   {
     id: "Q20124",
@@ -436,5 +450,73 @@ export const sampleEvents: readonly HistEvent[] = [
     places: [{ lon: 13.4, lat: 52.52, label: "ベルリン" }],
     importance: 3,
     source: "https://ja.wikipedia.org/wiki/ベルリンの壁崩壊",
+  },
+
+  // ── 期間を持つイベント（R3 で追加） ──────────────────────
+  // サンプルの地域の偏り（ヨーロッパ18件に対し、南アジア・サハラ以南アフリカ・コロンブス以前のアメリカ・
+  // オセアニアが0件）を減らすため、これらの地域から選んだ。
+  // 年は出典の記事で確認し、Wikidata の P580/P582（開始・終了）がある項目はそれとも一致することを確認した（2026-09-20）。
+  {
+    id: "Q28573",
+    title: { ja: "インカ帝国", en: "Inca Empire" },
+    description: {
+      ja: "1438年のパチャクテク即位で国家として再編され、1533年にスペインのコンキスタドールに滅ぼされるまで、アンデス一帯を支配した。",
+    },
+    domain: "polity",
+    tags: ["polity"],
+    kind: "period",
+    start: 1438,
+    end: 1533,
+    places: [{ lon: -71.97, lat: -13.53, label: "クスコ" }],
+    importance: 3,
+    source: "https://ja.wikipedia.org/wiki/インカ帝国",
+  },
+  {
+    // QID は霊廟そのもの（出来事で生まれた構造物）
+    id: "Q9141",
+    title: { ja: "タージ・マハルの建設", en: "Construction of the Taj Mahal" },
+    description: {
+      ja: "ムガル帝国のシャー・ジャハーンが亡妃ムムターズ・マハルのために建てた墓廟。1632年着工、1653年竣工とされる。",
+    },
+    domain: "culture",
+    tags: ["culture", "technology"],
+    kind: "period",
+    start: 1632,
+    end: 1653,
+    places: [{ lon: 78.04, lat: 27.18, label: "アーグラ" }],
+    importance: 2,
+    source: "https://ja.wikipedia.org/wiki/タージ・マハル",
+  },
+  {
+    id: "Q1545405",
+    title: { ja: "ニュージーランド戦争", en: "New Zealand Wars" },
+    description: {
+      ja: "土地の売買をめぐって、ニュージーランドの植民地政府とマオリの諸部族などが戦った一連の戦争。",
+    },
+    domain: "conflict",
+    tags: ["conflict", "polity"],
+    kind: "period",
+    start: 1845,
+    end: 1872,
+    // 戦域は北島の各地にわたる。点は北島の中部に置いた概略値。
+    places: [{ lon: 175.5, lat: -38.5, label: "北島" }],
+    importance: 2,
+    // 日本語版に記事が無い（Wikidata Q1545405 に jawiki のリンクが無い）ため英語版
+    source: "https://en.wikipedia.org/wiki/New_Zealand_Wars",
+  },
+  {
+    id: "Q705553",
+    title: { ja: "マジ・マジ反乱", en: "Maji Maji Rebellion" },
+    description: {
+      ja: "ドイツ領東アフリカ南部で、綿花栽培の強制に反発した住民が蜂起した。鎮圧後の飢饉を含め、数十万人が犠牲になったと推測されている。",
+    },
+    domain: "conflict",
+    tags: ["conflict", "polity", "population"],
+    kind: "period",
+    start: 1905,
+    end: 1907,
+    places: [{ lon: 38.9, lat: -8.5, label: "タンガニーカ南部" }],
+    importance: 2,
+    source: "https://ja.wikipedia.org/wiki/マジ・マジ反乱",
   },
 ];

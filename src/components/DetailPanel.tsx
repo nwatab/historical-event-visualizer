@@ -3,7 +3,7 @@
 import { FONT_WEIGHT, GRAY, SPACE, surfaceStyle, swatchStyle, textStyle } from "@/lib/design";
 import { DOMAIN_LABELS } from "@/lib/domain";
 import type { Selection } from "@/lib/appState";
-import { formatYear } from "@/lib/year";
+import { formatYear, formatYearRange } from "@/lib/year";
 import type { HistEvent } from "@/types/event";
 
 interface DetailPanelProps {
@@ -41,6 +41,12 @@ const sourceInfo = (url: string): SourceInfo => {
   return { label: parsed.hostname, license: null };
 };
 
+/** instant は年、period / diffusion は期間を表示する。 */
+const eventYears = (event: HistEvent): string =>
+  event.kind !== "instant" && event.end !== undefined
+    ? formatYearRange(event.start, event.end)
+    : formatYear(event.start);
+
 const linkStyle = { color: GRAY.text, textDecoration: "underline" } as const;
 
 const DomainLabel = ({ event }: { readonly event: HistEvent }) => (
@@ -56,7 +62,7 @@ const EventDetail = ({ event }: { readonly event: HistEvent }) => {
     <article className="flex flex-col" style={{ gap: SPACE[8] }}>
       <DomainLabel event={event} />
       <h2 style={textStyle.emphasis}>{event.title.ja}</h2>
-      <p style={{ ...textStyle.body, fontVariantNumeric: "tabular-nums" }}>{formatYear(event.start)}</p>
+      <p style={{ ...textStyle.body, fontVariantNumeric: "tabular-nums" }}>{eventYears(event)}</p>
       {event.description && <p style={textStyle.body}>{event.description.ja}</p>}
       {source && event.source && (
         <p style={textStyle.caption}>
@@ -100,7 +106,7 @@ const EventList = ({
             <DomainLabel event={event} />
             <span style={{ ...textStyle.body, fontWeight: FONT_WEIGHT.bold }}>{event.title.ja}</span>
             <span style={{ ...textStyle.caption, fontVariantNumeric: "tabular-nums" }}>
-              {formatYear(event.start)}
+              {eventYears(event)}
             </span>
           </button>
         </li>

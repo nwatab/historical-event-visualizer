@@ -4,7 +4,8 @@ import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "r
 import { sampleEvents } from "@/data/events.sample";
 import { appReducer, initialAppState, type AppAction, type AppState } from "@/lib/appState";
 import { SCREEN_INSET, SLIDER_PANEL_MAX_WIDTH } from "@/lib/design";
-import { INITIAL_YEAR, YEAR_MAX, YEAR_MIN, instantEventMarkers } from "@/lib/timeline";
+import { INITIAL_YEAR, YEAR_MAX, YEAR_MIN, eventMarkers } from "@/lib/timeline";
+import { eventTicks } from "@/lib/yearAxis";
 import type { Domain } from "@/types/event";
 import { DetailPanel } from "./DetailPanel";
 import { Legend } from "./Legend";
@@ -36,7 +37,8 @@ const actionFromKey = (event: KeyboardEvent, state: AppState): AppAction | null 
 export function EventMapApp() {
   const [state, dispatch] = useReducer(reducer, INITIAL_YEAR, initialAppState);
   const [hoveredDomain, setHoveredDomain] = useState<Domain | null>(null);
-  const markers = useMemo(() => instantEventMarkers(sampleEvents, state.year), [state.year]);
+  const markers = useMemo(() => eventMarkers(sampleEvents, state.year), [state.year]);
+  const ticks = useMemo(() => eventTicks(sampleEvents, state.hiddenDomains), [state.hiddenDomains]);
 
   // キーハンドラは一度だけ登録し、最新の状態は ref から読む
   const stateRef = useRef(state);
@@ -118,6 +120,7 @@ export function EventMapApp() {
             year={state.year}
             min={YEAR_MIN}
             max={YEAR_MAX}
+            eventTicks={ticks}
             onChange={(year) => dispatch({ type: "setYear", year })}
           />
         </div>

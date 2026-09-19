@@ -1,5 +1,5 @@
 import type { FeatureCollection, Point } from "geojson";
-import type { Domain, HistEvent, Year } from "@/types/event";
+import type { Domain, HistEvent, TemporalKind, Year } from "@/types/event";
 
 /** 年スライダーの範囲（天文年）。 */
 export const YEAR_MIN: Year = -3000;
@@ -15,12 +15,16 @@ export const EVENT_WINDOW_YEARS = 20;
  */
 export const EVENT_EDGE_SCALE = 0.5;
 
+/** 地図に描く時間種別。diffusion は R6 で実装する（それまでは地図に出さない）。 */
+export type MarkerKind = Extract<TemporalKind, "instant" | "period">;
+
 export interface EventMarkerProperties {
   readonly id: string;
   readonly title: string;
   readonly domain: Domain;
   readonly importance: HistEvent["importance"];
-  /** 年の差に応じた大きさの倍率（EVENT_EDGE_SCALE〜1） */
+  readonly kind: MarkerKind;
+  /** 年の差に応じた大きさの倍率（EVENT_EDGE_SCALE〜1）。period は常に 1。 */
   readonly fade: number;
 }
 
@@ -38,29 +42,49 @@ export const eventFade = (
   return 1 - (1 - EVENT_EDGE_SCALE) * (distance / windowYears);
 };
 
-/** 現在年に表示すべき instant イベントを、places の全点ぶんのマーカーに展開する。 */
-export const instantEventMarkers = (
+/**
+ * period は start 以上 end 以下の年に表示する（両端を含む）。窓による前後の延長はしない。
+ * 大きさは常に 1 倍。期間中はその出来事が「進行中」で、現在年との差が 0 にあたるため。
+ * 開始・終了からの距離で縮めると、期間の端で「起きていない」ように見えてしまう。
+ */
+export const periodFade = (start: Year, end: Year, year: Year): number | null =>
+  start <= year && year <= end ? 1 : null;
+
+/** 現在年での大きさの倍率。表示しないなら null。 */
+const markerFade = (event: HistEvent, year: Year): number | null => {
+  switch (event.kind) {
+    case "instant":
+      return eventFade(event.start, year);
+    case "period":
+      return event.end === undefined ? null : periodFade(event.start, event.end, year);
+    case "diffusion":
+      return null;
+  }
+};
+
+/** 現在年に表示すべき instant / period イベントを、places の全点ぶんのマーカーに展開する。 */
+export const eventMarkers = (
   events: readonly HistEvent[],
   year: Year,
 ): EventMarkerCollection => ({
   type: "FeatureCollection",
-  features: events
-    .filter((event) => event.kind === "instant")
-    .flatMap((event) => {
-      const fade = eventFade(event.start, year);
-      if (fade === null) return [];
-      return event.places.map((place) => ({
-        type: "Feature" as const,
-        geometry: { type: "Point" as const, coordinates: [place.lon, place.lat] },
-        properties: {
-          id: event.id,
-          title: event.title.ja,
-          domain: event.domain,
-          importance: event.importance,
-          fade,
-        },
-      }));
-    }),
+  features: events.flatMap((event) => {
+    const fade = markerFade(event, year);
+    if (fade === null || event.kind === "diffusion") return [];
+    const kind: MarkerKind = event.kind;
+    return event.places.map((place) => ({
+      type: "Feature" as const,
+      geometry: { type: "Point" as const, coordinates: [place.lon, place.lat] },
+      properties: {
+        id: event.id,
+        title: event.title.ja,
+        domain: event.domain,
+        importance: event.importance,
+        kind,
+        fade,
+      },
+    }));
+  }),
 });
 
 /**
