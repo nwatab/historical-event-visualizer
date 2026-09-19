@@ -16,21 +16,24 @@ export const MAP_COLORS = {
 } as const;
 
 /**
- * 分類の7色。Okabe-Ito（黒を除く7色）の色相と彩度を保ったまま OKLCH の明度だけを下げ、
- * 陸・海の両方に対して WCAG コントラスト比 3:1 以上にしたもの。
- * 明度は、通常視と色覚シミュレーション3種（Machado 2009）の全ペアで OKLab 距離の最小値が
- * 最大になるように選んだ（明度の下限は OKLCH L = 0.36）。
- * コントラスト比（陸 / 海）: conflict 8.52/6.42, polity 4.26/3.21, science 4.16/3.13,
- * technology 8.18/6.16, economy 4.11/3.10, culture 6.00/4.52, population 5.16/3.89
+ * 分類の7色。マーカーは白い縁取り（MARKER.strokeWidth）で囲むため、分類色が接する背景は白だけになる。
+ * 要件は「白 #ffffff に対して WCAG コントラスト比 3:1 以上」。3:1 は下限であって目標値ではない。
+ * Okabe-Ito（黒を除く7色）を基に、白に対して 3:1 に届かない空色・黄・橙の明度を下げた。
+ * そのうえで黄・橙・朱の3色を互いに離すため、橙と朱をさらに下げている（色相は維持、
+ * 彩度は色域に収まる範囲で維持）。評価基準は21ペアの OKLab 距離の最小値（CLAUDE.md 参照）。
+ * 白に対するコントラスト比 / OKLCH L:
+ *   conflict 5.27 / 0.544, polity 3.06 / 0.679, science 5.19 / 0.532, technology 3.03 / 0.662,
+ *   economy 3.02 / 0.664, culture 4.03 / 0.600, population 3.42 / 0.620
+ * マーカーは不透明度 1.0 で描く（不透明度を下げると実効コントラストが 3:1 を割る）。
  */
 export const DOMAIN_COLORS: Readonly<Record<Domain, string>> = {
-  conflict: "#652900", // vermillion #D55E00 由来
-  polity: "#9b4d7a", // reddish purple #CC79A7 由来
-  science: "#036eac", // blue #0072B2 由来
-  technology: "#004260", // sky blue #56B4E9 由来
-  economy: "#736c01", // yellow #F0E442 由来
-  culture: "#6f4a01", // orange #E69F00 由来
-  population: "#02684b", // bluish green #009E73 由来
+  conflict: "#b24e03", // vermillion #D55E00 の明度を下げたもの（L 0.621 → 0.544）
+  polity: "#CC79A7", // reddish purple（無調整）
+  science: "#0072B2", // blue（無調整）
+  technology: "#3d9dd1", // sky blue #56B4E9 の明度を下げたもの（L 0.735 → 0.662）
+  economy: "#a19705", // yellow #F0E442 の明度を下げたもの（L 0.902 → 0.664）
+  culture: "#aa7400", // orange #E69F00 の明度を下げたもの（L 0.753 → 0.600）
+  population: "#009E73", // bluish green（無調整）
 };
 
 /** グレースケール5段階 */
@@ -39,7 +42,7 @@ export const GRAY = {
   surface: "#ffffff",
   /** 境界線・スライダーのトラック */
   line: "#d9d9d9",
-  /** 弱いテキスト・スライダーのつまみ */
+  /** 弱いテキスト・スライダーのつまみ・海岸線 */
   weak: "#6b6b6b",
   /** 通常テキスト */
   text: "#333333",
@@ -78,17 +81,25 @@ export const LINE_HEIGHT = 1.5;
 // ── マーカー ───────────────────────────────────────────────
 
 export const MARKER = {
-  /** importance 1 / 2 / 3 の半径 (px) */
+  /** importance 1 / 2 / 3 の半径 (px)。年の差に応じてこれに fade（0.5〜1）を掛ける。 */
   radius: { 1: 4, 2: 6, 3: 8 },
-  strokeColor: GRAY.surface,
-  strokeWidth: 1,
-  /** 凡例で別の分類を強調しているときに、それ以外のマーカーに掛ける不透明度の係数 */
-  dimFactor: 0.15,
   /**
-   * 強調中の分類のマーカーの不透明度の下限。年の差でフェードしたマーカー（窓の端では 0.15）も
-   * 強調中は見つけられるようにする。
+   * 年の差で縮めたときの半径の下限 (px)。縁取りは円の外側に 2px 付くため、半径 2px まで縮むと
+   * 色の面積より白の面積が大きくなり「白い輪」に見える（importance 1 を窓の端で実測、色の面積比 8%）。
+   * 3px にすると 20〜26% になり、色の点として読める。
    */
-  highlightMinOpacity: 0.8,
+  minRadius: 3,
+  /** 白い縁取り（ハロー）。分類色が接する背景を白に統一するため 2px。 */
+  strokeColor: GRAY.surface,
+  strokeWidth: 2,
+  /** 凡例で別の分類を強調しているときに、それ以外のマーカーに掛ける不透明度 */
+  dimOpacity: 0.15,
+} as const;
+
+/** 地図の線 */
+export const MAP_LINE = {
+  coastlineColor: GRAY.weak,
+  coastlineWidth: 0.5,
 } as const;
 
 // ── 共有スタイル ───────────────────────────────────────────
