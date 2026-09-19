@@ -1,13 +1,9 @@
-import React from 'react';
-import {LazyMap} from '../components'
+import { WorldMapClient } from "@/components/WorldMapClient";
 
-const HomePage = () => {
+export default function Home() {
   return (
-    <div>
-      <h1>クラシック作曲家の歴史的イベントマップ</h1>
-        <LazyMap />
-    </div>
+    <main className="h-dvh w-screen">
+      <WorldMapClient />
+    </main>
   );
-};
-
-export default HomePage;
+}
