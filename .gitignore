@@ -42,3 +42,6 @@ next-env.d.ts
 
 # MapLibre worker (copied from node_modules by scripts/copy-maplibre-worker.mjs)
 /public/maplibre/
+
+# Wikidata などから取得した作業用データ（scripts/wikidata/ が出力。コミットしない）
+/data/raw/

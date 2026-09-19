@@ -7,7 +7,9 @@
     "copy-maplibre-worker": "node scripts/copy-maplibre-worker.mjs",
     "dev": "pnpm copy-maplibre-worker && next dev",
     "build": "pnpm copy-maplibre-worker && next build",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "wikidata:fetch": "node scripts/wikidata/fetch.mjs",
+    "wikidata:report": "node scripts/wikidata/report.mjs"
   },
   "dependencies": {
     "maplibre-gl": "6.10.0",
