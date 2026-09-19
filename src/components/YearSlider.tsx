@@ -1,5 +1,6 @@
 "use client";
 
+import { SPACE, YEAR_LABEL_MIN_WIDTH, surfaceStyle, textStyle } from "@/lib/design";
 import { formatYear } from "@/lib/year";
 import type { Year } from "@/types/event";
 
@@ -13,11 +14,19 @@ interface YearSliderProps {
 export function YearSlider({ year, min, max, onChange }: YearSliderProps) {
   const label = formatYear(year);
   return (
-    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 rounded-lg bg-white/85 px-4 py-3 shadow-md backdrop-blur">
-      <output className="order-first w-full text-center text-lg font-semibold tabular-nums text-neutral-900 sm:order-last sm:w-32 sm:text-right">
+    <div
+      className="flex flex-wrap items-center"
+      style={{ ...surfaceStyle, columnGap: SPACE[16], rowGap: SPACE[4] }}
+    >
+      <output
+        className="order-first w-full text-center sm:order-last sm:w-auto sm:text-right"
+        style={{ ...textStyle.year, minWidth: YEAR_LABEL_MIN_WIDTH }}
+      >
         {label}
       </output>
-      <span className="hidden shrink-0 text-xs text-neutral-500 sm:inline">{formatYear(min)}</span>
+      <span className="hidden shrink-0 sm:inline" style={textStyle.caption}>
+        {formatYear(min)}
+      </span>
       <input
         type="range"
         min={min}
@@ -27,9 +36,11 @@ export function YearSlider({ year, min, max, onChange }: YearSliderProps) {
         onChange={(e) => onChange(Number(e.currentTarget.value))}
         aria-label="年"
         aria-valuetext={label}
-        className="h-2 min-w-0 flex-1 cursor-pointer accent-neutral-700"
+        className="hv-range min-w-0 flex-1"
       />
-      <span className="hidden shrink-0 text-xs text-neutral-500 sm:inline">{formatYear(max)}</span>
+      <span className="hidden shrink-0 sm:inline" style={textStyle.caption}>
+        {formatYear(max)}
+      </span>
     </div>
   );
 }

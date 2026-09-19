@@ -1,5 +1,5 @@
 import type { FeatureCollection, Point } from "geojson";
-import type { HistEvent, Year } from "@/types/event";
+import type { Domain, HistEvent, Year } from "@/types/event";
 
 /** 年スライダーの範囲（天文年）。 */
 export const YEAR_MIN: Year = -3000;
@@ -15,6 +15,7 @@ export const EVENT_EDGE_OPACITY = 0.15;
 export interface EventMarkerProperties {
   readonly id: string;
   readonly title: string;
+  readonly domain: Domain;
   readonly importance: HistEvent["importance"];
   readonly opacity: number;
 }
@@ -50,6 +51,7 @@ export const instantEventMarkers = (
         properties: {
           id: event.id,
           title: event.title.ja,
+          domain: event.domain,
           importance: event.importance,
           opacity,
         },
