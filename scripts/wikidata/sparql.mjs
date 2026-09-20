@@ -187,15 +187,52 @@ SELECT ?item ?prop ?loc ?coord WHERE {
 }`;
 
 /**
- * 指定した項目のうち、人口（P1082）を持つもの。都市・国・地方を、P31 の種類を列挙せずに見分けるために使う
- * （年表の行の主題から、地名のリンクを外す）。
+ * 日本語版・英語版 Wikipedia の記事名（sitelink）。出典 URL を作るために使う。
  * @param {readonly string[]} qids
  */
-export const buildPopulatedQuery = (qids) => `
-SELECT DISTINCT ?item WHERE {
+export const buildArticlesQuery = (qids) => `
+SELECT ?item ?site ?name WHERE {
+  # 書いた順に結合させる。最適化に任せると「日本語版の全記事」から始めてしまい、300 件で数十秒かかって 429 を招いた
+  hint:Query hint:optimizer "None" .
   ${valuesOf(qids)}
-  ?item wdt:P1082 ?population .
+  ?article schema:about ?item .
+  ?article schema:isPartOf ?site .
+  FILTER(?site IN (<https://ja.wikipedia.org/>, <https://en.wikipedia.org/>))
+  ?article schema:name ?name .
 }`;
+
+/**
+ * 国の代表点しか場所が無い項目について、地点の候補を Wikidata の他の項目の P625 から探す（place-overrides の下書き用）。
+ * route は候補の辿り方。強い順に:
+ *   creation … P1071（制作地）
+ *   agentWork … 発見者・発明者・作者・創設者・開発者・製造者・作曲者・監督（P61/P170/P50/P112/P178/P176/P86/P57）の P937（活動地）
+ *   agentHq … 上記または制作会社（P272）の P159（本部所在地）。組織が作ったものの場合
+ *   capital … P495（原産国）/ P17（国）の P36（首都）。国を首都で代表させるだけなので、地点の根拠としては弱い
+ * 4つを UNION で1本にするとタイムアウトしたので、route ごとに別のクエリにしている。ラベルは別に引く（buildLabelsQuery）。
+ */
+export const PLACE_CANDIDATE_ROUTES = Object.freeze({
+  creation: { via: /** @type {readonly string[]} */ ([]), to: "P1071" },
+  agentWork: { via: ["P61", "P170", "P50", "P112", "P178", "P176", "P86", "P57"], to: "P937" },
+  agentHq: { via: ["P61", "P170", "P50", "P112", "P178", "P176", "P86", "P57", "P272"], to: "P159" },
+  capital: { via: ["P495", "P17"], to: "P36" },
+});
+
+/** @param {readonly string[]} qids @param {keyof typeof PLACE_CANDIDATE_ROUTES} route */
+export const buildPlaceCandidatesQuery = (qids, route) => {
+  const { via, to } = PLACE_CANDIDATE_ROUTES[route];
+  const hop =
+    via.length === 0
+      ? `?item wdt:${to} ?src .`
+      : `VALUES ?viaProp { ${via.map((p) => `wdt:${p}`).join(" ")} }\n  ?item ?viaProp ?agent .\n  ?agent wdt:${to} ?src .`;
+  return `
+SELECT DISTINCT ?item ?agent ?src ?coord WHERE {
+  # 書いた順に結合させる（項目 → 関係者 → 場所 → 座標）
+  hint:Query hint:optimizer "None" .
+  ${valuesOf(qids)}
+  ${hop}
+  ?src wdt:P625 ?coord .
+}`;
+};
 
 // ── 応答の解釈（純粋関数） ──────────────────────────────────
 

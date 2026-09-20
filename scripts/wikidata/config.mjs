@@ -39,10 +39,22 @@ export const LISTS_DIR = join(ROOT_DIR, "data", "raw", "lists");
 export const LIST_PAGES_DIR = join(LISTS_DIR, "pages");
 export const LIST_TITLES_PATH = join(LISTS_DIR, "titles.json");
 export const LIST_ATTRS_PATH = join(LISTS_DIR, "attrs.json");
-/** 年表の主題の候補のうち、人口（P1082）を持つ項目（＝地名）。QID → true/false。 */
-export const LIST_POPULATED_PATH = join(LISTS_DIR, "populated.json");
 /** 年か場所が取れなかった項目を、理由付きで書き出す先（手入力の候補）。report.mjs が作る。 */
 export const LIST_MISSING_PATH = join(LISTS_DIR, "missing.json");
+
+// アプリ用データの生成（R4b-2）に追加で要る取得結果。作業用で、コミットしない。
+export const APP_RAW_DIR = join(ROOT_DIR, "data", "raw", "app");
+/** QID → { ja?: 記事名, en?: 記事名 } */
+export const ARTICLES_PATH = join(APP_RAW_DIR, "articles.json");
+/** 場所（P276 などの先）の QID → { ja?, en? } */
+export const PLACE_LABELS_PATH = join(APP_RAW_DIR, "place-labels.json");
+/** 国の代表点しか無い項目（sitelinks 上位）の、地点の候補。QID → 候補の配列 */
+export const PLACE_CANDIDATES_PATH = join(APP_RAW_DIR, "place-candidates.json");
+export const PLACE_CANDIDATE_LABELS_PATH = join(APP_RAW_DIR, "place-candidate-labels.json");
+/** 人が確認するための下書き（コミットする）。承認後の表は place-overrides.json */
+export const PLACE_OVERRIDES_DRAFT_PATH = join(import.meta.dirname, "place-overrides.draft.md");
+/** 生成したアプリ用データの出力先。こちらはコミットする。 */
+export const APP_DATA_DIR = join(ROOT_DIR, "public", "data", "events");
 
 export const REPORT_PATH = join(import.meta.dirname, "REPORT.md");
 

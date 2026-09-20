@@ -1,4 +1,4 @@
-// 科学・技術・経済・文化を取るための、Wikipedia の選抜リスト（人が編集する表）。
+// 科学・技術・経済・文化を取るための、Wikipedia の選抜リスト（Vital articles。人が編集する表）。
 //
 // R4a の結論: P31 と座標に頼る取得では、この4分類は実質的に空になる（発明・発見・著作は「出来事」の項目ではなく、
 // 物・概念・著作の項目として存在するため）。そこで、人が選抜したリストから項目を取り、分類はリストの節で決める。
@@ -55,31 +55,9 @@ export const VITAL_PAGES = Object.freeze([
   { page: "Arts/Narrative arts", domain: "culture", excludeSections: ["Fictional and legendary characters"] },
 ]);
 
-/**
- * 年表形式の記事。1行（箇条書き1つ）を1項目として扱い、行頭の年と、行内のリンクを取る。
- * 行内のリンクには人名や地名が混ざるので、「人間（Q5）でも地理的な項目でもない最初のリンク」をその行の主題とみなす
- * （fetch-lists.mjs）。年表に書かれた年（listYear）は、Wikidata に年が無い項目の手入力の手がかりとして残す。
- *
- * 試したが入れなかった記事（2026-09-20 に wikitext を取得して確認）:
- * - Timeline of art … 行が芸術家の生没（"Birth of …" / "Death of …"）で、主題が人になる。
- * - Timeline of astronomy … 箇条書きではなく、この parser では 0 行。
- * - Timeline of chemistry … 年と本文が別の行に分かれた定義リスト形式で、1 行しか読めない。
- * - Timeline of international trade … 年が行頭に無い文章形式で、134 行中 11 行しか読めない。
- *   このため経済の出典は Vital articles だけになる。
- * @typedef {{ page: string, domain: Domain }} TimelinePage
- * @type {readonly TimelinePage[]}
- */
-export const TIMELINE_PAGES = Object.freeze([
-  { page: "Timeline of historic inventions", domain: "technology" },
-  { page: "Timeline of scientific discoveries", domain: "science" },
-  { page: "Timeline of mathematics", domain: "science" },
-  { page: "Timeline of medicine and medical technology", domain: "science" },
-  { page: "Timeline of architecture", domain: "culture" },
-  { page: "Timeline of religion", domain: "culture" },
-]);
-
-/** 年表の1行から QID を引くリンクの数の上限（行頭から）。API の問い合わせ数を抑えるため。 */
-export const TIMELINE_LINKS_PER_LINE = 3;
+// 年表形式の記事（Timeline of …）は、R4b-1 で試したうえで R4b-2 で出典から外した。
+// 行内のリンクから主題を当てる方法では、主題の記事が無い行で組織名や言語名を拾ってしまうこと（ラテン語が科学、国際連合が文化に入った）、
+// Wikidata に年が無い項目を年表の年で補えたのが 36 件だけだったことによる（FINDINGS-R4b1.md）。parser はコミット 7cfe612 にある。
 
 // 年として使う Wikidata のプロパティ（先頭が優先）。
 // 依頼の指定は P571（成立）・P577（出版）・P585（時点）。P575（発見・発明の時点）と P580（開始）は
@@ -94,14 +72,3 @@ export const LIST_TIME_PROPS_SPEC = Object.freeze(["P571", "P577", "P585"]);
 export const LIST_PLACE_PROPS = Object.freeze(["P625", "P189", "P276", "P159", "P740", "P291", "P495", "P17"]);
 export const LIST_PLACE_PROPS_SPEC = Object.freeze(["P625", "P276", "P495", "P159"]);
 export const COUNTRY_LEVEL_PLACE_PROPS = Object.freeze(["P495", "P17"]);
-
-// 年表の行の主題にしない項目の P31（人が編集する表）。QID は 2026-09-20 に wbgetentities で照合した。
-// 地理的な項目を網羅はできないので、場所を表す項目の判定は「自分の P625 を持ち、年のプロパティを1つも持たない」も併用する。
-export const NON_SUBJECT_CLASSES = Object.freeze([
-  "Q5", // human
-  "Q6256", // country
-  "Q3624078", // sovereign state
-  "Q3024240", // historical country
-  "Q515", // city
-  "Q5107", // continent
-]);

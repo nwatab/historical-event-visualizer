@@ -9,11 +9,9 @@ import {
   LIST_PLACE_PROPS_SPEC,
   LIST_TIME_PROPS,
   LIST_TIME_PROPS_SPEC,
-  NON_SUBJECT_CLASSES,
 } from "./lists.mjs";
 import { regionOf } from "./regions.mjs";
 import { ROOTS } from "./roots.mjs";
-import { parseListYear } from "./wikipedia.mjs";
 
 /** @typedef {import("./merge.mjs").RawItem} RawItem */
 /** @typedef {import("./fetch-lists.mjs").ListAttrs} ListAttrs */
@@ -21,6 +19,9 @@ import { parseListYear } from "./wikipedia.mjs";
 /** @typedef {import("./regions.mjs").Region} Region */
 /** @typedef {{ lon: number, lat: number, via: string, loc?: string }} Place */
 /** @typedef {{ labels: { ja?: string, en?: string }, p31: string[], parents: string[], sitelinks: number, isWar?: boolean }} Parent */
+
+/** これ未満の sitelinks の項目は母集団に入れない（R4b-2 の決定4）。 */
+export const MIN_SITELINKS = 2;
 
 const WAR_ROOTS = new Set(ROOTS.filter((r) => r.group === "war").map((r) => r.qid));
 const ENGAGEMENT_ROOTS = new Set(ROOTS.filter((r) => r.group === "engagement").map((r) => r.qid));
@@ -96,7 +97,6 @@ const regionOfPlaces = (countryIndex, places) => {
 // ── 選抜リストの項目 ────────────────────────────────────────
 
 /** @typedef {ReturnType<typeof import("./list-entries.mjs").vitalEntries>[number]} VitalEntry */
-/** @typedef {ReturnType<typeof import("./list-entries.mjs").timelineEntries>[number]} TimelineEntry */
 
 /** @param {ListAttrs} attrs @param {readonly string[]} props */
 const listStart = (attrs, props) => {
@@ -115,38 +115,14 @@ const listPlaces = (attrs, props) => {
 };
 
 /**
- * 年表の1行の主題: 行頭から順に、人でも場所でもない最初のリンク。
- * 場所の判定は、P31 が NON_SUBJECT_CLASSES に当たるか、人口（P1082）を持つか、
- * 「自分の P625 を持ち、年のプロパティを1つも持たない」か。
- * 主題にあたる記事が無い行では、行内の別のリンク（組織名など）を主題と誤ることがある。
- * @param {TimelineEntry} entry
- * @param {Readonly<Record<string, { qid: string | null }>>} titles
- * @param {Readonly<Record<string, ListAttrs>>} attrs
- * @param {Readonly<Record<string, boolean>>} populated
- * @returns {{ title: string, qid: string } | null}
- */
-export const timelineSubject = (entry, titles, attrs, populated) => {
-  const hit = entry.links.find((title) => {
-    const qid = titles[title]?.qid;
-    const a = qid ? attrs[qid] : undefined;
-    if (!qid || !a) return false;
-    const isNonSubject = a.p31.some((c) => NON_SUBJECT_CLASSES.includes(c));
-    const isPlaceLike = a.places.some((p) => p.prop === "P625") && LIST_TIME_PROPS.every((p) => (a.times[p] ?? []).length === 0);
-    return !isNonSubject && !isPlaceLike && populated[qid] !== true;
-  });
-  return hit ? { title: hit, qid: /** @type {string} */ (titles[hit].qid) } : null;
-};
-
-/**
  * リストの1項目（出典 × 記事）の状態。QID・年・場所のどこまで取れたか。
- * @param {{ source: string, domain: Domain | null, title: string, listKind: "vital" | "timeline", level?: number, yearLabel?: string, text?: string }} ref
+ * @param {{ source: string, domain: Domain | null, title: string, level: number }} ref
  * @param {string | null} qid
  * @param {ListAttrs | undefined} attrs
  */
 export const listRecord = (ref, qid, attrs) => {
   const start = attrs ? listStart(attrs, LIST_TIME_PROPS) : null;
   const places = attrs ? listPlaces(attrs, LIST_PLACE_PROPS) : [];
-  const listYear = ref.yearLabel ? parseListYear(ref.yearLabel) : null;
   return {
     ...ref,
     qid,
@@ -155,7 +131,6 @@ export const listRecord = (ref, qid, attrs) => {
     places,
     startSpecOnly: attrs ? listStart(attrs, LIST_TIME_PROPS_SPEC) : null,
     placesSpecOnly: attrs ? listPlaces(attrs, LIST_PLACE_PROPS_SPEC) : [],
-    listYear,
     reasons: [
       ...(qid && attrs ? [] : ["QID に解決できない"]),
       ...(qid && attrs && !start ? [`年が無い（${LIST_TIME_PROPS.join("/")}）`] : []),
@@ -182,9 +157,10 @@ export const buildItems = ({ rawItems, outsideParents, listRecords, countryIndex
   const listsByQid = Map.groupBy(usable, (r) => /** @type {string} */ (r.qid));
   // 年・場所が取れていなくても、Vital articles に載っていれば「選抜済み」
   const vitalLevelByQid = new Map(
-    [...Map.groupBy(listRecords.filter((r) => r.qid && r.listKind === "vital"), (r) => /** @type {string} */ (r.qid)).entries()].map(
-      ([qid, rs]) => [qid, Math.min(...rs.map((r) => r.level ?? 5))],
-    ),
+    [...Map.groupBy(listRecords.filter((r) => r.qid), (r) => /** @type {string} */ (r.qid)).entries()].map(([qid, rs]) => [
+      qid,
+      Math.min(...rs.map((r) => r.level)),
+    ]),
   );
 
   /** @param {string} qid @param {RawItem | undefined} raw @param {readonly ListRecord[]} lists */
@@ -227,6 +203,7 @@ export const buildItems = ({ rawItems, outsideParents, listRecords, countryIndex
       inAppRange: start !== null && start.year >= APP_YEAR_MIN && start.year <= APP_YEAR_MAX,
       places,
       coords: places,
+      // 場所が国の代表点でしかない項目（P495 / P17 経由）。データには残すが、アプリは地図に出さない（R4b-2 の決定2）
       countryLevelPlace: places.length > 0 && COUNTRY_LEVEL_PLACE_PROPS.includes(places[0].via),
       region: place.region,
       country: place.country,
@@ -240,11 +217,21 @@ export const buildItems = ({ rawItems, outsideParents, listRecords, countryIndex
   const qids = [...new Set([...rawItems.map((i) => i.qid), ...listsByQid.keys()])];
   const all = qids.map((qid) => unify(qid, itemsByQid.get(qid), listsByQid.get(qid) ?? []));
 
-  // 母集団: 年がアプリの表示範囲内で、場所があり、7分類のどれかに入った項目
-  const population = all.filter((i) => i.inAppRange && i.places.length > 0 && i.classification.status === "mapped");
-  const thresholds = importanceThresholds(
-    population.map((i) => ({ year: /** @type {NonNullable<typeof i.start>} */ (i.start).year, sitelinks: i.sitelinks })),
+  // 母集団: 年がアプリの表示範囲内で、場所があり、7分類のどれかに入り、sitelinks が MIN_SITELINKS 以上の項目。
+  // sitelinks 0〜1 の項目は、個々の核実験や一括登録されたデータセットが大半なので除く（R4b-2 の決定4）。
+  const population = all.filter(
+    (i) => i.inAppRange && i.places.length > 0 && i.classification.status === "mapped" && i.sitelinks >= MIN_SITELINKS,
   );
+  // importance のパーセンタイルは由来別に取る（R4b-2 の決定1）。出来事の記事（P31 で分類）と、
+  // 物・作品・組織の記事（Vital articles の節で分類）とでは sitelinks の水準が一桁違い、混ぜると後者が上位を占めるため。
+  /** @param {"p31" | "list"} by */
+  const thresholdsOf = (by) =>
+    importanceThresholds(
+      population
+        .filter((i) => i.classification.by === by)
+        .map((i) => ({ year: /** @type {NonNullable<typeof i.start>} */ (i.start).year, sitelinks: i.sitelinks })),
+    );
+  const thresholds = { p31: thresholdsOf("p31"), list: thresholdsOf("list") };
   const withImportance = population.map((i) => ({
     ...i,
     ...importanceOf(
@@ -254,7 +241,7 @@ export const buildItems = ({ rawItems, outsideParents, listRecords, countryIndex
         cappedAsEngagement: i.kind === "engagement" && i.parentWar !== null,
         vital: i.vital,
       },
-      thresholds,
+      thresholds[i.classification.by],
     ),
   }));
   return { all, population: withImportance, thresholds };

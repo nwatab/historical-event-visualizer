@@ -10,7 +10,10 @@
     "lint": "eslint .",
     "wikidata:fetch": "node scripts/wikidata/fetch.mjs",
     "wikidata:fetch-lists": "node scripts/wikidata/fetch-lists.mjs",
-    "wikidata:report": "node scripts/wikidata/report.mjs"
+    "wikidata:fetch-app-extras": "node scripts/wikidata/fetch-app-extras.mjs",
+    "wikidata:report": "node scripts/wikidata/report.mjs",
+    "wikidata:build-app-data": "node scripts/wikidata/build-app-data.mjs",
+    "wikidata:place-overrides-draft": "node scripts/wikidata/build-place-overrides-draft.mjs"
   },
   "dependencies": {
     "maplibre-gl": "6.10.0",

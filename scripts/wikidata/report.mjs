@@ -5,31 +5,21 @@
 //
 // ネットワークには、地域判定用の Natural Earth を初回に1度だけ取りに行く。
 // REPORT.md は自動生成なので手で編集しない。数値の読み方・所見は FINDINGS.md に書く。
-import { readFile, writeFile } from "node:fs/promises";
+import { writeFile } from "node:fs/promises";
 import {
   APP_YEAR_MAX,
   APP_YEAR_MIN,
   CLASS_LABELS_PATH,
   COORD_LOSS_PATH,
-  COUNTRIES_PATH,
-  COUNTRIES_URL,
-  EVENTS_PATH,
-  FETCH_LOG_PATH,
-  LIST_ATTRS_PATH,
   LIST_MISSING_PATH,
-  LIST_POPULATED_PATH,
-  LIST_TITLES_PATH,
   MANUAL_ITEMS_PATH,
-  PARENTS_PATH,
   REPORT_PATH,
-  USER_AGENT,
 } from "./config.mjs";
-import { buildItems, listRecord, timelineSubject } from "./analyze.mjs";
+import { MIN_SITELINKS } from "./analyze.mjs";
 import { isMappedClass } from "./classify.mjs";
-import { pageFile, timelineEntries, vitalEntries, vitalPageTitle } from "./list-entries.mjs";
-import { TIMELINE_PAGES, VITAL_PAGES } from "./lists.mjs";
+import { loadAnalysis, readJson } from "./load-analysis.mjs";
 import { DOMAIN_PRIORITY, P31_DOMAIN_MAP } from "./p31-domain-map.mjs";
-import { REGIONS, buildCountryIndex, regionOf } from "./regions.mjs";
+import { REGIONS, regionOf } from "./regions.mjs";
 import { missingRecords, r4aSubset, sectionComparison, sectionConflict, sectionImportance, sectionLists } from "./report-r4b.mjs";
 import {
   COARSE_ERAS,
@@ -48,29 +38,6 @@ import { countBy, fmt, histogram, mdTable, percent, summarize } from "./stats.mj
 /** @typedef {import("./merge.mjs").RawItem} RawItem */
 /** @typedef {import("./analyze.mjs").Item} Item */
 /** @typedef {import("./analyze.mjs").AnyItem} AnyItem */
-
-// ── 読み込み（副作用） ──────────────────────────────────────
-
-/** @param {string} path */
-const readJson = async (path) => JSON.parse(await readFile(path, "utf8"));
-
-/** 選抜リストをまだ取得していなくてもレポートは作れるようにする。 @param {string} path @param {any} fallback */
-const readJsonOr = (path, fallback) => readJson(path).catch(() => fallback);
-
-const loadCountries = async () => {
-  try {
-    return await readJson(COUNTRIES_PATH);
-  } catch {
-    console.log(`Natural Earth を取得: ${COUNTRIES_URL}`);
-    const res = await fetch(COUNTRIES_URL, { headers: { "User-Agent": USER_AGENT } });
-    if (!res.ok) throw new Error(`Natural Earth の取得に失敗: HTTP ${res.status}`);
-    const text = await res.text();
-    await writeFile(COUNTRIES_PATH, text);
-    return JSON.parse(text);
-  }
-};
-
-// ── 導出（純粋関数） ────────────────────────────────────────
 
 // ── 各節（純粋関数。Item[] → Markdown） ───────────────────────
 
@@ -492,59 +459,25 @@ const sectionFetch = (log, coordLoss, allItems) => {
 
 // ── メイン ────────────────────────────────────────────────
 
-/** @type {readonly RawItem[]} */
-const rawItems = await readJson(EVENTS_PATH);
-const [classLabels, coordLoss, manual, log, countries, outsideParents, titles, attrs, populated] = await Promise.all([
+const [classLabels, coordLoss, manual] = await Promise.all([
   readJson(CLASS_LABELS_PATH),
   readJson(COORD_LOSS_PATH),
   readJson(MANUAL_ITEMS_PATH),
-  readJson(FETCH_LOG_PATH),
-  loadCountries(),
-  readJsonOr(PARENTS_PATH, {}),
-  readJsonOr(LIST_TITLES_PATH, {}),
-  readJsonOr(LIST_ATTRS_PATH, {}),
-  readJsonOr(LIST_POPULATED_PATH, {}),
 ]);
-
-// 選抜リスト: 保存済みのページ → 項目 → QID・属性を引き当てる
-const vitalPages = (
-  await Promise.all(VITAL_PAGES.map(async (cfg) => ({ cfg, page: await readJsonOr(pageFile(vitalPageTitle(cfg)), null) })))
-).filter((p) => p.page !== null);
-const timelinePages = (
-  await Promise.all(TIMELINE_PAGES.map(async (cfg) => ({ cfg, page: await readJsonOr(pageFile(cfg.page), null) })))
-).filter((p) => p.page !== null);
-const listRecords = [
-  ...vitalPages.flatMap(({ cfg, page }) =>
-    vitalEntries(cfg, page.wikitext).map((e) => {
-      const qid = titles[e.title]?.qid ?? null;
-      return listRecord({ source: e.source, domain: e.domain, title: e.title, listKind: "vital", level: e.level }, qid, qid ? attrs[qid] : undefined);
-    }),
-  ),
-  ...timelinePages.flatMap(({ cfg, page }) =>
-    timelineEntries(cfg, page.wikitext).map((e) => {
-      const subject = timelineSubject(e, titles, attrs, populated);
-      return listRecord(
-        { source: e.source, domain: e.domain, title: subject?.title ?? e.links[0], listKind: "timeline", yearLabel: e.yearLabel, text: e.text },
-        subject?.qid ?? null,
-        subject ? attrs[subject.qid] : undefined,
-      );
-    }),
-  ),
-];
-const listRevisions = [...vitalPages, ...timelinePages].map(({ page }) => `${page.page}（rev ${page.revid}）`);
-
-const countryIndex = buildCountryIndex(countries);
-const { all: allItems, population: mapped, thresholds } = buildItems({ rawItems, outsideParents, listRecords, countryIndex });
-const inRange = allItems.filter((i) => i.inAppRange && i.places.length > 0);
+const { all: allItems, population: mapped, thresholds, listRecords, countryIndex, fetchLog: log, listPages } = await loadAnalysis();
+const listRevisions = listPages.map((p) => `${p.page}（rev ${p.revid}）`);
+const inRange = allItems.filter((i) => i.inAppRange && i.places.length > 0 && i.sitelinks >= MIN_SITELINKS);
 
 const report = [
-  "# Wikidata 取得結果の分布レポート（R4b-1）",
+  "# Wikidata 取得結果の分布レポート（R4b-2: アプリに組み込むデータの母集団）",
   "",
   "> このファイルは `pnpm wikidata:report`（scripts/wikidata/report.mjs）が自動生成する。手で編集しない。",
   "> 数値の出所はすべて、`pnpm wikidata:fetch` と `pnpm wikidata:fetch-lists` が data/raw/ に保存した取得結果（コミット対象外）。",
-  "> 数値の読み方と所見は [FINDINGS.md](FINDINGS.md)。R4a 時点のレポートは [REPORT-R4a.md](REPORT-R4a.md)。",
+  "> 以前の時点のレポートと所見: [REPORT-R4a.md](REPORT-R4a.md)・[FINDINGS-R4a.md](FINDINGS-R4a.md)、[REPORT-R4b1.md](REPORT-R4b1.md)・[FINDINGS-R4b1.md](FINDINGS-R4b1.md)。",
+  "> 母集団と importance の決め方は CLAUDE.md「データパイプライン」にある。",
   "",
-  "母集団は「開始年がアプリの表示範囲内にあり、座標が1つ以上あり、7分類のどれかに入った項目」。以降、断りが無ければこの母集団で数える。",
+  `母集団は「開始年がアプリの表示範囲内にあり、座標が1つ以上あり、7分類のどれかに入り、sitelinks が ${MIN_SITELINKS} 以上の項目」。以降、断りが無ければこの母集団で数える。`,
+  "public/data/events/ に出力されるのは、このうち日本語か英語のラベルを持つ項目（build-app-data.mjs）。",
   "",
   sectionFetch(log, coordLoss, allItems),
   "",
