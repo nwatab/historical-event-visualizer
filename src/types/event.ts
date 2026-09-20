@@ -4,7 +4,7 @@
 
 /** 分類（7種）。主分類 `domain` と副分類 `tags` の両方で使う。 */
 export type Domain =
-  | "conflict" // 紛争：戦争、内乱、反乱
+  | "conflict" // 戦争・紛争：戦争、会戦、内乱、反乱
   | "polity" // 政体変動：革命、建国・滅亡、条約、制度改革
   | "science" // 科学：理論、発見、観測
   | "technology" // 技術：発明、実用化、インフラ

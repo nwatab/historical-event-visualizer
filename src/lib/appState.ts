@@ -78,6 +78,7 @@ export const appReducer =
           ? state
           : { ...state, selection: { ...state.selection, activeId: null } };
       case "closeSelection":
-        return { ...state, selection: null };
+        // すでに閉じていれば同じ状態を返す（地図の空白のクリックは何度でも来る）
+        return state.selection === null ? state : { ...state, selection: null };
     }
   };
