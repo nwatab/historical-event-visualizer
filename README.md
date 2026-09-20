@@ -8,11 +8,13 @@
 - **期間を持つ出来事**（戦争、帝国、飢饉など）は、開始年から終了年までのあいだ中抜きの輪として表示されます。
 - マーカーは7分類で色分けされています。左上の凡例は、ホバーでその分類を強調し、クリック（タップ）で表示／非表示を切り替えます。
 - マーカーをクリックすると、詳細（年または期間、説明、出典）が開きます。
-- 年スライダーには2種類の目盛りがあります。トラックの下は100年ごとの時間軸（紀元元年だけ太い線）、トラックの上はイベントのある年（期間を持つものは横の帯）で、凡例で非表示にした分類は除かれます。
+- 表示するマーカーは、重要度（importance 1〜3）とズームで絞っています。世界全体の表示では最も重要なものだけが出て、拡大すると増えます。
+- 場所を1点に決められない出来事（概念など、国単位の場所しか分からない項目）は、データには入っていますが、まだ地図には出していません（今後のリリースで年表に出す予定です）。
+- 年スライダーには2種類の目盛りがあります。トラックの下は100年ごとの時間軸（紀元元年だけ太い線）、トラックの上は重要度の高いイベントのある年（期間を持つものは横の帯）で、凡例で非表示にした分類は除かれます。
 
-データは手書きのサンプル38件です。疫病の伝播のように地理的に広がる出来事は、今後のリリースで広がりとして表示する予定で、現在は期間として表示しています。
+データは約 19,800 件です（2026-09-20 生成。正確な件数と内訳は `public/data/events/manifest.json`）。Wikidata と英語版 Wikipedia の Vital articles から取得した項目に、手書きのサンプル38件を統合しています。年代ごとのファイルに分けてあり、表示中の年の前後だけを読み込みます。分類は紛争が約7割を占め、地域はヨーロッパと北アメリカに偏っています（偏りの分析は `scripts/wikidata/FINDINGS-R4a.md`・`FINDINGS-R4b1.md`）。疫病の伝播のように地理的に広がる出来事は、今後のリリースで広がりとして表示する予定で、現在は期間として表示しています。
 
-分類・スキーマ・年の扱いなどの規約は [CLAUDE.md](CLAUDE.md) にまとめています。
+分類・スキーマ・年の扱い・データの生成手順などの規約は [CLAUDE.md](CLAUDE.md) にまとめています。
 
 公開 URL: https://nwatab.github.io/historical-event-visualizer/
 
@@ -60,9 +62,14 @@ MapLibre GL JS v6 は、ワーカーを別ファイル（`maplibre-gl-worker.mjs
 
 ## データ出典
 
-### イベントデータ — `src/data/events.sample.ts`
+### イベントデータ — `public/data/events/`
 
-手書きのサンプルデータです。各イベントの `source` に参照した Wikipedia の URL を付けています（年や期間はその記事で確認しています）。`id` は Wikidata の QID です（該当する項目が無いものは slug）。
+`scripts/wikidata/` のスクリプトで取得・生成し、生成した JSON をリポジトリに含めています（手順と規則は [CLAUDE.md](CLAUDE.md) の「データパイプライン」）。生成日時、取得データの日時、使った Vital articles の版番号は `public/data/events/manifest.json` に記録しています。
+
+- **[Wikidata](https://www.wikidata.org/)** — 項目の QID、ラベル、年、座標、分類（P31）、sitelinks 数。ライセンス: [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/)（[Wikidata:Licensing](https://www.wikidata.org/wiki/Wikidata:Licensing)）。[Wikidata Query Service](https://query.wikidata.org/) の SPARQL エンドポイントから取得。
+- **[英語版 Wikipedia の Vital articles（Level 5）](https://en.wikipedia.org/wiki/Wikipedia:Vital_articles/Level_5)** — 科学・技術・経済・文化の項目の選抜と、その分類（リストの節）に使用。ライセンス: [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)。使ったページは `scripts/wikidata/lists.mjs`、取得した版は manifest.json にあります。
+- 各イベントの `source` は、日本語版 Wikipedia の記事（無ければ英語版、それも無ければ Wikidata の項目）への URL です。記事の本文は取得・転載していません。詳細パネルでは、Wikipedia へのリンクに CC BY-SA 4.0 の表記を添えています。
+- **手書きのサンプル — `src/data/events.sample.ts`**（38件）。各イベントの `source` に参照した Wikipedia の URL を付けています（年や期間はその記事で確認しています）。`id` は Wikidata の QID です（該当する項目が無いものは slug）。生成時に統合し、QID が同じ項目は手書きを優先します。
 
 ### 陸地形状 — `public/geo/ne_110m_land.geojson`
 

@@ -2,7 +2,7 @@
 
 > **R4a 時点の凍結版。** コミット f52958b の `scripts/wikidata/report.mjs` が 2026-09-20 に生成したもの（元のファイル名は REPORT.md）。
 > R4b-1 で取得条件とレポートの作りを変えたので、現在のスクリプトではこの内容を再生成できない。冒頭のこの注記以外は生成時のまま。
-> 数値の読み方と所見は [FINDINGS-R4a.md](FINDINGS-R4a.md)。R4b-1 の結果は [REPORT.md](REPORT.md) と [FINDINGS.md](FINDINGS.md)。
+> 数値の読み方と所見は [FINDINGS-R4a.md](FINDINGS-R4a.md)。R4b-1 の結果は [REPORT-R4b1.md](REPORT-R4b1.md) と [FINDINGS-R4b1.md](FINDINGS-R4b1.md)。
 
 ## 取得の概要
 

@@ -1,5 +1,5 @@
 import type { FeatureCollection, Point } from "geojson";
-import type { Domain, HistEvent, TemporalKind, Year } from "@/types/event";
+import type { Domain, HistEvent, PlaceKind, TemporalKind, Year } from "@/types/event";
 
 /** 年スライダーの範囲（天文年）。 */
 export const YEAR_MIN: Year = -3000;
@@ -24,6 +24,8 @@ export interface EventMarkerProperties {
   readonly domain: Domain;
   readonly importance: HistEvent["importance"];
   readonly kind: MarkerKind;
+  /** "none" は地図に出さない（mapFilters.ts の filter 式で除く。生成データの none は places が空なので、そもそもマーカーにならない） */
+  readonly placeKind: PlaceKind;
   /** 年の差に応じた大きさの倍率（EVENT_EDGE_SCALE〜1）。period は常に 1。 */
   readonly fade: number;
 }
@@ -81,6 +83,7 @@ export const eventMarkers = (
         domain: event.domain,
         importance: event.importance,
         kind,
+        placeKind: event.placeKind ?? "point",
         fade,
       },
     }));
@@ -90,11 +93,16 @@ export const eventMarkers = (
 /**
  * importance ごとの表示を始めるズームレベル。ズームがこの値以上のときに表示する。
  * 値を変えれば調整できる（-Infinity は常に表示）。世界全体の初期表示は、幅の広い画面で zoom ≈ 1.3、
- * 縦長の画面で ≈ -0.6。
- * R2 時点では全件表示（サンプルが34件のため）。R5 でデータ量に応じて設定する。
+ * 縦長の画面で ≈ -0.6 なので、どちらでも importance 3 だけが出る。
+ *
+ * 世界全体の表示（zoom 1.3 でも -0.6 でも同じ）でのマーカー数は、1500年 13、1800年 50、1950年 121
+ * （2026-09-20 に生成したデータを scripts/wikidata/count-markers.mjs で数えた実測値。地図に出ない項目は除く）。
+ * 上限の目安にしている 500 を下回るので、閾値は 3 → 常時、2 → zoom 2 以上、1 → zoom 4 以上とした。
+ * zoom 2 では全世界で 120 / 415 / 911、zoom 4 では 252 / 1585 / 2495（画面に入るのはその一部）。
+ * データを作り直したら数え直すこと（CLAUDE.md「データパイプライン」）。
  */
 export const MIN_ZOOM_BY_IMPORTANCE: Readonly<Record<HistEvent["importance"], number>> = {
   3: -Infinity,
-  2: -Infinity,
-  1: -Infinity,
+  2: 2,
+  1: 4,
 };

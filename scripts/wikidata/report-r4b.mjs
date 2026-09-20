@@ -1,6 +1,5 @@
 // R4b-1 で追加した節（紛争の構造・選抜リスト・importance・R4a 条件との比較）。純粋関数のみ（項目の列 → Markdown）。
-import { importanceOf, importanceThresholds } from "./importance.mjs";
-import { LIST_PLACE_PROPS_SPEC, LIST_TIME_PROPS_SPEC, TIMELINE_PAGES, VITAL_PAGES } from "./lists.mjs";
+import { LIST_PLACE_PROPS_SPEC, LIST_TIME_PROPS_SPEC, VITAL_PAGES } from "./lists.mjs";
 import {
   COARSE_ERAS,
   DOMAINS,
@@ -169,13 +168,12 @@ export const sectionConflict = (all, population) => {
  * @param {readonly Item[]} population
  */
 export const sectionLists = (records, population) => {
-  const sources = [...VITAL_PAGES.map((p) => p.page), ...TIMELINE_PAGES.map((p) => p.page)];
+  const sources = VITAL_PAGES.map((p) => p.page);
   /** @param {readonly ListRecord[]} rs @param {string} name */
   const row = (rs, name) => {
     const n = rs.length;
     const resolved = rs.filter((r) => r.qid && r.attrs);
     const both = resolved.filter((r) => r.start && r.places.length > 0);
-    const rescuable = resolved.filter((r) => !r.start && r.listYear !== null && r.places.length > 0);
     return [
       name,
       n,
@@ -186,7 +184,6 @@ export const sectionLists = (records, population) => {
       percent(resolved.filter((r) => r.places.length > 0).length, n),
       both.length,
       percent(both.length, n),
-      rescuable.length,
     ];
   };
   const rows = [...sources.map((src) => row(records.filter((r) => r.source === src), src)), row(records, "**合計（のべ）**")];
@@ -237,16 +234,14 @@ export const sectionLists = (records, population) => {
   return [
     "## 2. 選抜リスト（英語版 Wikipedia）からの取得",
     "",
-    "出典は lists.mjs に列挙した Vital articles Level 5 の各ページと、年表形式の記事（CC BY-SA 4.0）。",
-    "年表は1行を1項目とし、行頭から 3 つまでのリンクのうち「人でも場所でもない最初の記事」を主題とした。",
+    "出典は lists.mjs に列挙した Vital articles Level 5 の各ページ（CC BY-SA 4.0）。年表形式の記事は R4b-2 で出典から外した。",
     "",
     "### 出典リストごとの項目数と取得率",
     "",
     `- 「年（指定）」は ${LIST_TIME_PROPS_SPEC.join("/")}、「場所（指定）」は ${LIST_PLACE_PROPS_SPEC.join("/")} だけを使った場合。「拡張」は P575（発見・発明の時点）・P580、P189（発見地）・P740・P291・P17 を足した場合で、以降の集計は拡張のほうを使う。`,
-    "- 「年表の年で救える」は、Wikidata に年が無いが場所はあり、年表の行頭の年が読めた項目（今回は母集団に入れていない）。",
     "",
     mdTable(
-      ["出典", "項目数", "QID 解決", "年（指定）", "年（拡張）", "場所（指定）", "場所（拡張）", "年・場所とも", "割合", "年表の年で救える"],
+      ["出典", "項目数", "QID 解決", "年（指定）", "年（拡張）", "場所（指定）", "場所（拡張）", "年・場所とも", "割合"],
       rows,
     ),
     "",
@@ -295,10 +290,8 @@ export const missingRecords = (records) =>
       qid: r.qid,
       label: r.attrs?.labels.ja ?? r.attrs?.labels.en ?? null,
       sitelinks: r.attrs?.sitelinks ?? null,
-      vitalLevel: r.listKind === "vital" ? (r.level ?? 5) : null,
+      vitalLevel: r.level,
       reasons: r.reasons,
-      // 年表に書かれていた年と本文（手入力の手がかり）
-      ...(r.yearLabel ? { listYearLabel: r.yearLabel, listYear: r.listYear, listText: r.text } : {}),
       // 取れていた側の値
       year: r.start?.year ?? null,
       place: r.places[0] ? { lon: r.places[0].lon, lat: r.places[0].lat, via: r.places[0].via } : null,
@@ -309,7 +302,7 @@ export const missingRecords = (records) =>
 
 /**
  * @param {readonly Item[]} population
- * @param {Record<string, { n: number, top5: number, top25: number }>} thresholds
+ * @param {Record<"p31" | "list", Record<string, { n: number, top5: number, top25: number }>>} thresholds 由来別の閾値
  */
 export const sectionImportance = (population, thresholds) => {
   const three = population.filter((i) => i.importance === 3);
@@ -320,11 +313,13 @@ export const sectionImportance = (population, thresholds) => {
   });
   const capped = population.filter((i) => i.base === 3 && i.importance < 3);
   const raised = population.filter((i) => i.base === 1 && i.importance > 1);
-  const thresholdRows = COARSE_ERAS.map((e) => {
-    const t = thresholds[e];
-    const n3 = three.filter((i) => coarseEra(yearOf(i)) === e).length;
-    return [e, t.n, fmt(t.top25), fmt(t.top5), n3, percent(n3, t.n)];
-  });
+  /** @param {"p31" | "list"} by */
+  const thresholdRows = (by) =>
+    COARSE_ERAS.map((e) => {
+      const t = thresholds[by][e];
+      const n3 = three.filter((i) => i.classification.by === by && coarseEra(yearOf(i)) === e).length;
+      return [e, t.n, fmt(t.top25), fmt(t.top5), n3, percent(n3, t.n)];
+    });
   /** @param {string} name @param {(i: Item) => boolean} pred */
   const breakdown = (name, pred) => {
     const n3 = three.filter(pred).length;
@@ -360,30 +355,11 @@ export const sectionImportance = (population, thresholds) => {
     return [name, items.length, fmt(q.q1), fmt(q.median), fmt(q.q3), fmt(q.p90), n3, percent(n3, items.length)];
   });
 
-  // 参考: パーセンタイルを「P31 ベース」と「リストで分類が決まった項目」で別々に取った場合（依頼の規則ではない）
-  const separately = [
-    population.filter((i) => i.classification.by === "p31"),
-    population.filter((i) => i.classification.by === "list"),
-  ].flatMap((group) => {
-    const t = importanceThresholds(group.map((i) => ({ year: yearOf(i), sitelinks: i.sitelinks })));
-    return group.map((i) => ({
-      item: i,
-      importance: importanceOf(
-        { year: yearOf(i), sitelinks: i.sitelinks, cappedAsEngagement: i.kind === "engagement" && i.parentWar !== null, vital: i.vital },
-        t,
-      ).importance,
-    }));
-  });
-  const three2 = separately.filter((x) => x.importance === 3).map((x) => x.item);
-  const altRows = DOMAINS.map((d) => {
-    const a = three.filter((i) => domainOf(i) === d).length;
-    const b = three2.filter((i) => domainOf(i) === d).length;
-    return [DOMAIN_LABELS[d], a, percent(a, three.length), b, percent(b, three2.length)];
-  });
   return [
-    "## 3. importance の試算",
+    "## 3. importance",
     "",
     "規則（importance.mjs）: 年代5区分ごとに sitelinks の上位 5% → 3、上位 25% → 2、それ以外 → 1。会戦は親の戦争が見つかれば上限 2。Vital articles に載っている項目は下限 2。",
+    "パーセンタイルは由来別に取る（「P31 で分類した項目」と「Vital articles の節で分類した項目」は別の母集団）。",
     "「上位 5%」は区分内の 95% 点以上として判定する（同じ sitelinks の項目を同じ扱いにするため、5% を少し超えることがある）。",
     "",
     mdTable(["importance", "件数", "割合", "（参考）上限・下限を掛ける前の件数"], levelRows, ["r", "r", "r", "r"]),
@@ -395,9 +371,13 @@ export const sectionImportance = (population, thresholds) => {
     "",
     mdTable(["由来", "件数", "Q1", "中央値", "Q3", "90%点", "importance 3", "割合"], originRows),
     "",
-    "### 年代区分ごとの閾値",
+    "### 年代区分ごとの閾値（P31 で分類した項目）",
     "",
-    mdTable(["年代", "母集団", "上位 25% の閾値（sitelinks）", "上位 5% の閾値", "importance 3 の件数", "割合"], thresholdRows),
+    mdTable(["年代", "母集団", "上位 25% の閾値（sitelinks）", "上位 5% の閾値", "importance 3 の件数", "割合"], thresholdRows("p31")),
+    "",
+    "### 年代区分ごとの閾値（Vital articles の節で分類した項目）",
+    "",
+    mdTable(["年代", "母集団", "上位 25% の閾値（sitelinks）", "上位 5% の閾値", "importance 3 の件数", "割合"], thresholdRows("list")),
     "",
     `### importance 3 の内訳（${three.length} 件）`,
     "",
@@ -416,14 +396,6 @@ export const sectionImportance = (population, thresholds) => {
         breakdown("Vital articles に載っている項目", (i) => i.vital),
       ],
     ),
-    "",
-    "### （参考）パーセンタイルを由来別に取った場合の、importance 3 の分類別内訳",
-    "",
-    "依頼の規則ではない。「P31 ベースの項目」と「リストで分類が決まった項目」を別の母集団として、それぞれの中で年代区分ごとの上位 5% / 25% を取った場合。上限・下限の規則は同じ。",
-    "",
-    mdTable(["分類", "依頼の規則: 3 の件数", "割合", "由来別に取った場合: 3 の件数", "割合"], altRows),
-    "",
-    `由来別に取った場合の importance 3 は ${three2.length} 件（うち会戦 ${three2.filter((i) => i.kind === "engagement").length}、戦争 ${three2.filter((i) => i.kind === "war").length}、リストで分類が決まった項目 ${three2.filter((i) => i.classification.by === "list").length}）。`,
     "",
     "### importance 3 の上位100件（sitelinks 順）",
     "",

@@ -1,6 +1,10 @@
 # R4b-1: 取得条件を変えた結果についての所見
 
-数値の表は [REPORT.md](REPORT.md)（自動生成）にある。このファイルは、その読み方と所見を手で書いたもの。
+> **R4b-1 時点の所見。** 本文中の「REPORT」は凍結版の [REPORT-R4b1.md](REPORT-R4b1.md) を指す。
+> この所見を受けた決定（importance を由来別に取る、年表を外す、sitelinks 2 未満を除外、国の代表点だけの項目は地図に出さない）は
+> R4b-2 で実装し、CLAUDE.md「データパイプライン」に書いた。現在のレポートは [REPORT.md](REPORT.md)。
+
+数値の表は [REPORT-R4b1.md](REPORT-R4b1.md) にある。このファイルは、その読み方と所見を手で書いたもの。
 R4a 時点の所見は [FINDINGS-R4a.md](FINDINGS-R4a.md)、その時のレポートは [REPORT-R4a.md](REPORT-R4a.md)。
 
 **出所の書き方**: この文書の数値は、断りが無いかぎり 2026-09-20（JST）に取得したデータから作った REPORT.md の値で、

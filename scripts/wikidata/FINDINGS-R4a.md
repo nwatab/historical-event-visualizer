@@ -1,6 +1,6 @@
 # R4a: Wikidata 取得結果についての所見
 
-> **R4a 時点の所見。** R4b-1 で取得条件を変えた後の結果は [FINDINGS.md](FINDINGS.md) にある。
+> **R4a 時点の所見。** R4b-1 で取得条件を変えた後の結果は [FINDINGS-R4b1.md](FINDINGS-R4b1.md) にある。
 > ここに書いた数値は R4a の取得条件（P625 必須）でのもので、本文中の「REPORT」は凍結版の [REPORT-R4a.md](REPORT-R4a.md) を指す。
 > 「CLAUDE.md への追記を提案」の件は、R4b-1 で CLAUDE.md に反映した。
 

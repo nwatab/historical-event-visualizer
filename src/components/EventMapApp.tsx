@@ -1,10 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
-import { sampleEvents } from "@/data/events.sample";
 import { appReducer, initialAppState, type AppAction, type AppState } from "@/lib/appState";
 import { SCREEN_INSET, SLIDER_PANEL_MAX_WIDTH } from "@/lib/design";
 import { INITIAL_YEAR, YEAR_MAX, YEAR_MIN, eventMarkers } from "@/lib/timeline";
+import { useEvents } from "@/lib/useEvents";
 import { eventTicks } from "@/lib/yearAxis";
 import type { Domain } from "@/types/event";
 import { DetailPanel } from "./DetailPanel";
@@ -13,8 +13,6 @@ import { WorldMapClient } from "./WorldMapClient";
 import { YearSlider } from "./YearSlider";
 
 const reducer = appReducer({ min: YEAR_MIN, max: YEAR_MAX });
-
-const eventsById = new Map(sampleEvents.map((event) => [event.id, event] as const));
 
 const isTextInput = (target: EventTarget | null): boolean =>
   target instanceof HTMLElement &&
@@ -37,8 +35,11 @@ const actionFromKey = (event: KeyboardEvent, state: AppState): AppAction | null 
 export function EventMapApp() {
   const [state, dispatch] = useReducer(reducer, INITIAL_YEAR, initialAppState);
   const [hoveredDomain, setHoveredDomain] = useState<Domain | null>(null);
-  const markers = useMemo(() => eventMarkers(sampleEvents, state.year), [state.year]);
-  const ticks = useMemo(() => eventTicks(sampleEvents, state.hiddenDomains), [state.hiddenDomains]);
+  // イベントは public/data/events/ から、現在年の前後の区間だけを読む。読み込み中は直前のものが返る
+  const { events, eventsById, manifest } = useEvents(state.year);
+  const markers = useMemo(() => eventMarkers(events, state.year), [events, state.year]);
+  // 年スライダーの目盛りは、全区間を読まなくても出せるように manifest に入っている要約（importance 3）から作る
+  const ticks = useMemo(() => eventTicks(manifest?.ticks ?? [], state.hiddenDomains), [manifest, state.hiddenDomains]);
 
   // キーハンドラは一度だけ登録し、最新の状態は ref から読む
   const stateRef = useRef(state);

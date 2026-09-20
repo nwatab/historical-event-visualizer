@@ -1,4 +1,4 @@
-// R4b-1: Wikipedia の選抜リスト（lists.mjs）から項目を取り、Wikidata の QID と属性を引いて data/raw/lists/ に保存する。
+// Wikipedia の選抜リスト（lists.mjs の Vital articles）から項目を取り、Wikidata の QID と属性を引いて data/raw/lists/ に保存する。
 //
 //   pnpm wikidata:fetch-lists
 //
@@ -7,18 +7,16 @@
 //   2. wikitext から記事名を抜く（wikipedia.mjs の純粋関数）
 //   3. 記事名 → QID（ページの wikibase_item。50 件ずつ）
 //   4. QID → sitelinks・ラベル・P31・年・場所（SPARQL、VALUES で 300 件ずつ）
-//   5. 年表の行の主題の候補について、人口（P1082）を持つか（＝地名か）を引く
 // どの段も、取得済みの分はファイルから読み、足りない分だけ問い合わせる。クエリは直列で、間隔を空ける。
 //
 // ここでは取得した値をそのまま保存するだけで、年・場所の選び方や分類は analyze.mjs が決める。
 import { mkdir, readFile, writeFile } from "node:fs/promises";
-import { LIST_ATTRS_PATH, LIST_PAGES_DIR, LIST_POPULATED_PATH, LIST_TITLES_PATH, LISTS_DIR } from "./config.mjs";
-import { pageFile, timelineEntries, vitalEntries, vitalPageTitle } from "./list-entries.mjs";
-import { LIST_PLACE_PROPS, LIST_TIME_PROPS, TIMELINE_PAGES, VITAL_PAGES } from "./lists.mjs";
+import { LIST_ATTRS_PATH, LIST_PAGES_DIR, LIST_TITLES_PATH, LISTS_DIR } from "./config.mjs";
+import { pageFile, vitalEntries, vitalPageTitle } from "./list-entries.mjs";
+import { LIST_PLACE_PROPS, LIST_TIME_PROPS, VITAL_PAGES } from "./lists.mjs";
 import {
   buildListCoreQuery,
   buildListPlacesQuery,
-  buildPopulatedQuery,
   buildListTimesQuery,
   parsePoint,
   parseYear,
@@ -161,57 +159,18 @@ const loadAttrs = async (qids) => {
   }, Promise.resolve(known));
 };
 
-/**
- * 年表の主題の候補が地名かどうか（人口を持つかどうか）。
- * @param {readonly string[]} qids @returns {Promise<Record<string, boolean>>}
- */
-const loadPopulated = async (qids) => {
-  /** @type {Record<string, boolean>} */
-  const known = (await readJson(LIST_POPULATED_PATH)) ?? {};
-  const batches = chunksOf(qids.filter((q) => !(q in known)).sort(), 300);
-  return batches.reduce(async (accP, batch) => {
-    const acc = await accP;
-    const result = await runQuery(buildPopulatedQuery(batch));
-    if (result.status !== "ok") {
-      console.warn(`  人口の有無の取得に失敗（${batch.length} 件）。再実行すれば、この分だけ取り直す`);
-      return acc;
-    }
-    const populated = new Set(result.bindings.map((b) => qidOf(b.item.value)));
-    const next = { ...acc, ...Object.fromEntries(batch.map((q) => [q, populated.has(q)])) };
-    await writeJson(LIST_POPULATED_PATH, next);
-    return next;
-  }, Promise.resolve(known));
-};
-
 // ── メイン ────────────────────────────────────────────────
 
 await mkdir(LIST_PAGES_DIR, { recursive: true });
 
-console.log(`[1/4] リストのページ（${VITAL_PAGES.length + TIMELINE_PAGES.length} ページ）`);
+console.log(`[1/3] リストのページ（${VITAL_PAGES.length} ページ）`);
 const vital = await sequentially(VITAL_PAGES, async (cfg) => ({ cfg, page: await loadPage(vitalPageTitle(cfg)) }));
-const timelines = await sequentially(TIMELINE_PAGES, async (cfg) => ({ cfg, page: await loadPage(cfg.page) }));
 
-const titles = [
-  ...new Set([
-    ...vital.flatMap(({ cfg, page }) => vitalEntries(cfg, page.wikitext).map((e) => e.title)),
-    ...timelines.flatMap(({ cfg, page }) => timelineEntries(cfg, page.wikitext).flatMap((e) => e.links)),
-  ]),
-].sort();
-console.log(`[2/4] 記事名 → QID（${titles.length} 件）`);
+const titles = [...new Set(vital.flatMap(({ cfg, page }) => vitalEntries(cfg, page.wikitext).map((e) => e.title)))].sort();
+console.log(`[2/3] 記事名 → QID（${titles.length} 件）`);
 const resolved = await loadTitles(titles);
 
-const qids = [...new Set(Object.values(resolved).flatMap((r) => (r.qid ? [r.qid] : [])))];
-console.log(`[3/4] Wikidata の属性（${qids.length} 件）`);
-const attrs = await loadAttrs(qids);
-
-const candidateQids = [
-  ...new Set(
-    timelines.flatMap(({ cfg, page }) =>
-      timelineEntries(cfg, page.wikitext).flatMap((e) => e.links.flatMap((t) => (resolved[t]?.qid ? [resolved[t].qid] : []))),
-    ),
-  ),
-];
-console.log(`[4/4] 年表の主題の候補が地名かどうか（${candidateQids.length} 件）`);
-const populated = await loadPopulated(/** @type {string[]} */ (candidateQids));
-console.log(`  地名 ${Object.values(populated).filter(Boolean).length} 件`);
+const qids = [...new Set(titles.flatMap((t) => (resolved[t]?.qid ? [resolved[t].qid] : [])))];
+console.log(`[3/3] Wikidata の属性（${qids.length} 件）`);
+const attrs = await loadAttrs(/** @type {string[]} */ (qids));
 console.log(`完了。属性あり ${Object.keys(attrs).length} 件。出力先: ${LISTS_DIR}`);

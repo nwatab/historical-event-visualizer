@@ -114,7 +114,10 @@ export interface EventTicks {
 }
 
 /** 表示中の分類のイベントから、B の目盛りを作る。分類による色分けはしない。 */
-export const eventTicks = (events: readonly HistEvent[], hiddenDomains: readonly Domain[]): EventTicks => {
+export const eventTicks = (
+  events: readonly Pick<HistEvent, "kind" | "start" | "end" | "domain">[],
+  hiddenDomains: readonly Domain[],
+): EventTicks => {
   const visible = events.filter((event) => !hiddenDomains.includes(event.domain));
   const instants = [...new Set(visible.filter((e) => e.kind === "instant").map((e) => e.start))].sort(
     (a, b) => a - b,

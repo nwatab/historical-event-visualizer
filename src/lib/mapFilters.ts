@@ -15,6 +15,7 @@ export const importancesVisibleAt = (
 /**
  * マーカーの表示条件（MapLibre の filter 式）。
  * - 非表示の分類を除く
+ * - 地図に出さない項目（placeKind が "none"。国の代表点しか無い項目など）を除く
  * - ズームに応じて importance で絞る（ズームを変えても GeoJSON は作り直さない）
  * 式は ["step", ["zoom"], …] の1段構成にし、分類などの条件は各段に入れている。
  * extra を渡すと、その条件も各段に加える（選択中のマーカーの強調レイヤーで使う）。
@@ -28,10 +29,12 @@ export const markerFilter = (
     "!",
     ["in", ["get", "domain"], ["literal", [...hiddenDomains]]],
   ];
+  const onMap: ExpressionSpecification = ["!=", ["get", "placeKind"], "none"];
   const at = (zoom: number): ExpressionSpecification =>
     [
       "all",
       domainVisible,
+      onMap,
       ["in", ["get", "importance"], ["literal", [...importancesVisibleAt(zoom, thresholds)]]],
       ...(extra === null ? [] : [extra]),
     ] as ExpressionSpecification;
