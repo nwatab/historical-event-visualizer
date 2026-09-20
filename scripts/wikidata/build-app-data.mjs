@@ -15,6 +15,7 @@ import {
   ARTICLES_PATH,
   MUL_LABELS_PATH,
   OVERRIDE_PLACES_PATH,
+  PLACE_CLASS_LABELS_PATH,
   PLACE_LABELS_PATH,
 } from "./config.mjs";
 import { loadAnalysis, readJsonOr } from "./load-analysis.mjs";
@@ -166,7 +167,7 @@ const countBy = (xs, key) =>
 
 // ── メイン ────────────────────────────────────────────────
 
-const { population, dropped, fetchLog, listPages, placeOverrides } = await loadAnalysis();
+const { population, dropped, fetchLog, listPages, placeOverrides, placeClasses } = await loadAnalysis();
 const [articles, placeLabels, resolved, mulLabels, sample] = await Promise.all([
   readJsonOr(ARTICLES_PATH, null),
   readJsonOr(PLACE_LABELS_PATH, null),
@@ -195,6 +196,27 @@ const sampleIds = new Set(sample.map((e) => e.id));
 const duplicates = generated.filter((e) => sampleIds.has(/** @type {string} */ (e.id)));
 const events = [...sample, ...generated.filter((e) => !sampleIds.has(/** @type {string} */ (e.id)))].sort(
   (a, b) => a.start - b.start || b.importance - a.importance || String(a.id).localeCompare(String(b.id)),
+);
+
+// 場所の粒度（R4e）の影響。R4d までの規則（場所はすべて使う。none は P495 / P17 だけの項目）と比べる。
+// 人が場所を決めた項目（place-overrides）は、粒度に関係なくその場所を使うので数えない。
+const COUNTRY_PROPS = ["P495", "P17"];
+const placeImpact = population
+  .filter((i) => !overrideByQid.has(i.qid) && generatedIds.has(i.qid))
+  .map((i) => {
+    const beforeNone = i.allPlaces.every((p) => COUNTRY_PROPS.includes(p.via));
+    const afterNone = i.countryLevelPlace;
+    const same = (/** @type {{ lon: number, lat: number }} */ a, /** @type {{ lon: number, lat: number }} */ b) => a.lon === b.lon && a.lat === b.lat;
+    return {
+      item: i,
+      becameNone: !beforeNone && afterNone,
+      reduced: !afterNone && i.places.length < i.allPlaces.length,
+      primaryChanged: !beforeNone && !afterNone && !same(i.places[0], i.allPlaces[0]),
+    };
+  });
+const granularityCounts = countBy(
+  population.flatMap((i) => i.allPlaces.filter((p) => p.loc).map((p) => p.granularity)),
+  (g) => g,
 );
 
 // 述語を足した件数（手書きを優先して置き換えた項目は数えない）
@@ -237,6 +259,8 @@ const manifest = {
   byPlaceKind: countBy(events, (e) => e.placeKind ?? "point"),
   // title に述語（〜の発見 / 〜の導入 / 〜の設立 / 〜の完成）を足した件数
   byTitlePredicate: byPredicate,
+  // 場所の項目（P276 などの先）の粒度別の数（place-granularity.mjs）。coarse は使わず、country は fine / region が無ければ none
+  placeGranularity: granularityCounts,
   // 年スライダーの目盛り用の要約。全区間のファイルを読まなくても目盛りを出せるように、importance 3 の項目だけを入れる
   // （全件だとほぼ毎年に目盛りが付き、目盛りの意味が無くなる）。地図に出ない項目（places が空）は除く。
   ticks: events
@@ -253,6 +277,35 @@ console.log(`母集団 ${population.length} 件 → ラベルなしで除外 ${n
 console.log(`手書きサンプル ${sample.length} 件（うち Wikidata 由来と QID が重複 ${duplicates.length} 件、手書きを優先）→ 合計 ${events.length} 件`);
 console.log("分類別:", JSON.stringify(manifest.byDomain));
 console.log("importance 別:", JSON.stringify(manifest.byImportance), " placeKind 別:", JSON.stringify(manifest.byPlaceKind));
+const describePlace = (/** @type {import("./analyze.mjs").GradedPlace} */ p) =>
+  `${p.loc ? (placeLabels[p.loc]?.ja ?? placeLabels[p.loc]?.en ?? p.loc) : "自身の座標"}[${p.granularity}]`;
+console.log("場所の項目（P276 などの先）の粒度:", JSON.stringify(granularityCounts));
+console.log(
+  `場所の粒度の影響: places が減った ${placeImpact.filter((x) => x.reduced).length} 件、none に変わった ${placeImpact.filter((x) => x.becameNone).length} 件` +
+    `（うち戦争 ${placeImpact.filter((x) => x.becameNone && x.item.kind === "war").length} 件）、primary が変わった ${placeImpact.filter((x) => x.primaryChanged).length} 件`,
+);
+console.log(
+  placeImpact
+    .filter((x) => x.becameNone || x.reduced || x.primaryChanged)
+    .sort((a, b) => b.item.sitelinks - a.item.sitelinks)
+    .slice(0, 20)
+    .map(
+      (x) =>
+        `  ${x.item.label}（${x.item.sitelinks}）: ${x.item.allPlaces.map(describePlace).join("、").slice(0, 160)} → ` +
+        (x.becameNone ? "none" : `${x.item.places.map(describePlace).join("、").slice(0, 100)}${x.primaryChanged ? "（primary 変更）" : ""}`),
+    )
+    .join("\n"),
+);
+/** @type {Record<string, string>} */
+const placeClassLabels = await readJsonOr(PLACE_CLASS_LABELS_PATH, {});
+const fineClasses = countBy(
+  population.flatMap((i) => i.allPlaces.filter((p) => p.loc && p.granularity === "fine").flatMap((p) => placeClasses[/** @type {string} */ (p.loc)]?.p31 ?? ["(P31 なし)"])),
+  (q) => q,
+);
+console.log(
+  "fine と判定された場所のクラス（上位。広い範囲のものがあれば place-granularity.mjs に足す）:",
+  Object.entries(fineClasses).sort((a, b) => b[1] - a[1]).slice(0, 25).map(([q, n]) => `${placeClassLabels[q] ?? q}(${n})`).join("、"),
+);
 console.log("title に述語を足した件数:", JSON.stringify(byPredicate));
 console.log("kind 別:", JSON.stringify(countBy(events, (e) => e.kind)));
 console.log("出典別:", JSON.stringify(countBy(events, (e) => (e.source ?? "").replace(/^https:\/\/([^/]+)\/.*$/, "$1") || "なし")));

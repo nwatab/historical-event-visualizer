@@ -10,6 +10,7 @@ import {
   LIST_ATTRS_PATH,
   LIST_TITLES_PATH,
   PARENTS_PATH,
+  PLACE_CLASSES_PATH,
   PLACE_OVERRIDES_PATH,
   USER_AGENT,
 } from "./config.mjs";
@@ -40,13 +41,14 @@ const loadCountries = async () => {
 export const loadAnalysis = async () => {
   /** @type {readonly import("./merge.mjs").RawItem[]} */
   const rawItems = await readJson(EVENTS_PATH);
-  const [log, countries, outsideParents, titles, attrs, placeOverrides] = await Promise.all([
+  const [log, countries, outsideParents, titles, attrs, placeOverrides, placeClasses] = await Promise.all([
     readJson(FETCH_LOG_PATH),
     loadCountries(),
     readJsonOr(PARENTS_PATH, {}),
     readJsonOr(LIST_TITLES_PATH, {}),
     readJsonOr(LIST_ATTRS_PATH, {}),
     /** @type {Promise<import("./place-overrides.mjs").PlaceOverrides>} */ (readJson(PLACE_OVERRIDES_PATH)),
+    readJsonOr(PLACE_CLASSES_PATH, {}),
   ]);
   // 選抜リスト: 保存済みのページ → 項目 → QID・属性を引き当てる。まだ取得していなければ空
   const vitalPages = (
@@ -60,7 +62,8 @@ export const loadAnalysis = async () => {
   );
   const countryIndex = buildCountryIndex(countries);
   return {
-    ...buildItems({ rawItems, outsideParents, listRecords, countryIndex, excludedQids: placeOverrides.exclude.map((e) => e.qid) }),
+    ...buildItems({ rawItems, outsideParents, listRecords, countryIndex, excludedQids: placeOverrides.exclude.map((e) => e.qid), placeClasses }),
+    placeClasses,
     placeOverrides,
     listRecords,
     countryIndex,

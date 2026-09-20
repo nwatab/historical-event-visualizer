@@ -11,6 +11,7 @@ import {
   LIST_TIME_PROPS_SPEC,
   WORK_CLASSES,
 } from "./lists.mjs";
+import { granularityOf } from "./place-granularity.mjs";
 import { regionOf } from "./regions.mjs";
 import { isChemicalElement } from "./title-predicates.mjs";
 import { ROOTS } from "./roots.mjs";
@@ -19,7 +20,9 @@ import { ROOTS } from "./roots.mjs";
 /** @typedef {import("./fetch-lists.mjs").ListAttrs} ListAttrs */
 /** @typedef {import("./p31-domain-map.mjs").Domain} Domain */
 /** @typedef {import("./regions.mjs").Region} Region */
+/** @typedef {import("./place-granularity.mjs").Granularity} Granularity */
 /** @typedef {{ lon: number, lat: number, via: string, loc?: string }} Place */
+/** 粒度を付けた場所。 @typedef {Place & { granularity: Granularity }} GradedPlace */
 /** @typedef {{ labels: { ja?: string, en?: string }, p31: string[], parents: string[], sitelinks: number, isWar?: boolean }} Parent */
 
 /** これ未満の sitelinks の項目は母集団に入れない（R4b-2 の決定4）。 */
@@ -152,9 +155,11 @@ export const listRecord = (ref, qid, attrs) => {
  *   listRecords: readonly ListRecord[],
  *   countryIndex: readonly import("./regions.mjs").CountryPolygon[],
  *   excludedQids?: readonly string[],
- * }} input excludedQids は、人が誤データと判断した項目（place-overrides.json の exclude）
+ *   placeClasses?: Readonly<Record<string, { p31: readonly string[] } | null>>,
+ * }} input placeClasses は、場所の項目（P276 などの先）の P31（fetch-places.mjs）。
+ *   excludedQids は、人が誤データと判断した項目（place-overrides.json の exclude）
  */
-export const buildItems = ({ rawItems, outsideParents, listRecords, countryIndex, excludedQids = [] }) => {
+export const buildItems = ({ rawItems, outsideParents, listRecords, countryIndex, excludedQids = [], placeClasses = {} }) => {
   const itemsByQid = new Map(rawItems.map((i) => [i.qid, i]));
   const usable = listRecords.filter((r) => r.qid && r.start && r.places.length > 0);
   const listsByQid = Map.groupBy(usable, (r) => /** @type {string} */ (r.qid));
@@ -173,7 +178,25 @@ export const buildItems = ({ rawItems, outsideParents, listRecords, countryIndex
     const rawStart = raw ? startOfRaw(raw) : null;
     // 年と場所は、P31 ベースの取得で取れていればそちら（出来事としての年・場所）を優先し、無ければリスト側
     const start = rawStart ?? first?.start ?? null;
-    const places = rawPlaces.length > 0 ? rawPlaces : (first?.places ?? []);
+    // 場所の粒度（place-granularity.mjs）。項目自身の座標（P625）は fine。P495 / P17 は値が必ず国なので country。
+    // それ以外は、場所の項目の P31 から決める。
+    /** @type {GradedPlace[]} */
+    const allPlaces = (rawPlaces.length > 0 ? rawPlaces : (first?.places ?? [])).map((p) => ({
+      ...p,
+      granularity: COUNTRY_LEVEL_PLACE_PROPS.includes(p.via)
+        ? "country"
+        : p.loc
+          ? granularityOf(placeClasses[p.loc]?.p31 ?? [])
+          : "fine",
+    }));
+    // 使うのは fine と region だけ（fine が先。ラベルを付ける最初の1点を、いちばん細かい場所にするため）。
+    // coarse は常に外し、country は fine / region があれば外す。fine も region も無ければ、地図に置ける場所が無い
+    const usable = [
+      ...allPlaces.filter((p) => p.granularity === "fine"),
+      ...allPlaces.filter((p) => p.granularity === "region"),
+    ];
+    // 地域の集計には、置ける場所が無い項目でも元の場所を使う（国の代表点でも地域は分かる）
+    const places = usable.length > 0 ? usable : allPlaces;
     const p31 = raw?.p31 ?? first?.attrs?.p31 ?? [];
     const byP31 = classify(p31);
     // 分類は、リストの節で決まるものがあればそれを主分類にする（P31 は使わない）。History のように節で決まらないときだけ P31 の写像表
@@ -206,8 +229,10 @@ export const buildItems = ({ rawItems, outsideParents, listRecords, countryIndex
       inAppRange: start !== null && start.year >= APP_YEAR_MIN && start.year <= APP_YEAR_MAX,
       places,
       coords: places,
-      // 場所が国の代表点でしかない項目（P495 / P17 経由）。データには残すが、アプリは地図に出さない（R4b-2 の決定2）
-      countryLevelPlace: places.length > 0 && COUNTRY_LEVEL_PLACE_PROPS.includes(places[0].via),
+      allPlaces,
+      // 地図に置ける場所（fine / region）が無く、国や大陸の代表点しか無い項目。データには残すが、地図には出さない
+      // （R4b-2 の決定2。R4e で、P495 / P17 だけでなく、P276 などの先が国・大陸・海洋の場合にも広げた）
+      countryLevelPlace: allPlaces.length > 0 && usable.length === 0,
       region: place.region,
       country: place.country,
       regionMethod: place.method,

@@ -50,6 +50,11 @@ export const ARTICLES_PATH = join(APP_RAW_DIR, "articles.json");
 export const MUL_LABELS_PATH = join(APP_RAW_DIR, "mul-labels.json");
 /** 場所（P276 などの先）の QID → { ja?, en? } */
 export const PLACE_LABELS_PATH = join(APP_RAW_DIR, "place-labels.json");
+/** 場所の項目（P276 / P189 などの先）の P31 とラベル。QID → { p31: string[], ja?, en? }。場所の粒度の判定に使う */
+export const PLACE_CLASSES_PATH = join(APP_RAW_DIR, "place-classes.json");
+/** 場所の項目の P31 に現れたクラスのラベル。QID → 英語ラベル（place-granularity.mjs の表を作るときに見る） */
+export const PLACE_CLASS_LABELS_PATH = join(APP_RAW_DIR, "place-class-labels.json");
+export const WIKIDATA_API = "https://www.wikidata.org/w/api.php";
 /** 人が承認した地点・起点の表（コミットする）。座標は書かれておらず、下の OVERRIDE_PLACES_PATH に取得結果を保存する */
 export const PLACE_OVERRIDES_PATH = join(import.meta.dirname, "place-overrides.json");
 /** place-overrides.json の places[].from から引いた座標。キーは `${from}|${path}` */
