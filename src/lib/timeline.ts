@@ -24,7 +24,7 @@ export interface EventMarkerProperties {
   readonly domain: Domain;
   readonly importance: HistEvent["importance"];
   readonly kind: MarkerKind;
-  /** "none" は地図に出さない（mapFilters.ts の filter 式で除く） */
+  /** "none" は地図に出さない（mapFilters.ts の filter 式で除く。生成データの none は places が空なので、そもそもマーカーにならない） */
   readonly placeKind: PlaceKind;
   /** 年の差に応じた大きさの倍率（EVENT_EDGE_SCALE〜1）。period は常に 1。 */
   readonly fade: number;
@@ -90,35 +90,15 @@ export const eventMarkers = (
   }),
 });
 
-/** 一覧（場所を特定できない出来事）に、絞り込まずに出す件数の上限。超えたら importance 3 だけにする。 */
-export const PLACELESS_LIST_LIMIT = 12;
-
-/**
- * 現在年の窓に入る、地図に出さないイベント（placeKind が "none"）。窓の判定はマーカーと同じ。
- * 件数が多いときは importance 3 だけにする。並びは重要度の高い順、同じなら現在年に近い順。
- */
-export const placelessEvents = (
-  events: readonly HistEvent[],
-  year: Year,
-  hiddenDomains: readonly Domain[],
-  limit: number = PLACELESS_LIST_LIMIT,
-): { readonly shown: readonly HistEvent[]; readonly total: number } => {
-  const inWindow = events
-    .filter((e) => e.placeKind === "none" && !hiddenDomains.includes(e.domain) && markerFade(e, year) !== null)
-    .sort((a, b) => b.importance - a.importance || Math.abs(a.start - year) - Math.abs(b.start - year));
-  const shown = inWindow.length > limit ? inWindow.filter((e) => e.importance === 3) : inWindow;
-  return { shown, total: inWindow.length };
-};
-
 /**
  * importance ごとの表示を始めるズームレベル。ズームがこの値以上のときに表示する。
  * 値を変えれば調整できる（-Infinity は常に表示）。世界全体の初期表示は、幅の広い画面で zoom ≈ 1.3、
  * 縦長の画面で ≈ -0.6 なので、どちらでも importance 3 だけが出る。
  *
- * 世界全体の表示（zoom 1.3 でも -0.6 でも同じ）でのマーカー数は、1500年 13、1800年 53、1950年 125
+ * 世界全体の表示（zoom 1.3 でも -0.6 でも同じ）でのマーカー数は、1500年 13、1800年 50、1950年 121
  * （2026-09-20 に生成したデータを scripts/wikidata/count-markers.mjs で数えた実測値。地図に出ない項目は除く）。
  * 上限の目安にしている 500 を下回るので、閾値は 3 → 常時、2 → zoom 2 以上、1 → zoom 4 以上とした。
- * zoom 2 では全世界で 120 / 414 / 909、zoom 4 では 252 / 1584 / 2493（画面に入るのはその一部）。
+ * zoom 2 では全世界で 120 / 415 / 911、zoom 4 では 252 / 1585 / 2495（画面に入るのはその一部）。
  * データを作り直したら数え直すこと（CLAUDE.md「データパイプライン」）。
  */
 export const MIN_ZOOM_BY_IMPORTANCE: Readonly<Record<HistEvent["importance"], number>> = {

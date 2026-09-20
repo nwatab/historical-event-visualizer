@@ -234,6 +234,41 @@ SELECT DISTINCT ?item ?agent ?src ?coord WHERE {
 }`;
 };
 
+/**
+ * place-overrides.json の places[].from から座標を引く。path が "P625" なら項目自身の座標、
+ * "P159>P625" なら P159（本部所在地。非推奨ランクは除く）の先の項目の座標と、その P159 の始点・終点の修飾子。
+ * 地球以外の座標は除く。精度（geoPrecision）は、座標が複数あるときに選ぶために取る。
+ * @param {string} qid @param {"P625" | "P159>P625"} path
+ */
+export const buildOverridePlaceQuery = (qid, path) => `
+SELECT ?hq ?from ?to ?lat ?lon ?prec ?ja ?en WHERE {
+  # 書いた順に結合させる。最適化に任せると P159 経由のほうがタイムアウトした（全項目の座標から始めてしまう）
+  hint:Query hint:optimizer "None" .
+  ${
+    path === "P625"
+      ? `BIND(wd:${qid} AS ?target)`
+      : `wd:${qid} p:P159 ?st . ?st ps:P159 ?hq ; wikibase:rank ?rank . FILTER(?rank != wikibase:DeprecatedRank)
+  OPTIONAL { ?st pq:P580 ?from } OPTIONAL { ?st pq:P582 ?to }
+  BIND(?hq AS ?target)`
+  }
+  ?target p:P625 ?cst . ?cst a wikibase:BestRank ; psv:P625 ?cv .
+  ?cv wikibase:geoLatitude ?lat ; wikibase:geoLongitude ?lon ; wikibase:geoGlobe wd:Q2 .
+  OPTIONAL { ?cv wikibase:geoPrecision ?prec }
+  OPTIONAL { ?target rdfs:label ?ja FILTER(LANG(?ja) = "ja") }
+  OPTIONAL { ?target rdfs:label ?en FILTER(LANG(?en) = "en") }
+}`;
+
+/**
+ * 多言語共通のラベル（mul）。Wikidata は、どの言語でも同じ表記になる名前（AK-47、Gmail など）を mul に寄せていて、
+ * そういう項目は日本語・英語のラベルを持たないことがある。
+ * @param {readonly string[]} qids
+ */
+export const buildMulLabelsQuery = (qids) => `
+SELECT ?item ?mul WHERE {
+  ${valuesOf(qids)}
+  ?item rdfs:label ?mul FILTER(LANG(?mul) = "mul")
+}`;
+
 // ── 応答の解釈（純粋関数） ──────────────────────────────────
 
 /** @param {string} uri */

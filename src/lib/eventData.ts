@@ -49,6 +49,3 @@ export const filesForYear = (
 export const mergeEventFiles = (chunks: readonly (readonly HistEvent[])[]): readonly HistEvent[] => [
   ...new Map(chunks.flatMap((events) => events.map((event) => [event.id, event] as const))).values(),
 ];
-
-/** 地図に出さない項目（場所の概念が無い、または地点をまだ決められていない）。 */
-export const isPlaceless = (event: HistEvent): boolean => event.placeKind === "none";

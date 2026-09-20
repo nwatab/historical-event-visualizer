@@ -47,7 +47,7 @@ export interface PathPoint {
  * 場所の性質。省略時は "point"。
  * - point:  特定の地点で起きた。通常のマーカー
  * - origin: 広がりを持つ概念の起点。通常のマーカーだが、R6 で diffusion に変換する対象
- * - none:   場所の概念が無い（または、まだ地点を決められていない）。地図には出さず、一覧に出す
+ * - none:   場所の概念が無い（または、まだ地点を決められていない）。places は空で、地図には出ない。R5 で年表に出す
  */
 export type PlaceKind = "point" | "origin" | "none";
 
@@ -64,15 +64,10 @@ export interface HistEvent {
   readonly start: Year;
   /** period / diffusion 用 */
   readonly end?: Year;
-  /** 同時発見等で複数可。placeKind が "none" で、地点の候補も無い項目では空 */
+  /** 同時発見等で複数可。placeKind が "none" の項目では空 */
   readonly places: readonly Place[];
   /** 省略時は "point" */
   readonly placeKind?: PlaceKind;
-  /**
-   * "country" は、places が国の代表点でしかないことを表す（Wikidata の P495 原産国 / P17 国 から取った座標）。
-   * 国の代表点に数百件が重なるので、地図には出さない。地点を人が決めたら、この印を外して placeKind を付け直す。
-   */
-  readonly placeQuality?: "country";
   /** diffusion 用 */
   readonly path?: readonly PathPoint[];
   /** 3 が最重要 */

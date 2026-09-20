@@ -9,6 +9,7 @@ import {
   LIST_PLACE_PROPS_SPEC,
   LIST_TIME_PROPS,
   LIST_TIME_PROPS_SPEC,
+  WORK_CLASSES,
 } from "./lists.mjs";
 import { regionOf } from "./regions.mjs";
 import { ROOTS } from "./roots.mjs";
@@ -149,9 +150,10 @@ export const listRecord = (ref, qid, attrs) => {
  *   outsideParents: Readonly<Record<string, Parent>>,
  *   listRecords: readonly ListRecord[],
  *   countryIndex: readonly import("./regions.mjs").CountryPolygon[],
- * }} input
+ *   excludedQids?: readonly string[],
+ * }} input excludedQids は、人が誤データと判断した項目（place-overrides.json の exclude）
  */
-export const buildItems = ({ rawItems, outsideParents, listRecords, countryIndex }) => {
+export const buildItems = ({ rawItems, outsideParents, listRecords, countryIndex, excludedQids = [] }) => {
   const itemsByQid = new Map(rawItems.map((i) => [i.qid, i]));
   const usable = listRecords.filter((r) => r.qid && r.start && r.places.length > 0);
   const listsByQid = Map.groupBy(usable, (r) => /** @type {string} */ (r.qid));
@@ -219,9 +221,16 @@ export const buildItems = ({ rawItems, outsideParents, listRecords, countryIndex
 
   // 母集団: 年がアプリの表示範囲内で、場所があり、7分類のどれかに入り、sitelinks が MIN_SITELINKS 以上の項目。
   // sitelinks 0〜1 の項目は、個々の核実験や一括登録されたデータセットが大半なので除く（R4b-2 の決定4）。
-  const population = all.filter(
+  const candidates = all.filter(
     (i) => i.inAppRange && i.places.length > 0 && i.classification.status === "mapped" && i.sitelinks >= MIN_SITELINKS,
   );
+  // そこから、場所が国の代表点しか無い作品（lists.mjs の WORK_CLASSES）と、人が誤データと判断した項目を除く
+  const isCountryOnlyWork = (/** @type {(typeof all)[number]} */ i) => i.countryLevelPlace && i.p31.some((c) => WORK_CLASSES.includes(c));
+  const dropped = {
+    countryOnlyWorks: candidates.filter(isCountryOnlyWork),
+    excludedByHand: candidates.filter((i) => excludedQids.includes(i.qid)),
+  };
+  const population = candidates.filter((i) => !isCountryOnlyWork(i) && !excludedQids.includes(i.qid));
   // importance のパーセンタイルは由来別に取る（R4b-2 の決定1）。出来事の記事（P31 で分類）と、
   // 物・作品・組織の記事（Vital articles の節で分類）とでは sitelinks の水準が一桁違い、混ぜると後者が上位を占めるため。
   /** @param {"p31" | "list"} by */
@@ -244,7 +253,7 @@ export const buildItems = ({ rawItems, outsideParents, listRecords, countryIndex
       thresholds[i.classification.by],
     ),
   }));
-  return { all, population: withImportance, thresholds };
+  return { all, population: withImportance, thresholds, dropped };
 };
 
 /** @typedef {ReturnType<typeof buildItems>["all"][number]} AnyItem */

@@ -46,8 +46,14 @@ export const LIST_MISSING_PATH = join(LISTS_DIR, "missing.json");
 export const APP_RAW_DIR = join(ROOT_DIR, "data", "raw", "app");
 /** QID → { ja?: 記事名, en?: 記事名 } */
 export const ARTICLES_PATH = join(APP_RAW_DIR, "articles.json");
+/** 日本語・英語のラベルが無い項目の、多言語共通ラベル（mul）。QID → ラベル（無ければ null） */
+export const MUL_LABELS_PATH = join(APP_RAW_DIR, "mul-labels.json");
 /** 場所（P276 などの先）の QID → { ja?, en? } */
 export const PLACE_LABELS_PATH = join(APP_RAW_DIR, "place-labels.json");
+/** 人が承認した地点・起点の表（コミットする）。座標は書かれておらず、下の OVERRIDE_PLACES_PATH に取得結果を保存する */
+export const PLACE_OVERRIDES_PATH = join(import.meta.dirname, "place-overrides.json");
+/** place-overrides.json の places[].from から引いた座標。キーは `${from}|${path}` */
+export const OVERRIDE_PLACES_PATH = join(APP_RAW_DIR, "override-places.json");
 /** 国の代表点しか無い項目（sitelinks 上位）の、地点の候補。QID → 候補の配列 */
 export const PLACE_CANDIDATES_PATH = join(APP_RAW_DIR, "place-candidates.json");
 export const PLACE_CANDIDATE_LABELS_PATH = join(APP_RAW_DIR, "place-candidate-labels.json");

@@ -4,11 +4,29 @@
 //
 //   1. 母集団の各項目の、日本語版・英語版 Wikipedia の記事名（出典 URL 用。SPARQL の schema:about）
 //   2. places の場所（P276 などの先の項目）のラベル（地名の表示用）
+//   3. 日本語・英語のラベルが無い項目の、多言語共通ラベル（mul）
+//   4. place-overrides.json（人が承認した地点・起点）の places[].from の座標
 // 取得済みの分は問い合わせない。クエリは直列で、間隔を空ける（sparql.mjs の runQuery）。
 import { mkdir, writeFile } from "node:fs/promises";
-import { APP_RAW_DIR, ARTICLES_PATH, PLACE_LABELS_PATH } from "./config.mjs";
-import { loadAnalysis, readJsonOr } from "./load-analysis.mjs";
-import { buildArticlesQuery, buildLabelsQuery, qidOf, runQuery } from "./sparql.mjs";
+import {
+  APP_RAW_DIR,
+  ARTICLES_PATH,
+  MUL_LABELS_PATH,
+  OVERRIDE_PLACES_PATH,
+  PLACE_LABELS_PATH,
+  PLACE_OVERRIDES_PATH,
+} from "./config.mjs";
+import { loadAnalysis, readJson, readJsonOr } from "./load-analysis.mjs";
+import { placeKey } from "./place-overrides.mjs";
+import {
+  buildArticlesQuery,
+  buildLabelsQuery,
+  buildMulLabelsQuery,
+  buildOverridePlaceQuery,
+  parseYear,
+  qidOf,
+  runQuery,
+} from "./sparql.mjs";
 
 /** @template T @param {readonly T[]} xs @param {number} size @returns {T[][]} */
 const chunksOf = (xs, size) =>
@@ -47,7 +65,7 @@ const LANG_BY_SITE = /** @type {Record<string, "ja" | "en">} */ ({
 await mkdir(APP_RAW_DIR, { recursive: true });
 const { population } = await loadAnalysis();
 
-console.log(`[1/2] Wikipedia の記事名（${population.length} 件）`);
+console.log(`[1/4] Wikipedia の記事名（${population.length} 件）`);
 await fillCache(ARTICLES_PATH, population.map((i) => i.qid), 300, async (batch) => {
   const result = await runQuery(buildArticlesQuery(batch));
   if (result.status !== "ok") return null;
@@ -60,7 +78,7 @@ await fillCache(ARTICLES_PATH, population.map((i) => i.qid), 300, async (batch) 
 });
 
 const locQids = [...new Set(population.flatMap((i) => i.places.flatMap((p) => (p.loc ? [p.loc] : []))))];
-console.log(`[2/2] 場所のラベル（${locQids.length} 件）`);
+console.log(`[2/4] 場所のラベル（${locQids.length} 件）`);
 await fillCache(PLACE_LABELS_PATH, locQids, 300, async (batch) => {
   const result = await runQuery(buildLabelsQuery(batch));
   if (result.status !== "ok") return null;
@@ -71,5 +89,39 @@ await fillCache(PLACE_LABELS_PATH, locQids, 300, async (batch) => {
     const en = rows.find((b) => b.en)?.en.value;
     return [qid, { ...(ja ? { ja } : {}), ...(en ? { en } : {}) }];
   });
+});
+const unlabeled = population.filter((i) => !i.labels.ja && !i.labels.en).map((i) => i.qid);
+console.log(`[3/4] 多言語共通ラベル（${unlabeled.length} 件）`);
+await fillCache(MUL_LABELS_PATH, unlabeled, 300, async (batch) => {
+  const result = await runQuery(buildMulLabelsQuery(batch));
+  if (result.status !== "ok") return null;
+  const byItem = new Map(result.bindings.map((b) => [qidOf(b.item.value), b.mul.value]));
+  return batch.map((qid) => [qid, byItem.get(qid) ?? null]);
+});
+
+/** @type {import("./place-overrides.mjs").PlaceOverrides} */
+const overrides = await readJson(PLACE_OVERRIDES_PATH);
+const overridePlaces = [...new Map(overrides.overrides.flatMap((o) => o.places ?? []).map((pl) => [placeKey(pl), pl])).values()];
+console.log(`[4/4] place-overrides の座標（${overridePlaces.length} か所）`);
+const placeByKey = new Map(overridePlaces.map((pl) => [placeKey(pl), pl]));
+await fillCache(OVERRIDE_PLACES_PATH, [...placeByKey.keys()], 1, async ([key]) => {
+  const place = /** @type {import("./place-overrides.mjs").OverridePlace} */ (placeByKey.get(key));
+  const result = await runQuery(buildOverridePlaceQuery(place.from, place.path));
+  if (result.status !== "ok") return null;
+  return [
+    [
+      key,
+      result.bindings.map((b) => ({
+        lat: Number(b.lat.value),
+        lon: Number(b.lon.value),
+        precision: b.prec ? Number(b.prec.value) : null,
+        ...(b.hq ? { hq: qidOf(b.hq.value) } : {}),
+        from: b.from ? parseYear(b.from.value) : null,
+        to: b.to ? parseYear(b.to.value) : null,
+        ...(b.ja ? { labelJa: b.ja.value } : {}),
+        ...(b.en ? { labelEn: b.en.value } : {}),
+      })),
+    ],
+  ];
 });
 console.log(`完了。出力先: ${APP_RAW_DIR}`);

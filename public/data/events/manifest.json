@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-09-20T04:53:42.891Z",
+ "generatedAt": "2026-09-20T07:22:40.281Z",
  "sources": {
   "wikidata": {
    "license": "CC0",
@@ -88,26 +88,31 @@
   "handwritten": {
    "file": "src/data/events.sample.ts",
    "count": 38
+  },
+  "placeOverrides": {
+   "file": "scripts/wikidata/place-overrides.json",
+   "applied": 21
   }
  },
- "total": 20698,
+ "total": 19768,
  "byDomain": {
   "conflict": 14797,
-  "culture": 1890,
+  "culture": 957,
   "economy": 320,
   "polity": 990,
-  "population": 2179,
-  "science": 118,
-  "technology": 404
+  "population": 2180,
+  "science": 117,
+  "technology": 407
  },
  "byImportance": {
-  "1": 13453,
-  "2": 6345,
-  "3": 900
+  "1": 13454,
+  "2": 5462,
+  "3": 852
  },
  "byPlaceKind": {
-  "none": 1372,
-  "point": 19326
+  "none": 419,
+  "origin": 11,
+  "point": 19338
  },
  "ticks": [
   {
@@ -813,6 +818,11 @@
    "kind": "instant",
    "start": 1415,
    "domain": "polity"
+  },
+  {
+   "kind": "instant",
+   "start": 1420,
+   "domain": "culture"
   },
   {
    "kind": "instant",
@@ -1534,11 +1544,6 @@
    "domain": "technology"
   },
   {
-   "kind": "instant",
-   "start": 1778,
-   "domain": "science"
-  },
-  {
    "kind": "period",
    "start": 1778,
    "end": 1779,
@@ -1551,11 +1556,6 @@
   },
   {
    "kind": "instant",
-   "start": 1783,
-   "domain": "science"
-  },
-  {
-   "kind": "instant",
    "start": 1785,
    "domain": "polity"
   },
@@ -1564,11 +1564,6 @@
    "start": 1787,
    "end": 1792,
    "domain": "conflict"
-  },
-  {
-   "kind": "instant",
-   "start": 1787,
-   "domain": "science"
   },
   {
    "kind": "instant",
@@ -1619,6 +1614,11 @@
    "start": 1792,
    "end": 1802,
    "domain": "conflict"
+  },
+  {
+   "kind": "instant",
+   "start": 1792,
+   "domain": "economy"
   },
   {
    "kind": "instant",
@@ -1689,11 +1689,6 @@
   {
    "kind": "instant",
    "start": 1801,
-   "domain": "science"
-  },
-  {
-   "kind": "instant",
-   "start": 1801,
    "domain": "polity"
   },
   {
@@ -1717,11 +1712,6 @@
    "start": 1803,
    "end": 1815,
    "domain": "conflict"
-  },
-  {
-   "kind": "instant",
-   "start": 1803,
-   "domain": "science"
   },
   {
    "kind": "period",
@@ -2097,20 +2087,10 @@
    "domain": "science"
   },
   {
-   "kind": "instant",
-   "start": 1860,
-   "domain": "science"
-  },
-  {
    "kind": "period",
    "start": 1861,
    "end": 1865,
    "domain": "conflict"
-  },
-  {
-   "kind": "instant",
-   "start": 1861,
-   "domain": "science"
   },
   {
    "kind": "period",
@@ -2167,6 +2147,11 @@
    "domain": "polity"
   },
   {
+   "kind": "instant",
+   "start": 1869,
+   "domain": "science"
+  },
+  {
    "kind": "period",
    "start": 1870,
    "end": 1871,
@@ -2188,6 +2173,11 @@
    "start": 1871,
    "end": 1871,
    "domain": "population"
+  },
+  {
+   "kind": "instant",
+   "start": 1876,
+   "domain": "technology"
   },
   {
    "kind": "instant",
@@ -2274,11 +2264,6 @@
   {
    "kind": "instant",
    "start": 1886,
-   "domain": "science"
-  },
-  {
-   "kind": "instant",
-   "start": 1886,
    "domain": "culture"
   },
   {
@@ -2343,11 +2328,6 @@
    "domain": "conflict"
   },
   {
-   "kind": "instant",
-   "start": 1898,
-   "domain": "science"
-  },
-  {
    "kind": "period",
    "start": 1898,
    "end": 1898,
@@ -2404,11 +2384,6 @@
    "domain": "conflict"
   },
   {
-   "kind": "instant",
-   "start": 1903,
-   "domain": "economy"
-  },
-  {
    "kind": "period",
    "start": 1904,
    "end": 1905,
@@ -2443,11 +2418,6 @@
   {
    "kind": "instant",
    "start": 1909,
-   "domain": "economy"
-  },
-  {
-   "kind": "instant",
-   "start": 1909,
    "domain": "technology"
   },
   {
@@ -2471,11 +2441,6 @@
    "start": 1911,
    "end": 1912,
    "domain": "polity"
-  },
-  {
-   "kind": "instant",
-   "start": 1911,
-   "domain": "economy"
   },
   {
    "kind": "period",
@@ -2550,11 +2515,6 @@
    "domain": "conflict"
   },
   {
-   "kind": "instant",
-   "start": 1916,
-   "domain": "economy"
-  },
-  {
    "kind": "period",
    "start": 1917,
    "end": 1917,
@@ -2576,6 +2536,11 @@
    "start": 1917,
    "end": 1922,
    "domain": "conflict"
+  },
+  {
+   "kind": "instant",
+   "start": 1917,
+   "domain": "culture"
   },
   {
    "kind": "instant",
@@ -2716,20 +2681,10 @@
    "domain": "economy"
   },
   {
-   "kind": "instant",
-   "start": 1926,
-   "domain": "economy"
-  },
-  {
    "kind": "period",
    "start": 1927,
    "end": 1950,
    "domain": "conflict"
-  },
-  {
-   "kind": "instant",
-   "start": 1928,
-   "domain": "science"
   },
   {
    "kind": "instant",
@@ -2744,6 +2699,12 @@
   {
    "kind": "instant",
    "start": 1929,
+   "domain": "economy"
+  },
+  {
+   "kind": "period",
+   "start": 1929,
+   "end": 1939,
    "domain": "economy"
   },
   {
@@ -2836,16 +2797,6 @@
    "kind": "instant",
    "start": 1937,
    "domain": "economy"
-  },
-  {
-   "kind": "instant",
-   "start": 1937,
-   "domain": "economy"
-  },
-  {
-   "kind": "instant",
-   "start": 1937,
-   "domain": "culture"
   },
   {
    "kind": "instant",
@@ -3139,16 +3090,6 @@
    "domain": "conflict"
   },
   {
-   "kind": "instant",
-   "start": 1946,
-   "domain": "economy"
-  },
-  {
-   "kind": "instant",
-   "start": 1946,
-   "domain": "culture"
-  },
-  {
    "kind": "period",
    "start": 1946,
    "end": 1954,
@@ -3368,6 +3309,12 @@
   },
   {
    "kind": "period",
+   "start": 1966,
+   "end": 1976,
+   "domain": "polity"
+  },
+  {
+   "kind": "period",
    "start": 1967,
    "end": 1970,
    "domain": "conflict"
@@ -3445,6 +3392,11 @@
    "domain": "conflict"
   },
   {
+   "kind": "instant",
+   "start": 1973,
+   "domain": "culture"
+  },
+  {
    "kind": "period",
    "start": 1973,
    "end": 1973,
@@ -3482,11 +3434,6 @@
    "kind": "instant",
    "start": 1975,
    "domain": "economy"
-  },
-  {
-   "kind": "instant",
-   "start": 1975,
-   "domain": "technology"
   },
   {
    "kind": "instant",
@@ -3617,11 +3564,6 @@
   {
    "kind": "instant",
    "start": 1986,
-   "domain": "culture"
-  },
-  {
-   "kind": "instant",
-   "start": 1986,
    "domain": "population"
   },
   {
@@ -3676,6 +3618,11 @@
    "kind": "instant",
    "start": 1989,
    "domain": "polity"
+  },
+  {
+   "kind": "instant",
+   "start": 1989,
+   "domain": "technology"
   },
   {
    "kind": "period",
@@ -3815,6 +3762,11 @@
    "domain": "conflict"
   },
   {
+   "kind": "instant",
+   "start": 1995,
+   "domain": "technology"
+  },
+  {
    "kind": "period",
    "start": 1996,
    "end": 2006,
@@ -3830,6 +3782,11 @@
    "kind": "instant",
    "start": 1997,
    "domain": "culture"
+  },
+  {
+   "kind": "instant",
+   "start": 1997,
+   "domain": "technology"
   },
   {
    "kind": "period",
@@ -3878,6 +3835,11 @@
   },
   {
    "kind": "instant",
+   "start": 1999,
+   "domain": "economy"
+  },
+  {
+   "kind": "instant",
    "start": 2001,
    "domain": "conflict"
   },
@@ -3916,11 +3878,6 @@
    "kind": "instant",
    "start": 2001,
    "domain": "polity"
-  },
-  {
-   "kind": "instant",
-   "start": 2002,
-   "domain": "economy"
   },
   {
    "kind": "period",
@@ -4406,6 +4363,11 @@
    "domain": "polity"
   },
   {
+   "kind": "instant",
+   "start": 2022,
+   "domain": "technology"
+  },
+  {
    "kind": "period",
    "start": 2023,
    "end": 2023,
@@ -4520,8 +4482,8 @@
    "file": "-3000.json",
    "from": -3000,
    "to": -2500,
-   "count": 13,
-   "bytes": 3762
+   "count": 12,
+   "bytes": 3397
   },
   {
    "file": "-2500.json",
@@ -4534,57 +4496,57 @@
    "file": "-2000.json",
    "from": -2000,
    "to": -1500,
-   "count": 11,
-   "bytes": 3252
+   "count": 10,
+   "bytes": 2770
   },
   {
    "file": "-1500.json",
    "from": -1500,
    "to": -1000,
    "count": 21,
-   "bytes": 5899
+   "bytes": 5756
   },
   {
    "file": "-1000.json",
    "from": -1000,
    "to": -500,
-   "count": 69,
-   "bytes": 19059
+   "count": 68,
+   "bytes": 18752
   },
   {
    "file": "-500.json",
    "from": -500,
    "to": 0,
-   "count": 603,
-   "bytes": 169322
+   "count": 594,
+   "bytes": 165845
   },
   {
    "file": "0.json",
    "from": 0,
    "to": 100,
-   "count": 50,
-   "bytes": 14252
+   "count": 49,
+   "bytes": 13893
   },
   {
    "file": "100.json",
    "from": 100,
    "to": 200,
-   "count": 42,
-   "bytes": 12233
+   "count": 40,
+   "bytes": 11530
   },
   {
    "file": "200.json",
    "from": 200,
    "to": 300,
-   "count": 76,
-   "bytes": 21090
+   "count": 74,
+   "bytes": 20500
   },
   {
    "file": "300.json",
    "from": 300,
    "to": 400,
    "count": 80,
-   "bytes": 22989
+   "bytes": 22923
   },
   {
    "file": "400.json",
@@ -4598,112 +4560,112 @@
    "from": 500,
    "to": 600,
    "count": 110,
-   "bytes": 30967
+   "bytes": 30835
   },
   {
    "file": "600.json",
    "from": 600,
    "to": 700,
-   "count": 167,
-   "bytes": 47320
+   "count": 166,
+   "bytes": 46858
   },
   {
    "file": "700.json",
    "from": 700,
    "to": 800,
    "count": 120,
-   "bytes": 33785
+   "bytes": 33652
   },
   {
    "file": "800.json",
    "from": 800,
    "to": 900,
    "count": 151,
-   "bytes": 41080
+   "bytes": 40935
   },
   {
    "file": "900.json",
    "from": 900,
    "to": 1000,
    "count": 122,
-   "bytes": 34234
+   "bytes": 33671
   },
   {
    "file": "1000.json",
    "from": 1000,
    "to": 1100,
-   "count": 223,
-   "bytes": 61311
+   "count": 216,
+   "bytes": 58299
   },
   {
    "file": "1100.json",
    "from": 1100,
    "to": 1200,
-   "count": 284,
-   "bytes": 76802
+   "count": 281,
+   "bytes": 75361
   },
   {
    "file": "1200.json",
    "from": 1200,
    "to": 1300,
-   "count": 414,
-   "bytes": 111791
+   "count": 409,
+   "bytes": 109893
   },
   {
    "file": "1300.json",
    "from": 1300,
    "to": 1400,
-   "count": 474,
-   "bytes": 128929
+   "count": 466,
+   "bytes": 125757
   },
   {
    "file": "1400.json",
    "from": 1400,
    "to": 1500,
-   "count": 548,
-   "bytes": 150593
+   "count": 543,
+   "bytes": 148423
   },
   {
    "file": "1500.json",
    "from": 1500,
    "to": 1600,
-   "count": 950,
-   "bytes": 260298
+   "count": 935,
+   "bytes": 254590
   },
   {
    "file": "1600.json",
    "from": 1600,
    "to": 1700,
-   "count": 1139,
-   "bytes": 313127
+   "count": 1118,
+   "bytes": 305342
   },
   {
    "file": "1700.json",
    "from": 1700,
    "to": 1800,
-   "count": 1721,
-   "bytes": 474283
+   "count": 1685,
+   "bytes": 460891
   },
   {
    "file": "1800.json",
    "from": 1800,
    "to": 1900,
-   "count": 3509,
-   "bytes": 966252
+   "count": 3389,
+   "bytes": 920360
   },
   {
    "file": "1900.json",
    "from": 1900,
    "to": 2000,
-   "count": 6581,
-   "bytes": 1869844
+   "count": 5982,
+   "bytes": 1638074
   },
   {
    "file": "2000.json",
    "from": 2000,
    "to": 2100,
-   "count": 3431,
-   "bytes": 954699
+   "count": 3338,
+   "bytes": 918183
   }
  ]
 }

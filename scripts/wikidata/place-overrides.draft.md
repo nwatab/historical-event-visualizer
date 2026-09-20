@@ -1,4 +1,7 @@
-# place-overrides の下書き（人の確認待ち）
+# place-overrides の下書き（2026-09-20 に確認済み）
+
+> **この版は人が確認済み。** 確認の結果は [place-overrides.json](place-overrides.json) に反映した（この表の仮分類と座標候補は、確認前のたたき台のまま残してある）。
+> 確認後に方針が変わり、作品類（映画・番組・小説など）で場所が国の代表点しか無い項目は、データに含めないことになった。
 
 > `pnpm wikidata:place-overrides-draft`（scripts/wikidata/build-place-overrides-draft.mjs）が生成した下書き。
 > 国の代表点しか場所が無い項目（Wikidata の P495 原産国 / P17 国 から取った座標）のうち、sitelinks 上位 100 件。

@@ -1,0 +1,129 @@
+{
+  "about": [
+    "国の代表点しか場所が無い項目（Wikidata の P495 / P17 のみ）のうち、人が確認して地点・起点を決めたものの表。",
+    "下書き place-overrides.draft.md を 2026-09-20 に人が確認し、その指示をこの形に書き写した。ここに無い『国の代表点のみ』の項目は placeKind: none（places は空）になる。",
+    "座標はこのファイルに書かない。places[].from の QID から、path の経路で Wikidata の P625 を引く（pnpm wikidata:fetch-app-extras が取得し、build-app-data.mjs が反映する）。",
+    "path: \"P625\" は from の項目自身の座標。\"P159>P625\" は from の P159（本部所在地）の先の項目の座標で、P159 に始点・終点の修飾子があれば、その出来事の年（start の上書きがあればその年）に該当するものを選ぶ。",
+    "from の QID と fromLabel の対応は、2026-09-20 に wbgetentities / wbsearchentities の出力で照合した。QID を足すときも照合すること。",
+    "label は地図に出す地名。省略すると from の日本語ラベルを使う。",
+    "start / end / kind は、Wikidata から導いた値の上書き。理由を note に書く。"
+  ],
+  "overrides": [
+    { "qid": "Q10693", "title": "周期表", "placeKind": "point", "places": [{ "from": "Q656", "fromLabel": "サンクトペテルブルク", "path": "P625" }] },
+    { "qid": "Q8811", "title": "HTML", "placeKind": "point", "places": [{ "from": "Q42944", "fromLabel": "欧州原子核研究機構（CERN）", "path": "P625" }] },
+    { "qid": "Q251", "title": "Java", "placeKind": "point", "places": [{ "from": "Q159260", "fromLabel": "サンタ・クララ", "path": "P625" }] },
+    { "qid": "Q115564437", "title": "ChatGPT", "placeKind": "point", "places": [{ "from": "Q62", "fromLabel": "サンフランシスコ", "path": "P625" }] },
+    {
+      "qid": "Q1575",
+      "title": "Internet Explorer",
+      "placeKind": "point",
+      "places": [{ "from": "Q6331329", "fromLabel": "マイクロソフト・レドモンドキャンパス", "path": "P625" }],
+      "note": "下書きの候補（Microsoft Silicon Valley Campus）は不採用"
+    },
+    {
+      "qid": "Q11035",
+      "title": "電話機",
+      "placeKind": "point",
+      "places": [
+        { "from": "Q100", "fromLabel": "ボストン", "path": "P625", "label": "ベル" },
+        { "from": "Q1297", "fromLabel": "シカゴ", "path": "P625", "label": "グレイ" }
+      ]
+    },
+    {
+      "qid": "Q8690",
+      "title": "文化大革命",
+      "placeKind": "point",
+      "places": [{ "from": "Q956", "fromLabel": "北京市", "path": "P625" }],
+      "kind": "period",
+      "start": 1966,
+      "end": 1976,
+      "note": "period（1966–1976）であることを明示する"
+    },
+    { "qid": "Q9366", "title": "Google検索", "placeKind": "point", "places": [{ "from": "Q41506", "fromLabel": "スタンフォード大学", "path": "P625" }] },
+    {
+      "qid": "Q37116",
+      "title": "AK-47",
+      "placeKind": "point",
+      "places": [{ "from": "Q5426", "fromLabel": "イジェフスク", "path": "P625" }],
+      "note": "AK-47 の項目に P176（製造者）が無く、P176 → P159 の経路が使えなかったので、都市の項目を使う"
+    },
+
+    { "qid": "Q11401", "title": "ヒップホップ・ミュージック", "placeKind": "origin", "places": [{ "from": "Q18426", "fromLabel": "ブロンクス区", "path": "P625" }] },
+    {
+      "qid": "Q40415",
+      "title": "印象派",
+      "placeKind": "origin",
+      "places": [{ "from": "Q90", "fromLabel": "パリ", "path": "P625" }],
+      "start": 1874,
+      "note": "start を 1860（Wikidata の P571）から 1874（第1回印象派展）に上書き"
+    },
+    { "qid": "Q8341", "title": "ジャズ", "placeKind": "origin", "places": [{ "from": "Q34404", "fromLabel": "ニューオーリンズ", "path": "P625" }] },
+    {
+      "qid": "Q8698",
+      "title": "世界恐慌",
+      "placeKind": "origin",
+      "places": [{ "from": "Q60", "fromLabel": "ニューヨーク", "path": "P625" }],
+      "kind": "period",
+      "start": 1929,
+      "end": 1939,
+      "note": "period（1929–1939）にする。Wikidata 由来のデータでは instant だった"
+    },
+
+    {
+      "qid": "Q25224",
+      "title": "スターリング・ポンド",
+      "placeKind": "origin",
+      "places": [{ "from": "Q183231", "fromLabel": "イングランド銀行", "path": "P159>P625", "label": "イングランド銀行" }],
+      "note": "通貨は、導入年に発行を担った機関の所在地を起点にする。イングランド銀行（1694 設立）に P625 は無く、P159 は Q63637740（Bank of England building in London）で、期間の修飾子は無い"
+    },
+    {
+      "qid": "Q4917",
+      "title": "アメリカ合衆国ドル",
+      "placeKind": "origin",
+      "places": [{ "from": "Q3441320", "fromLabel": "フィラデルフィア造幣局", "path": "P625" }],
+      "note": "1792 年貨幣法。この項目は P625 を2つ持つ（39.9536,-75.1474 と 39.95,-75.17）。どちらが 1792 年の所在地かは Wikidata からは分からないので、精度の高いほうを使う"
+    },
+    {
+      "qid": "Q8146",
+      "title": "円",
+      "placeKind": "origin",
+      "places": [{ "from": "Q1130777", "fromLabel": "造幣局（大阪）", "path": "P625" }],
+      "note": "1871 年新貨条例。造幣局（Q1130777、1871 設立）の P625"
+    },
+    {
+      "qid": "Q25344",
+      "title": "スイス・フラン",
+      "placeKind": "origin",
+      "places": [{ "from": "Q70", "fromLabel": "ベルン", "path": "P625", "label": "連邦造幣所（ベルン）" }],
+      "note": "連邦造幣所（Swissmint、Q672792）の P159 は 1906-07-02 以降の建物（Q27037187）しか無く、P625 もその位置。導入年（1850）に該当する所在地が Wikidata に無いので、移転前も所在していた都市ベルンの項目の座標を使う"
+    },
+    {
+      "qid": "Q39099",
+      "title": "人民幣",
+      "placeKind": "origin",
+      "places": [{ "from": "Q58401", "fromLabel": "石家荘市", "path": "P625", "label": "中国人民銀行（石家荘）" }],
+      "start": 1948,
+      "note": "start を 1949 から 1948（中国人民銀行の設立・発行開始。Q249203 の P571 は 1948-12-01）に上書き。設立地の石家荘を使う（北京への移転は 1949）。Q249203 の P159 は北京・上海で、期間の修飾子が無いので使わない"
+    },
+    {
+      "qid": "Q41044",
+      "title": "ロシア・ルーブル",
+      "placeKind": "origin",
+      "places": [{ "from": "Q806651", "fromLabel": "ロシア連邦中央銀行", "path": "P159>P625", "label": "ロシア連邦中央銀行" }],
+      "note": "下書きの候補（ゴズナク）は不採用。中央銀行に P625 は無く、P159 は Q55657994（Bank of Russia Building）"
+    },
+    {
+      "qid": "Q4916",
+      "title": "ユーロ",
+      "placeKind": "origin",
+      "places": [{ "from": "Q8901", "fromLabel": "欧州中央銀行", "path": "P159>P625", "label": "欧州中央銀行" }],
+      "note": "欧州中央銀行の P625 は 2014 年 11 月に移った現在の建物の位置。導入年（1999）には、P159 のうち終点が 2014 の値（Q1794 フランクフルト）が該当する"
+    },
+
+    { "qid": "Q131723", "title": "ビットコイン", "placeKind": "none", "note": "発行機関が無い" }
+  ],
+  "exclude": [
+    { "qid": "Q162297", "title": "衛生", "reason": "誤データ（概念の項目。年が前 3000 年）" },
+    { "qid": "Q47433", "title": "紙幣", "reason": "誤データ（概念の項目。年が 618 年）" }
+  ]
+}

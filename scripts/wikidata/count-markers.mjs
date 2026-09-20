@@ -9,7 +9,7 @@ import { join } from "node:path";
 import { APP_DATA_DIR } from "./config.mjs";
 import { importFromSrc } from "./load-ts.mjs";
 
-const [{ eventMarkers, placelessEvents, EVENT_WINDOW_YEARS }, { importancesVisibleAt }, { filesForYear, mergeEventFiles }] =
+const [{ eventMarkers, EVENT_WINDOW_YEARS }, { importancesVisibleAt }, { filesForYear, mergeEventFiles }] =
   await Promise.all([importFromSrc("lib/timeline.ts"), importFromSrc("lib/mapFilters.ts"), importFromSrc("lib/eventData.ts")]);
 
 /** 世界全体の初期表示のズーム（幅の広い画面 1.3、縦長の画面 -0.6）と、閾値の前後。 */
@@ -28,8 +28,7 @@ const rows = await Promise.all(
       const shown = features.filter((/** @type {any} */ f) => visible.includes(f.properties.importance));
       return `zoom ${zoom}: マーカー ${shown.length}（イベント ${new Set(shown.map((/** @type {any} */ f) => f.properties.id)).size}）`;
     });
-    const placeless = placelessEvents(events, year, []);
-    return `${year}年  読むファイル ${files.map((/** @type {{ file: string }} */ f) => f.file).join(", ")}（${events.length} 件）\n  ${counts.join("\n  ")}\n  場所を特定できない出来事: 窓内 ${placeless.total} 件 → 一覧に出す ${placeless.shown.length} 件`;
+    return `${year}年  読むファイル ${files.map((/** @type {{ file: string }} */ f) => f.file).join(", ")}（${events.length} 件）\n  ${counts.join("\n  ")}`;
   }),
 );
 console.log(rows.join("\n"));

@@ -3,13 +3,12 @@
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { appReducer, initialAppState, type AppAction, type AppState } from "@/lib/appState";
 import { SCREEN_INSET, SLIDER_PANEL_MAX_WIDTH } from "@/lib/design";
-import { INITIAL_YEAR, YEAR_MAX, YEAR_MIN, eventMarkers, placelessEvents } from "@/lib/timeline";
+import { INITIAL_YEAR, YEAR_MAX, YEAR_MIN, eventMarkers } from "@/lib/timeline";
 import { useEvents } from "@/lib/useEvents";
 import { eventTicks } from "@/lib/yearAxis";
 import type { Domain } from "@/types/event";
 import { DetailPanel } from "./DetailPanel";
 import { Legend } from "./Legend";
-import { PlacelessList } from "./PlacelessList";
 import { WorldMapClient } from "./WorldMapClient";
 import { YearSlider } from "./YearSlider";
 
@@ -41,10 +40,6 @@ export function EventMapApp() {
   const markers = useMemo(() => eventMarkers(events, state.year), [events, state.year]);
   // 年スライダーの目盛りは、全区間を読まなくても出せるように manifest に入っている要約（importance 3）から作る
   const ticks = useMemo(() => eventTicks(manifest?.ticks ?? [], state.hiddenDomains), [manifest, state.hiddenDomains]);
-  const placeless = useMemo(
-    () => placelessEvents(events, state.year, state.hiddenDomains),
-    [events, state.year, state.hiddenDomains],
-  );
 
   // キーハンドラは一度だけ登録し、最新の状態は ref から読む
   const stateRef = useRef(state);
@@ -100,18 +95,13 @@ export function EventMapApp() {
           className="flex min-h-0 flex-1 flex-col items-start sm:flex-row sm:justify-between"
           style={{ gap: SCREEN_INSET }}
         >
-          <div className="pointer-events-auto flex max-h-full min-h-0 shrink-0 flex-col items-start" style={{ gap: SCREEN_INSET }}>
+          <div className="pointer-events-auto shrink-0">
             <Legend
               hiddenDomains={state.hiddenDomains}
               highlighted={hoveredDomain}
               onHover={setHoveredDomain}
               onToggle={(domain) => dispatch({ type: "toggleDomain", domain })}
               onShowAll={() => dispatch({ type: "showAllDomains" })}
-            />
-            <PlacelessList
-              events={placeless.shown}
-              totalCount={placeless.total}
-              onOpen={(eventId) => dispatch({ type: "selectEvents", eventIds: [eventId] })}
             />
           </div>
           {state.selection !== null && (

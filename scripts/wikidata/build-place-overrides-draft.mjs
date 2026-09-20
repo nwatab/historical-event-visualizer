@@ -1,4 +1,4 @@
-// 国の代表点しか場所が無い項目（placeQuality: "country"）の sitelinks 上位について、
+// 国の代表点しか場所が無い項目（Wikidata の P495 / P17 のみ。まだ人が地点を決めていないもの）の sitelinks 上位について、
 // 人が確認するための下書き（scripts/wikidata/place-overrides.draft.md）を作る。
 //
 //   pnpm wikidata:place-overrides-draft
@@ -119,9 +119,11 @@ const describe = (c, labelOf) =>
 // ── メイン ────────────────────────────────────────────────
 
 await mkdir(APP_RAW_DIR, { recursive: true });
-const { population } = await loadAnalysis();
+const { population, placeOverrides } = await loadAnalysis();
+// すでに place-overrides.json で扱いを決めた項目は出さない（次に確認する候補だけを出す）
+const decided = new Set(placeOverrides.overrides.map((o) => o.qid));
 const targets = population
-  .filter((i) => i.countryLevelPlace)
+  .filter((i) => i.countryLevelPlace && !decided.has(i.qid))
   .sort((a, b) => b.sitelinks - a.sitelinks || a.qid.localeCompare(b.qid))
   .slice(0, TOP_N);
 
@@ -257,8 +259,7 @@ const md = [
   "  - P495 / P17 の先の P36（首都）は、国を首都で代表させるだけなので、座標候補には採っていない（参考として根拠の欄に書いた）。",
   "  - 根拠が見つからない項目は、座標候補を空欄にして `none` にしてある。座標を足す場合は、根拠にする Wikidata の項目（QID）を決めてから、その P625 を写す。",
   "  - 作者の活動地や会社の本部は、その出来事の場所と一致するとは限らない（発明者の晩年の活動地など）。`point` にする前に、根拠の項目を開いて確認する。",
-  "- 承認後は、この表を `scripts/wikidata/place-overrides.json` にして build-app-data.mjs に読ませる（未実装。表が承認されてから作る）。",
-  "  101 位以下の項目は、当面 `none` として扱う。",
+  "- 確認した結果は `scripts/wikidata/place-overrides.json` に書く（座標ではなく、根拠にする項目の QID を書く）。ここに出ていない項目と、まだ決めていない項目は `none` として扱われる。",
   "",
   `仮分類の内訳: ${["**point**", "**origin**", "**none**"].map((k) => `${k} ${counts.get(k)?.length ?? 0} 件`).join("、")}`,
   "",

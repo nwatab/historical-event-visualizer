@@ -72,3 +72,22 @@ export const LIST_TIME_PROPS_SPEC = Object.freeze(["P571", "P577", "P585"]);
 export const LIST_PLACE_PROPS = Object.freeze(["P625", "P189", "P276", "P159", "P740", "P291", "P495", "P17"]);
 export const LIST_PLACE_PROPS_SPEC = Object.freeze(["P625", "P276", "P495", "P159"]);
 export const COUNTRY_LEVEL_PLACE_PROPS = Object.freeze(["P495", "P17"]);
+
+// 作品類の P31（人が編集する表）。場所が国の代表点しか無い作品は、データに含めない（R4b-2 の方針変更）。
+// 映画や小説には「どこで起きたか」が無く、地図にも一覧にも出す場所が無いため。座標を持つ作品（建築物や、制作地・出版地が分かるもの）は残す。
+// QID と英語ラベルは 2026-09-20 に wbgetentities の出力で照合した。
+export const WORK_CLASSES = Object.freeze([
+  "Q11424", // film
+  "Q5398426", // television series
+  "Q202866", // animated film
+  "Q117467246", // animated television series
+  "Q20650540", // anime film
+  "Q21198342", // manga series
+  "Q196600", // media franchise
+  "Q130371093", // film franchise
+  "Q7725634", // literary work
+  "Q116476516", // dramatic work
+  "Q105543609", // musical work/composition
+  "Q47461344", // written work
+  "Q1002697", // periodical
+]);
