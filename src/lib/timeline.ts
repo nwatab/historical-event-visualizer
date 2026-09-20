@@ -26,6 +26,11 @@ export interface EventMarkerProperties {
   readonly kind: MarkerKind;
   /** "none" は地図に出さない（mapFilters.ts の filter 式で除く。生成データの none は places が空なので、そもそもマーカーにならない） */
   readonly placeKind: PlaceKind;
+  /**
+   * そのイベントの places のうち最初の1点か。イベント名のラベルはこの点にだけ出す
+   * （複数の国にまたがる戦争で、同じ名前が地図じゅうに並ばないように）。
+   */
+  readonly primary: boolean;
   /** 年の差に応じた大きさの倍率（EVENT_EDGE_SCALE〜1）。period は常に 1。 */
   readonly fade: number;
 }
@@ -74,7 +79,7 @@ export const eventMarkers = (
     const fade = markerFade(event, year);
     if (fade === null || event.kind === "diffusion") return [];
     const kind: MarkerKind = event.kind;
-    return event.places.map((place) => ({
+    return event.places.map((place, index) => ({
       type: "Feature" as const,
       geometry: { type: "Point" as const, coordinates: [place.lon, place.lat] },
       properties: {
@@ -84,6 +89,7 @@ export const eventMarkers = (
         importance: event.importance,
         kind,
         placeKind: event.placeKind ?? "point",
+        primary: index === 0,
         fade,
       },
     }));
@@ -105,4 +111,14 @@ export const MIN_ZOOM_BY_IMPORTANCE: Readonly<Record<HistEvent["importance"], nu
   3: -Infinity,
   2: 2,
   1: 4,
+};
+
+/**
+ * イベント名のラベルを出し始めるズームレベル。マーカー（MIN_ZOOM_BY_IMPORTANCE）より 1 段遅らせ、
+ * マーカーが先に出て、拡大するとラベルが付くようにする。重なるラベルは MapLibre が間引く（importance の高いものを優先）。
+ */
+export const LABEL_MIN_ZOOM_BY_IMPORTANCE: Readonly<Record<HistEvent["importance"], number>> = {
+  3: -Infinity,
+  2: 3,
+  1: 5,
 };

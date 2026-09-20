@@ -62,6 +62,9 @@ export function EventMapApp() {
     (eventIds: readonly string[]) => dispatch({ type: "selectEvents", eventIds }),
     [],
   );
+  // 地図の何もない所をクリックしたら詳細パネルを閉じる。凡例やスライダーは地図の上に重なった別の要素なので、
+  // そこでのクリックは地図に届かず、パネルは閉じない
+  const onClickEmpty = useCallback(() => dispatch({ type: "closeSelection" }), []);
 
   const selectedIds = useMemo(
     () =>
@@ -81,6 +84,7 @@ export function EventMapApp() {
         hiddenDomains={state.hiddenDomains}
         selectedIds={selectedIds}
         onSelectEvents={onSelectEvents}
+        onClickEmpty={onClickEmpty}
       />
       {/*
         地図の上に重ねる UI。上段（凡例・詳細パネル）と下段（年スライダー、R5 で年表も入る）に分け、

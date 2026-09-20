@@ -8,7 +8,7 @@ import { REGIONS, REGION_LABELS } from "./regions.mjs";
 // src/lib/domain.ts の DOMAINS / DOMAIN_LABELS と同じ並び・名称（.mjs から import できないため転記）。
 export const DOMAINS = /** @type {const} */ (["conflict", "polity", "science", "technology", "economy", "culture", "population"]);
 export const DOMAIN_LABELS = Object.freeze({
-  conflict: "紛争",
+  conflict: "戦争・紛争",
   polity: "政体変動",
   science: "科学",
   technology: "技術",

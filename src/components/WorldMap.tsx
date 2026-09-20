@@ -18,6 +18,7 @@ import {
   DOMAIN_COLORS,
   GRAY,
   MAP_COLORS,
+  MAP_LABEL,
   MAP_LINE,
   MARKER,
   MARKER_HIT_TOLERANCE,
@@ -28,7 +29,7 @@ import {
 } from "@/lib/design";
 import { DOMAINS, DOMAIN_LABELS } from "@/lib/domain";
 import { markerFilter } from "@/lib/mapFilters";
-import type { EventMarkerCollection, MarkerKind } from "@/lib/timeline";
+import { LABEL_MIN_ZOOM_BY_IMPORTANCE, type EventMarkerCollection, type MarkerKind } from "@/lib/timeline";
 import type { Domain } from "@/types/event";
 
 const EVENTS_SOURCE_ID = "events";
@@ -36,9 +37,12 @@ const EVENTS_LAYER_ID = "events-circle";
 const PERIOD_HALO_LAYER_ID = "events-period-halo";
 const PERIOD_LAYER_ID = "events-period";
 const SELECTED_LAYER_ID = "events-selected";
+const LABEL_LAYER_ID = "events-label";
 
-/** クリック・ホバーの対象になるレイヤー */
+/** ホバーの対象になるレイヤー */
 const INTERACTIVE_LAYER_IDS = [EVENTS_LAYER_ID, PERIOD_LAYER_ID];
+/** クリックで選択できるレイヤー。ラベルをクリックしても、そのイベントを選ぶ */
+const CLICKABLE_LAYER_IDS = [...INTERACTIVE_LAYER_IDS, LABEL_LAYER_ID];
 
 const kindIs = (kind: MarkerKind): ExpressionSpecification => ["==", ["get", "kind"], kind];
 
@@ -85,6 +89,23 @@ const markerSortKey = (highlighted: Domain | null): ExpressionSpecification =>
   highlighted === null
     ? ["get", "importance"]
     : ["+", ["get", "importance"], ["case", ["==", ["get", "domain"], highlighted], 10, 0]];
+
+/** ラベルを出す条件。マーカーの表示条件に加えて、ラベル用のズームの閾値と「places の最初の1点だけ」を掛ける。 */
+const labelFilter = (hiddenDomains: readonly Domain[]): ExpressionSpecification =>
+  markerFilter(hiddenDomains, ["==", ["get", "primary"], true], LABEL_MIN_ZOOM_BY_IMPORTANCE);
+
+/** マーカーの白い縁取りの外側から MAP_LABEL.gap だけ離す（text-radial-offset は em 単位）。 */
+const labelOffset: ExpressionSpecification = [
+  "/",
+  ["+", markerRadius, MARKER.strokeWidth + MAP_LABEL.gap],
+  MAP_LABEL.fontSize,
+];
+
+/**
+ * ラベルを置く優先順。symbol-sort-key は小さいほど先に置かれる（＝重なったときに残る）ので、
+ * importance の高いもの、同じなら現在年に近いもの（fade が大きいもの）ほど小さくする。
+ */
+const labelSortKey: ExpressionSpecification = ["-", 0, ["+", ["*", ["get", "importance"], 10], ["get", "fade"]]];
 
 const createStyle = (landUrl: string, markers: EventMarkerCollection): StyleSpecification => ({
   version: 8,
@@ -171,6 +192,31 @@ const createStyle = (landUrl: string, markers: EventMarkerCollection): StyleSpec
         "circle-stroke-width": SELECTION_RING.width,
       },
     },
+    // イベント名のラベル。instant も period も出す。重なるものは MapLibre が間引く。
+    // スタイルに glyphs の URL を置いていないので、文字は端末のフォントで描かれる（design.ts の MAP_LABEL）。
+    {
+      id: LABEL_LAYER_ID,
+      type: "symbol",
+      source: EVENTS_SOURCE_ID,
+      filter: labelFilter([]),
+      layout: {
+        "text-field": ["get", "title"],
+        "text-font": [...MAP_LABEL.fontStack],
+        "text-size": MAP_LABEL.fontSize,
+        // マーカーの横（右）を第一候補にし、置けなければ左・上・下を試す
+        "text-variable-anchor": ["left", "right", "top", "bottom"],
+        "text-radial-offset": labelOffset,
+        "text-justify": "auto",
+        "text-allow-overlap": false,
+        "symbol-sort-key": labelSortKey,
+      },
+      paint: {
+        "text-color": MAP_LABEL.color,
+        "text-halo-color": MAP_LABEL.haloColor,
+        "text-halo-width": MAP_LABEL.haloWidth,
+        "text-opacity": markerOpacity(null),
+      },
+    },
   ],
 });
 
@@ -252,8 +298,10 @@ interface WorldMapProps {
   readonly hiddenDomains: readonly Domain[];
   /** 詳細パネルで選択中のイベント（地図上で輪を付ける） */
   readonly selectedIds: readonly string[];
-  /** マーカーをクリックしたとき。重なっていれば複数の id が渡る。 */
+  /** マーカー（またはラベル）をクリックしたとき。重なっていれば複数の id が渡る。 */
   readonly onSelectEvents: (eventIds: readonly string[]) => void;
+  /** 地図の何もない所をクリックしたとき */
+  readonly onClickEmpty: () => void;
 }
 
 /** 地図に反映する表示状態 */
@@ -269,12 +317,14 @@ export function WorldMap({
   hiddenDomains,
   selectedIds,
   onSelectEvents,
+  onClickEmpty,
 }: WorldMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const markersRef = useRef(markers);
   const viewRef = useRef<MapViewState>({ highlightedDomain, hiddenDomains, selectedIds });
   const onSelectRef = useRef(onSelectEvents);
+  const onClickEmptyRef = useRef(onClickEmpty);
   const hoverPopupRef = useRef<Popup | null>(null);
 
   useEffect(() => {
@@ -302,6 +352,10 @@ export function WorldMap({
       { padding: SPACE[16], animate: false },
     );
     mapRef.current = map;
+    // 開発時だけ、ブラウザのコンソールや自動検証から地図を調べられるようにする（本番ビルドには含まれない）
+    if (process.env.NODE_ENV !== "production") {
+      (window as unknown as { __hvMap?: MapLibreMap }).__hvMap = map;
+    }
 
     // style 読み込み前に年や強調が変わっていた場合に備え、読み込み完了時に最新の状態を反映する。
     map.on("load", () => {
@@ -323,6 +377,7 @@ export function WorldMap({
       hoverPopup.remove();
     });
     // クリック（タップ）で詳細パネルを開く。小さいマーカーも選べるよう、判定に余裕を持たせる。
+    // 何もない所のクリックは親に知らせる（詳細パネルを閉じる）。ドラッグでの移動は click にならない。
     map.on("click", (e) => {
       const t = MARKER_HIT_TOLERANCE;
       const features = map.queryRenderedFeatures(
@@ -330,11 +385,15 @@ export function WorldMap({
           [e.point.x - t, e.point.y - t],
           [e.point.x + t, e.point.y + t],
         ],
-        { layers: INTERACTIVE_LAYER_IDS },
+        { layers: CLICKABLE_LAYER_IDS },
       );
-      if (features.length === 0) return;
+      if (features.length === 0) {
+        onClickEmptyRef.current();
+        return;
+      }
       hoverPopup.remove();
-      onSelectRef.current(features.map((f) => String(f.properties?.id ?? "")));
+      // 同じイベントのマーカーとラベルの両方に当たることがあるので、id の重複を除く
+      onSelectRef.current([...new Set(features.map((f) => String(f.properties?.id ?? "")))]);
     });
 
     return () => {
@@ -353,7 +412,8 @@ export function WorldMap({
 
   useEffect(() => {
     onSelectRef.current = onSelectEvents;
-  }, [onSelectEvents]);
+    onClickEmptyRef.current = onClickEmpty;
+  }, [onSelectEvents, onClickEmpty]);
 
   useEffect(() => {
     const view = { highlightedDomain, hiddenDomains, selectedIds };
@@ -381,4 +441,6 @@ const applyViewState = (map: MapLibreMap, view: MapViewState): void => {
     map.setFilter(id, markerFilter(view.hiddenDomains, kindIs(kind)));
   });
   map.setFilter(SELECTED_LAYER_ID, selectedFilter(view.hiddenDomains, view.selectedIds));
+  map.setFilter(LABEL_LAYER_ID, labelFilter(view.hiddenDomains));
+  map.setPaintProperty(LABEL_LAYER_ID, "text-opacity", opacity);
 };

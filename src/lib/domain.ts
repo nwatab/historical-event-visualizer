@@ -12,7 +12,7 @@ export const DOMAINS: readonly Domain[] = [
 ];
 
 export const DOMAIN_LABELS: Readonly<Record<Domain, string>> = {
-  conflict: "紛争",
+  conflict: "戦争・紛争",
   polity: "政体変動",
   science: "科学",
   technology: "技術",

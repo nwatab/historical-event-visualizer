@@ -108,6 +108,25 @@ export const SELECTION_RING = {
   width: MARKER.strokeWidth,
 } as const;
 
+/**
+ * マーカーの横に出すイベント名のラベル（MapLibre の symbol レイヤ）。
+ * - 文字は4段階のうち最小の caption（11px）。地図が主役なので、UI の本文より小さくする。
+ * - 白いハローで囲む。マーカーの縁取りと同じ考え方で、文字が接する背景を白に統一する
+ *   （陸・海・他のマーカーの上でも読める）。太さも縁取りと同じ 2px。ぼかしは使わない。
+ * - マーカーの白い縁取りの外側から gap だけ離して置く。
+ * フォントは FONT_FAMILY。スタイルに glyphs の URL を置かないので、MapLibre は全グリフを端末のフォントで描く
+ * （フォントファイルも外部 CDN も要らない）。
+ */
+export const MAP_LABEL = {
+  fontSize: FONT_SIZE.caption,
+  color: GRAY.strong,
+  haloColor: GRAY.surface,
+  haloWidth: MARKER.strokeWidth,
+  gap: SPACE[4],
+  /** text-font に渡す並び（FONT_FAMILY を名前ごとに分けたもの）。MapLibre はこれを CSS の font-family として使う */
+  fontStack: FONT_FAMILY.split(",").map((name) => name.trim().replace(/^"|"$/g, "")),
+} as const;
+
 /** マーカーのクリック判定の余裕 (px)。タッチでも小さいマーカーを選べるように。 */
 export const MARKER_HIT_TOLERANCE = SPACE[4];
 
