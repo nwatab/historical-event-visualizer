@@ -8,6 +8,7 @@ import {
   setWorkerUrl,
   type ExpressionSpecification,
   type GeoJSONSource,
+  type LayerSpecification,
   type MapLayerMouseEvent,
   type StyleSpecification,
   type TransformConstrainFunction,
@@ -39,11 +40,14 @@ const PERIOD_LAYER_ID = "events-period";
 const SELECTED_LAYER_ID = "events-selected";
 const LABEL_LAYER_ID = "events-label";
 const LABEL_BLOCKER_LAYER_ID = "events-label-blocker";
+const PRIORITY_LABEL_LAYER_ID = "events-label-priority";
+/** イベント名のラベルのレイヤ（フィルタと不透明度を同じように更新する） */
+const LABEL_LAYER_IDS = [LABEL_LAYER_ID, PRIORITY_LABEL_LAYER_ID];
 
 /** ホバーの対象になるレイヤー */
 const INTERACTIVE_LAYER_IDS = [EVENTS_LAYER_ID, PERIOD_LAYER_ID];
 /** クリックで選択できるレイヤー。ラベルをクリックしても、そのイベントを選ぶ */
-const CLICKABLE_LAYER_IDS = [...INTERACTIVE_LAYER_IDS, LABEL_LAYER_ID];
+const CLICKABLE_LAYER_IDS = [...INTERACTIVE_LAYER_IDS, ...LABEL_LAYER_IDS];
 
 const kindIs = (kind: MarkerKind): ExpressionSpecification => ["==", ["get", "kind"], kind];
 
@@ -91,9 +95,27 @@ const markerSortKey = (highlighted: Domain | null): ExpressionSpecification =>
     ? ["get", "importance"]
     : ["+", ["get", "importance"], ["case", ["==", ["get", "domain"], highlighted], 10, 0]];
 
-/** ラベルを出す条件。マーカーの表示条件に加えて、ラベル用のズームの閾値と「places の最初の1点だけ」を掛ける。 */
-const labelFilter = (hiddenDomains: readonly Domain[]): ExpressionSpecification =>
-  markerFilter(hiddenDomains, ["==", ["get", "primary"], true], LABEL_MIN_ZOOM_BY_IMPORTANCE);
+/**
+ * 優先ラベルの対象: importance 3 の period（世界大戦のような、長く続く最重要の出来事）。
+ * こういう出来事の primary の周りは、その戦争の会戦のマーカーで埋まっていることが多く、マーカーを避ける通常のラベルだと
+ * どのズームでも出ない（1916 年の第一次世界大戦）。そこで、マーカーを避けない別のレイヤ（events-label-priority）に出す。
+ */
+const isPriorityLabel: ExpressionSpecification = [
+  "all",
+  ["==", ["get", "importance"], 3],
+  ["==", ["get", "kind"], "period"],
+];
+
+/**
+ * ラベルを出す条件。マーカーの表示条件に加えて、ラベル用のズームの閾値と「places の最初の1点だけ」を掛ける。
+ * priority が true なら優先ラベルの対象だけ、false ならそれ以外。
+ */
+const labelFilter = (hiddenDomains: readonly Domain[], priority: boolean): ExpressionSpecification =>
+  markerFilter(
+    hiddenDomains,
+    ["all", ["==", ["get", "primary"], true], priority ? isPriorityLabel : ["!", isPriorityLabel]],
+    LABEL_MIN_ZOOM_BY_IMPORTANCE,
+  );
 
 /** マーカーの白い縁取りの外側から MAP_LABEL.gap だけ離す（text-radial-offset は em 単位）。 */
 const labelOffset: ExpressionSpecification = [
@@ -117,6 +139,34 @@ const blockerSize: ExpressionSpecification = ["*", 2, ["+", markerRadius, MARKER
  * importance の高いもの、同じなら現在年に近いもの（fade が大きいもの）ほど小さくする。
  */
 const labelSortKey: ExpressionSpecification = ["-", 0, ["+", ["*", ["get", "importance"], 10], ["get", "fade"]]];
+
+/**
+ * イベント名のラベルのレイヤ。instant も period も出す。見た目と置く優先順は、通常のラベルも優先ラベルも同じ。
+ * スタイルに glyphs の URL を置いていないので、文字は端末のフォントで描かれる（design.ts の MAP_LABEL）。
+ */
+const labelLayer = (id: string, priority: boolean): LayerSpecification => ({
+  id,
+  type: "symbol",
+  source: EVENTS_SOURCE_ID,
+  filter: labelFilter([], priority),
+  layout: {
+    "text-field": ["get", "title"],
+    "text-font": [...MAP_LABEL.fontStack],
+    "text-size": MAP_LABEL.fontSize,
+    // マーカーの横（右）を第一候補にし、置けなければ左・上・下を試す
+    "text-variable-anchor": ["left", "right", "top", "bottom"],
+    "text-radial-offset": labelOffset,
+    "text-justify": "auto",
+    "text-allow-overlap": false,
+    "symbol-sort-key": labelSortKey,
+  },
+  paint: {
+    "text-color": MAP_LABEL.color,
+    "text-halo-color": MAP_LABEL.haloColor,
+    "text-halo-width": MAP_LABEL.haloWidth,
+    "text-opacity": markerOpacity(null),
+  },
+});
 
 const createStyle = (landUrl: string, markers: EventMarkerCollection): StyleSpecification => ({
   version: 8,
@@ -203,31 +253,8 @@ const createStyle = (landUrl: string, markers: EventMarkerCollection): StyleSpec
         "circle-stroke-width": SELECTION_RING.width,
       },
     },
-    // イベント名のラベル。instant も period も出す。重なるものは MapLibre が間引く。
-    // スタイルに glyphs の URL を置いていないので、文字は端末のフォントで描かれる（design.ts の MAP_LABEL）。
-    {
-      id: LABEL_LAYER_ID,
-      type: "symbol",
-      source: EVENTS_SOURCE_ID,
-      filter: labelFilter([]),
-      layout: {
-        "text-field": ["get", "title"],
-        "text-font": [...MAP_LABEL.fontStack],
-        "text-size": MAP_LABEL.fontSize,
-        // マーカーの横（右）を第一候補にし、置けなければ左・上・下を試す
-        "text-variable-anchor": ["left", "right", "top", "bottom"],
-        "text-radial-offset": labelOffset,
-        "text-justify": "auto",
-        "text-allow-overlap": false,
-        "symbol-sort-key": labelSortKey,
-      },
-      paint: {
-        "text-color": MAP_LABEL.color,
-        "text-halo-color": MAP_LABEL.haloColor,
-        "text-halo-width": MAP_LABEL.haloWidth,
-        "text-opacity": markerOpacity(null),
-      },
-    },
+    // イベント名のラベル（優先ラベルの対象を除く）。重なるものは MapLibre が間引き、他のマーカー（下の blocker）も避ける。
+    labelLayer(LABEL_LAYER_ID, false),
     {
       id: LABEL_BLOCKER_LAYER_ID,
       type: "symbol",
@@ -244,6 +271,9 @@ const createStyle = (landUrl: string, markers: EventMarkerCollection): StyleSpec
       },
       paint: { "text-opacity": 0 },
     },
+    // 優先ラベル（importance 3 の period）。MapLibre は上のレイヤの symbol から先に配置するので、blocker より後ろ（＝上）に
+    // 置いたこのレイヤは、マーカーの領域に関係なく先に置かれる。通常のラベルは、このラベルも避けて置かれる。
+    labelLayer(PRIORITY_LABEL_LAYER_ID, true),
   ],
 });
 
@@ -468,7 +498,8 @@ const applyViewState = (map: MapLibreMap, view: MapViewState): void => {
     map.setFilter(id, markerFilter(view.hiddenDomains, kindIs(kind)));
   });
   map.setFilter(SELECTED_LAYER_ID, selectedFilter(view.hiddenDomains, view.selectedIds));
-  map.setFilter(LABEL_LAYER_ID, labelFilter(view.hiddenDomains));
+  map.setFilter(LABEL_LAYER_ID, labelFilter(view.hiddenDomains, false));
+  map.setFilter(PRIORITY_LABEL_LAYER_ID, labelFilter(view.hiddenDomains, true));
   map.setFilter(LABEL_BLOCKER_LAYER_ID, markerFilter(view.hiddenDomains));
-  map.setPaintProperty(LABEL_LAYER_ID, "text-opacity", opacity);
+  LABEL_LAYER_IDS.forEach((id) => map.setPaintProperty(id, "text-opacity", opacity));
 };

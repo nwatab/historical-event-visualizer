@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-09-20T15:36:01.481Z",
+ "generatedAt": "2026-09-20T15:50:58.112Z",
  "sources": {
   "wikidata": {
    "license": "CC0",
@@ -1652,12 +1652,6 @@
    "domain": "conflict"
   },
   {
-   "kind": "period",
-   "start": 1800,
-   "end": 1821,
-   "domain": "conflict"
-  },
-  {
    "kind": "instant",
    "start": 1801,
    "domain": "polity"
@@ -1759,6 +1753,12 @@
    "kind": "period",
    "start": 1809,
    "end": 1809,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
+   "start": 1810,
+   "end": 1821,
    "domain": "conflict"
   },
   {
