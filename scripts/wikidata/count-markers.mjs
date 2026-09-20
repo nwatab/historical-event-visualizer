@@ -9,7 +9,7 @@ import { join } from "node:path";
 import { APP_DATA_DIR } from "./config.mjs";
 import { importFromSrc } from "./load-ts.mjs";
 
-const [{ eventMarkers, EVENT_WINDOW_YEARS }, { importancesVisibleAt }, { filesForYear, mergeEventFiles }] =
+const [{ eventMarkers, EVENT_WINDOW_YEARS }, { importancesVisibleAt, granularityVisibleAt }, { filesForYear, mergeEventFiles }] =
   await Promise.all([importFromSrc("lib/timeline.ts"), importFromSrc("lib/mapFilters.ts"), importFromSrc("lib/eventData.ts")]);
 
 /** 世界全体の初期表示のズーム（幅の広い画面 1.3、縦長の画面 -0.6）と、閾値の前後。 */
@@ -25,7 +25,7 @@ const rows = await Promise.all(
     const features = eventMarkers(events, year).features.filter((/** @type {any} */ f) => f.properties.placeKind !== "none");
     const counts = ZOOMS.map((zoom) => {
       const visible = importancesVisibleAt(zoom);
-      const shown = features.filter((/** @type {any} */ f) => visible.includes(f.properties.importance));
+      const shown = features.filter((/** @type {any} */ f) => visible.includes(f.properties.importance) && granularityVisibleAt(zoom, f.properties.granularity));
       return `zoom ${zoom}: マーカー ${shown.length}（イベント ${new Set(shown.map((/** @type {any} */ f) => f.properties.id)).size}）`;
     });
     return `${year}年  読むファイル ${files.map((/** @type {{ file: string }} */ f) => f.file).join(", ")}（${events.length} 件）\n  ${counts.join("\n  ")}`;

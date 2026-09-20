@@ -13,13 +13,17 @@ import {
   APP_YEAR_MAX,
   APP_YEAR_MIN,
   ARTICLES_PATH,
+  COARSE_ONLY_PATH,
   MUL_LABELS_PATH,
   OVERRIDE_PLACES_PATH,
+  PLACE_CLASS_LABELS_PATH,
   PLACE_LABELS_PATH,
 } from "./config.mjs";
+import { COUNTRY_LEVEL_PLACE_PROPS } from "./lists.mjs";
 import { loadAnalysis, readJsonOr } from "./load-analysis.mjs";
 import { loadSampleEvents } from "./load-ts.mjs";
 import { isMappedClass } from "./classify.mjs";
+import { granularityOf } from "./place-granularity.mjs";
 import { pickResolved, placeKey } from "./place-overrides.mjs";
 import { PREDICATE_SUFFIX, predicateFor } from "./title-predicates.mjs";
 
@@ -64,19 +68,33 @@ const temporalOf = (item, start) => {
 const roundCoord = (x) => Math.round(x * 1e4) / 1e4;
 
 /**
+ * 粒度は、既定値の fine のときは書かない（placeKind の "point" と同じ扱い。全 places に書くとファイルが 0.5MB ほど増える）。
+ * @param {import("./place-granularity.mjs").Granularity} granularity
+ */
+const granularityField = (granularity) => (granularity === "fine" ? {} : { granularity });
+
+/**
  * place-overrides.json の1件ぶんの places を、取得済みの座標に置き換える。
  * 該当する座標が無ければエラーにする（推測で埋めない）。
+ * 粒度は、根拠の項目そのものの座標（path: "P625"）ならその項目の P31 から決め、本部所在地（"P159>P625"）なら fine。
  * @param {import("./place-overrides.mjs").PlaceOverride} override
  * @param {number} year その出来事の年（P159 の修飾子から、その年に該当する所在地を選ぶため）
  * @param {Readonly<Record<string, import("./place-overrides.mjs").ResolvedRow[]>>} resolved
+ * @param {Readonly<Record<string, { p31: readonly string[] } | null>>} placeClasses
  */
-const overridePlaces = (override, year, resolved) =>
+const overridePlaces = (override, year, resolved, placeClasses) =>
   (override.places ?? []).map((place) => {
     const row = pickResolved(resolved[placeKey(place)] ?? [], year);
     if (!row) {
       throw new Error(`place-overrides: ${override.qid} の ${place.from}（${place.path}）から ${year} 年の座標が取れません。pnpm wikidata:fetch-app-extras を実行したか確認してください。`);
     }
-    return { lon: roundCoord(row.lon), lat: roundCoord(row.lat), label: place.label ?? row.labelJa ?? row.labelEn ?? place.fromLabel };
+    const granularity = place.path === "P625" ? granularityOf(placeClasses[place.from]?.p31 ?? []) : "fine";
+    return {
+      lon: roundCoord(row.lon),
+      lat: roundCoord(row.lat),
+      label: place.label ?? row.labelJa ?? row.labelEn ?? place.fromLabel,
+      ...granularityField(granularity),
+    };
   });
 
 /**
@@ -86,9 +104,10 @@ const overridePlaces = (override, year, resolved) =>
  * @param {import("./place-overrides.mjs").PlaceOverride | undefined} override 人が承認した地点・起点
  * @param {Readonly<Record<string, import("./place-overrides.mjs").ResolvedRow[]>>} resolved
  * @param {string | null | undefined} mulLabel 多言語共通ラベル（日本語・英語のラベルが無い項目だけ）
+ * @param {Readonly<Record<string, { p31: readonly string[] } | null>>} [placeClasses] 場所の項目の P31（人が決めた場所の粒度の判定用）
  * @returns {Record<string, unknown> | null} HistEvent。ラベルが無ければ null
  */
-export const toHistEvent = (item, articles, placeLabels, override, resolved, mulLabel) => {
+export const toHistEvent = (item, articles, placeLabels, override, resolved, mulLabel, placeClasses = {}) => {
   // 日本語 → 英語 → 多言語共通（mul）。mul は、どの言語でも同じ表記の名前（AK-47 など）で、英語ラベルの代わりに入っている
   const label = item.labels.ja ?? item.labels.en ?? mulLabel;
   if (!label || item.start === null || item.classification.status !== "mapped") return null;
@@ -102,17 +121,17 @@ export const toHistEvent = (item, articles, placeLabels, override, resolved, mul
   const kind = override?.kind ?? temporal.kind;
   // 場所:
   // - 人が地点・起点を決めた項目は、その places と placeKind（"point" は既定値なので書かない）
-  // - 国の代表点しか無い項目（P495 / P17）で、人が決めていないものは、placeKind: "none" で places は空
-  // - それ以外は Wikidata の座標
+  // - 地図に置ける場所が無い項目（P495 / P17 の国の代表点だけ、または大陸・海洋だけ）で、人が決めていないものは、placeKind: "none" で places は空
+  // - それ以外は Wikidata の座標（fine → region → country の順。粒度が fine 以外なら granularity を付ける）
   const placeKind = override?.placeKind ?? (item.countryLevelPlace ? "none" : "point");
   const places =
     placeKind === "none"
       ? []
       : override?.places
-        ? overridePlaces(override, start, resolved)
+        ? overridePlaces(override, start, resolved, placeClasses)
         : item.places.map((p) => {
             const label = p.loc ? (placeLabels[p.loc]?.ja ?? placeLabels[p.loc]?.en) : undefined;
-            return { lon: roundCoord(p.lon), lat: roundCoord(p.lat), ...(label ? { label } : {}) };
+            return { lon: roundCoord(p.lon), lat: roundCoord(p.lat), ...(label ? { label } : {}), ...granularityField(p.granularity) };
           });
   return {
     id: item.qid,
@@ -164,9 +183,36 @@ const splitToFit = (events, bin) => {
 const countBy = (xs, key) =>
   Object.fromEntries([...Map.groupBy(xs, key).entries()].map(([k, g]) => [k, g.length]).sort((a, b) => String(a[0]).localeCompare(String(b[0]))));
 
+/**
+ * 場所が大陸・海洋（coarse）だけで none になった項目の一覧（Markdown）。sitelinks の多い順。
+ * place-overrides.json で人が場所を決める候補を見つけるためのもの。
+ * @param {readonly Item[]} items @param {(p: import("./analyze.mjs").GradedPlace) => string} placeName @param {string} generatedAt
+ */
+export const coarseOnlyMarkdown = (items, placeName, generatedAt) =>
+  [
+    "# 場所が大陸・海洋だけの項目",
+    "",
+    `\`pnpm wikidata:build-app-data\` が作り直す（${generatedAt} 生成）。手で編集しない。`,
+    "",
+    "Wikidata の場所（戦争の P276 など）が大陸・海洋（粒度 coarse。`place-granularity.mjs`）しか無く、`placeKind: \"none\"` で地図に出ていない項目。",
+    "`place-overrides.json` で人が場所を決めた項目は、ここから消える。P495 / P17 だけで none の項目は含まない（`pnpm wikidata:place-overrides-draft` のほう）。",
+    "",
+    `${items.length} 件。sitelinks の多い順。`,
+    "",
+    "| sitelinks | 項目 | QID | 開始 | 終了 | 分類 | importance | 種別 | Wikidata の場所 |",
+    "|---:|---|---|---:|---:|---|---:|---|---|",
+    ...[...items]
+      .sort((a, b) => b.sitelinks - a.sitelinks || a.qid.localeCompare(b.qid))
+      .map(
+        (i) =>
+          `| ${i.sitelinks} | ${i.label} | ${i.qid} | ${i.start?.year ?? ""} | ${i.end ?? ""} | ${i.classification.status === "mapped" ? i.classification.domain : ""} | ${i.importance} | ${i.kind} | ${i.allPlaces.map(placeName).join("、")} |`,
+      ),
+    "",
+  ].join("\n");
+
 // ── メイン ────────────────────────────────────────────────
 
-const { population, dropped, fetchLog, listPages, placeOverrides } = await loadAnalysis();
+const { population, dropped, fetchLog, listPages, placeOverrides, placeClasses } = await loadAnalysis();
 const [articles, placeLabels, resolved, mulLabels, sample] = await Promise.all([
   readJsonOr(ARTICLES_PATH, null),
   readJsonOr(PLACE_LABELS_PATH, null),
@@ -179,7 +225,7 @@ if (!articles || !placeLabels || !resolved) throw new Error("data/raw/app/ が�
 const overrideByQid = new Map(placeOverrides.overrides.map((o) => [o.qid, o]));
 
 const generated = population.flatMap((item) => {
-  const event = toHistEvent(item, articles, placeLabels, overrideByQid.get(item.qid), resolved, mulLabels[item.qid]);
+  const event = toHistEvent(item, articles, placeLabels, overrideByQid.get(item.qid), resolved, mulLabels[item.qid], placeClasses);
   return event ? [event] : [];
 });
 const noLabel = population.length - generated.length;
@@ -195,6 +241,29 @@ const sampleIds = new Set(sample.map((e) => e.id));
 const duplicates = generated.filter((e) => sampleIds.has(/** @type {string} */ (e.id)));
 const events = [...sample, ...generated.filter((e) => !sampleIds.has(/** @type {string} */ (e.id)))].sort(
   (a, b) => a.start - b.start || b.importance - a.importance || String(a.id).localeCompare(String(b.id)),
+);
+
+// 場所の粒度（R4e）の影響。R4d までの規則（場所はすべて使う。none は P495 / P17 だけの項目）と比べる。
+// 人が場所を決めた項目（place-overrides）は、粒度に関係なくその場所を使うので数えない。
+const placeImpact = population
+  .filter((i) => !overrideByQid.has(i.qid) && generatedIds.has(i.qid))
+  .map((i) => {
+    const beforeNone = i.allPlaces.every((p) => COUNTRY_LEVEL_PLACE_PROPS.includes(p.via));
+    const afterNone = i.countryLevelPlace;
+    const same = (/** @type {{ lon: number, lat: number }} */ a, /** @type {{ lon: number, lat: number }} */ b) => a.lon === b.lon && a.lat === b.lat;
+    return {
+      item: i,
+      becameNone: !beforeNone && afterNone,
+      reduced: !afterNone && i.places.length < i.allPlaces.length,
+      primaryChanged: !beforeNone && !afterNone && !same(i.places[0], i.allPlaces[0]),
+      // 拡大すると（COUNTRY_MAX_ZOOM 以上で）地図から消える項目: 置ける場所が国だけ
+      countryOnly: !afterNone && i.places.every((p) => p.granularity === "country"),
+      hasCountry: !afterNone && i.places.some((p) => p.granularity === "country"),
+    };
+  });
+const granularityCounts = countBy(
+  population.flatMap((i) => i.allPlaces.filter((p) => p.loc).map((p) => p.granularity)),
+  (g) => g,
 );
 
 // 述語を足した件数（手書きを優先して置き換えた項目は数えない）
@@ -237,6 +306,12 @@ const manifest = {
   byPlaceKind: countBy(events, (e) => e.placeKind ?? "point"),
   // title に述語（〜の発見 / 〜の導入 / 〜の設立 / 〜の完成）を足した件数
   byTitlePredicate: byPredicate,
+  // 場所の項目（P276 などの先）の粒度別の数（place-granularity.mjs）。coarse は使わない。country は使うが、アプリが拡大時に消す
+  placeGranularity: granularityCounts,
+  // 出力した places の粒度別の数（手書きのサンプルと、人が決めた場所も含む。granularity の無い場所は fine）
+  placesByGranularity: countBy(events.flatMap((e) => e.places), (p) => p.granularity ?? "fine"),
+  // 置ける場所が国だけの項目の数（世界全体の表示には出て、拡大すると消える）
+  countryOnlyEvents: events.filter((e) => e.places.length > 0 && e.places.every((/** @type {any} */ p) => p.granularity === "country")).length,
   // 年スライダーの目盛り用の要約。全区間のファイルを読まなくても目盛りを出せるように、importance 3 の項目だけを入れる
   // （全件だとほぼ毎年に目盛りが付き、目盛りの意味が無くなる）。地図に出ない項目（places が空）は除く。
   ticks: events
@@ -253,6 +328,43 @@ console.log(`母集団 ${population.length} 件 → ラベルなしで除外 ${n
 console.log(`手書きサンプル ${sample.length} 件（うち Wikidata 由来と QID が重複 ${duplicates.length} 件、手書きを優先）→ 合計 ${events.length} 件`);
 console.log("分類別:", JSON.stringify(manifest.byDomain));
 console.log("importance 別:", JSON.stringify(manifest.byImportance), " placeKind 別:", JSON.stringify(manifest.byPlaceKind));
+const placeName = (/** @type {import("./analyze.mjs").GradedPlace} */ p) =>
+  p.loc ? (placeLabels[p.loc]?.ja ?? placeLabels[p.loc]?.en ?? placeClasses[p.loc]?.ja ?? placeClasses[p.loc]?.en ?? p.loc) : "自身の座標";
+const describePlace = (/** @type {import("./analyze.mjs").GradedPlace} */ p) => `${placeName(p)}[${p.granularity}]`;
+const coarseOnly = placeImpact.filter((x) => x.becameNone).map((x) => x.item);
+await writeFile(COARSE_ONLY_PATH, coarseOnlyMarkdown(coarseOnly, placeName, manifest.generatedAt.slice(0, 10)));
+console.log(`場所が大陸・海洋だけで none の項目 ${coarseOnly.length} 件 → ${COARSE_ONLY_PATH}`);
+console.log("場所の項目（P276 などの先）の粒度:", JSON.stringify(granularityCounts));
+console.log(
+  `場所の粒度の影響: places が減った ${placeImpact.filter((x) => x.reduced).length} 件、none に変わった ${placeImpact.filter((x) => x.becameNone).length} 件` +
+    `（うち戦争 ${placeImpact.filter((x) => x.becameNone && x.item.kind === "war").length} 件）、primary が変わった ${placeImpact.filter((x) => x.primaryChanged).length} 件`,
+);
+console.log(
+  `country の場所を持つ ${placeImpact.filter((x) => x.hasCountry).length} 件、うち置ける場所が country だけ ${placeImpact.filter((x) => x.countryOnly).length} 件` +
+    `（うち戦争 ${placeImpact.filter((x) => x.countryOnly && x.item.kind === "war").length} 件。世界全体の表示には出て、拡大すると消える）`,
+);
+console.log(
+  placeImpact
+    .filter((x) => x.becameNone || x.reduced || x.primaryChanged)
+    .sort((a, b) => b.item.sitelinks - a.item.sitelinks)
+    .slice(0, 20)
+    .map(
+      (x) =>
+        `  ${x.item.label}（${x.item.sitelinks}）: ${x.item.allPlaces.map(describePlace).join("、").slice(0, 160)} → ` +
+        (x.becameNone ? "none" : `${x.item.places.map(describePlace).join("、").slice(0, 100)}${x.primaryChanged ? "（primary 変更）" : ""}`),
+    )
+    .join("\n"),
+);
+/** @type {Record<string, string>} */
+const placeClassLabels = await readJsonOr(PLACE_CLASS_LABELS_PATH, {});
+const fineClasses = countBy(
+  population.flatMap((i) => i.allPlaces.filter((p) => p.loc && p.granularity === "fine").flatMap((p) => placeClasses[/** @type {string} */ (p.loc)]?.p31 ?? ["(P31 なし)"])),
+  (q) => q,
+);
+console.log(
+  "fine と判定された場所のクラス（上位。広い範囲のものがあれば place-granularity.mjs に足す）:",
+  Object.entries(fineClasses).sort((a, b) => b[1] - a[1]).slice(0, 25).map(([q, n]) => `${placeClassLabels[q] ?? q}(${n})`).join("、"),
+);
 console.log("title に述語を足した件数:", JSON.stringify(byPredicate));
 console.log("kind 別:", JSON.stringify(countBy(events, (e) => e.kind)));
 console.log("出典別:", JSON.stringify(countBy(events, (e) => (e.source ?? "").replace(/^https:\/\/([^/]+)\/.*$/, "$1") || "なし")));

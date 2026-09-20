@@ -31,10 +31,21 @@ export interface LocalizedText {
   readonly en?: string;
 }
 
+/**
+ * 場所の粒度。省略時は "fine"。
+ * - fine:    都市・建物・遺跡・戦場など
+ * - region:  州・県・地方・島・海など
+ * - country: 国・国家（現存・過去とも）。座標は国の代表点なので、拡大すると地図から消す（CLAUDE.md「表示の制御」）
+ * 大陸・海洋（coarse）の場所は、データに入れない。
+ */
+export type PlaceGranularity = "fine" | "region" | "country";
+
 export interface Place {
   readonly lon: number;
   readonly lat: number;
   readonly label?: string;
+  /** 省略時は "fine" */
+  readonly granularity?: PlaceGranularity;
 }
 
 export interface PathPoint {

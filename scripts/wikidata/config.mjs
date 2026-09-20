@@ -50,6 +50,11 @@ export const ARTICLES_PATH = join(APP_RAW_DIR, "articles.json");
 export const MUL_LABELS_PATH = join(APP_RAW_DIR, "mul-labels.json");
 /** 場所（P276 などの先）の QID → { ja?, en? } */
 export const PLACE_LABELS_PATH = join(APP_RAW_DIR, "place-labels.json");
+/** 場所の項目（P276 / P189 などの先）の P31 とラベル。QID → { p31: string[], ja?, en? }。場所の粒度の判定に使う */
+export const PLACE_CLASSES_PATH = join(APP_RAW_DIR, "place-classes.json");
+/** 場所の項目の P31 に現れたクラスのラベル。QID → 英語ラベル（place-granularity.mjs の表を作るときに見る） */
+export const PLACE_CLASS_LABELS_PATH = join(APP_RAW_DIR, "place-class-labels.json");
+export const WIKIDATA_API = "https://www.wikidata.org/w/api.php";
 /** 人が承認した地点・起点の表（コミットする）。座標は書かれておらず、下の OVERRIDE_PLACES_PATH に取得結果を保存する */
 export const PLACE_OVERRIDES_PATH = join(import.meta.dirname, "place-overrides.json");
 /** place-overrides.json の places[].from から引いた座標。キーは `${from}|${path}` */
@@ -58,6 +63,8 @@ export const OVERRIDE_PLACES_PATH = join(APP_RAW_DIR, "override-places.json");
 export const PLACE_CANDIDATES_PATH = join(APP_RAW_DIR, "place-candidates.json");
 export const PLACE_CANDIDATE_LABELS_PATH = join(APP_RAW_DIR, "place-candidate-labels.json");
 /** 人が確認するための下書き（コミットする）。承認後の表は place-overrides.json */
+/** 場所が大陸・海洋（coarse）だけで、地図に出ない項目の一覧（build-app-data.mjs が作り直す。place-overrides の候補） */
+export const COARSE_ONLY_PATH = join(import.meta.dirname, "coarse-only.md");
 export const PLACE_OVERRIDES_DRAFT_PATH = join(import.meta.dirname, "place-overrides.draft.md");
 /** 生成したアプリ用データの出力先。こちらはコミットする。 */
 export const APP_DATA_DIR = join(ROOT_DIR, "public", "data", "events");

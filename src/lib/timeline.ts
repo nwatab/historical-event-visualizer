@@ -1,5 +1,5 @@
 import type { FeatureCollection, Point } from "geojson";
-import type { Domain, HistEvent, PlaceKind, TemporalKind, Year } from "@/types/event";
+import type { Domain, HistEvent, PlaceGranularity, PlaceKind, TemporalKind, Year } from "@/types/event";
 
 /** 年スライダーの範囲（天文年）。 */
 export const YEAR_MIN: Year = -3000;
@@ -26,6 +26,8 @@ export interface EventMarkerProperties {
   readonly kind: MarkerKind;
   /** "none" は地図に出さない（mapFilters.ts の filter 式で除く。生成データの none は places が空なので、そもそもマーカーにならない） */
   readonly placeKind: PlaceKind;
+  /** その点の粒度。"country" は国の代表点で、COUNTRY_MAX_ZOOM 以上では出さない（mapFilters.ts） */
+  readonly granularity: PlaceGranularity;
   /**
    * そのイベントの places のうち最初の1点か。イベント名のラベルはこの点にだけ出す
    * （複数の国にまたがる戦争で、同じ名前が地図じゅうに並ばないように）。
@@ -89,6 +91,7 @@ export const eventMarkers = (
         importance: event.importance,
         kind,
         placeKind: event.placeKind ?? "point",
+        granularity: place.granularity ?? "fine",
         primary: index === 0,
         fade,
       },
@@ -101,10 +104,11 @@ export const eventMarkers = (
  * 値を変えれば調整できる（-Infinity は常に表示）。世界全体の初期表示は、幅の広い画面で zoom ≈ 1.3、
  * 縦長の画面で ≈ -0.6 なので、どちらでも importance 3 だけが出る。
  *
- * 世界全体の表示（zoom 1.3 でも -0.6 でも同じ）でのマーカー数は、1500年 13、1800年 43、1950年 113
- * （2026-09-20 に生成したデータを scripts/wikidata/count-markers.mjs で数えた実測値。地図に出ない項目は除く）。
+ * 世界全体の表示（zoom 1.3 でも -0.6 でも同じ）でのマーカー数は、1500年 13、1800年 40、1950年 110
+ * （2026-09-21 に生成したデータを scripts/wikidata/count-markers.mjs で数えた実測値。地図に出ない項目は除く）。
  * 上限の目安にしている 500 を下回るので、閾値は 3 → 常時、2 → zoom 2 以上、1 → zoom 4 以上とした。
- * zoom 2 では全世界で 120 / 415 / 911、zoom 4 では 252 / 1585 / 2495（画面に入るのはその一部）。
+ * zoom 2 では全世界で 120 / 410 / 908、zoom 4 では 239 / 1548 / 2382（画面に入るのはその一部。
+ * zoom 4 以上では、国の代表点のマーカーは除かれる。COUNTRY_MAX_ZOOM）。
  * データを作り直したら数え直すこと（CLAUDE.md「データパイプライン」）。
  */
 export const MIN_ZOOM_BY_IMPORTANCE: Readonly<Record<HistEvent["importance"], number>> = {
@@ -112,6 +116,14 @@ export const MIN_ZOOM_BY_IMPORTANCE: Readonly<Record<HistEvent["importance"], nu
   2: 2,
   1: 4,
 };
+
+/**
+ * 粒度が country の場所（国の代表点）は、ズームがこの値以上になったら出さない。マーカーもラベルも同じ。
+ * 世界全体の表示では「フランス革命はフランスで起きた」は正しいが、拡大すると、国の重心は場所として嘘になるため。
+ * importance 1 のマーカーが出始めるズーム（MIN_ZOOM_BY_IMPORTANCE）と同じ値なので、
+ * 場所が国しか無い importance 1 の項目は、どのズームでも地図に出ない（R5 の年表には出す）。
+ */
+export const COUNTRY_MAX_ZOOM = 4;
 
 /**
  * イベント名のラベルを出し始めるズームレベル。マーカー（MIN_ZOOM_BY_IMPORTANCE）より 1 段遅らせ、

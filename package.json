@@ -11,6 +11,7 @@
     "wikidata:fetch": "node scripts/wikidata/fetch.mjs",
     "wikidata:fetch-lists": "node scripts/wikidata/fetch-lists.mjs",
     "wikidata:fetch-app-extras": "node scripts/wikidata/fetch-app-extras.mjs",
+    "wikidata:fetch-places": "node scripts/wikidata/fetch-places.mjs",
     "wikidata:report": "node scripts/wikidata/report.mjs",
     "wikidata:build-app-data": "node scripts/wikidata/build-app-data.mjs",
     "wikidata:place-overrides-draft": "node scripts/wikidata/build-place-overrides-draft.mjs"

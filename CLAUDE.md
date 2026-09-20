@@ -71,12 +71,13 @@
 |---|---|---|---|
 | 取得 | `pnpm wikidata:fetch` | Wikidata の SPARQL から、`roots.mjs` のクラスごとに項目を取る。会戦は P625 必須で P361（親）も取る。戦争は座標を必須にせず、P276（場所）の先の座標を取る | `data/raw/wikidata/` |
 | 取得 | `pnpm wikidata:fetch-lists` | `lists.mjs` の Vital articles（Level 5）のページから記事名を取り、QID と年・場所を引く | `data/raw/lists/` |
+| 取得 | `pnpm wikidata:fetch-places` | 場所の項目（P276 / P189 などの先）の P31。場所の粒度の判定に使う（Wikidata の API、wbgetentities） | `data/raw/app/` |
 | 取得 | `pnpm wikidata:fetch-app-extras` | 母集団の項目の Wikipedia 記事名（出典 URL 用）、場所のラベル、`place-overrides.json` の根拠の項目の座標 | `data/raw/app/` |
 | 分析 | `pnpm wikidata:report` | `analyze.mjs` で開始年・場所・地域・分類・importance を導出し、分布を `scripts/wikidata/REPORT.md` に出す。年か場所が取れなかったリスト項目は `data/raw/lists/missing.json` | `REPORT.md` |
 | 生成 | `pnpm wikidata:build-app-data` | 母集団を `HistEvent` に変換し、手書きのサンプル（`src/data/events.sample.ts`）と統合して、区間ごとの JSON と `manifest.json` に分けて出す | `public/data/events/` |
 
 - 生データには導出値を持たせない。開始年・分類・importance などの規則は `analyze.mjs` / `classify.mjs` / `importance.mjs` に集め、レポートと生成が同じ関数を使う。
-- 人が編集する表は `roots.mjs`（取得の入口のクラス）、`p31-domain-map.mjs`（P31 → 7分類）、`title-predicates.mjs`（P31 → タイトルに足す述語）、`lists.mjs`（Vital articles のページと分類、作品類の P31）、`place-overrides.json`（人が決めた地点・起点）。QID を足すときは、ラベルを API の出力で照合する（記憶で書いた QID は R4a で 55 件中 3 件が別物だった）。
+- 人が編集する表は `roots.mjs`（取得の入口のクラス）、`p31-domain-map.mjs`（P31 → 7分類）、`title-predicates.mjs`（P31 → タイトルに足す述語）、`place-granularity.mjs`（場所の P31 → 粒度）、`lists.mjs`（Vital articles のページと分類、作品類の P31）、`place-overrides.json`（人が決めた地点・起点）。QID を足すときは、ラベルを API の出力で照合する（記憶で書いた QID は R4a で 55 件中 3 件が別物だった）。
 - Wikidata・Wikipedia への問い合わせは直列で、間隔を空け、User-Agent にリポジトリの URL を入れ、429 / 5xx は Retry-After に従って再試行する。取得済みの分はキャッシュから読む。
 - 各時点の分析結果と、そこから下した判断の根拠は `scripts/wikidata/FINDINGS-R4a.md`・`FINDINGS-R4b1.md` にある（対応するレポートは `REPORT-R4a.md`・`REPORT-R4b1.md` として凍結してある）。
 
@@ -88,12 +89,22 @@
    - 化学元素の上限の理由: 元素の記事は sitelinks が一様に高く、Vital articles で分類した項目の上位 5% を元素の「発見」が占めていた（科学の importance 3 の大半が元素だった）。R4d で上限を付け、29 件が 3 → 2 になった。
    - 理由: 出来事の記事と、物・作品・組織の記事とでは sitelinks の水準が一桁違い（中央値で 5 と 45）、混ぜるとリスト由来の項目が importance 3 の 7 割を占めた（FINDINGS-R4b1.md）。
 2. **国の代表点しか場所が無い項目**（Wikidata の P495 原産国 / P17 国 から取った座標しか無い項目）は、国の代表点をそのまま使わない。アメリカ合衆国の代表点1か所に 500 件以上が重なるため。`placeKind`（`point` / `origin` / `none`）で場所の性質を表す。
+   - **場所の粒度**（R4e）: 場所の項目（P276 / P189 / P159 などの先）を、その P31 から `fine`（都市・建物・遺跡など）/ `region`（州・県・地方・島・海など）/ `country`（国・国家。現存・過去とも）/ `coarse`（大陸・海洋・世界）に分ける。表は `scripts/wikidata/place-granularity.mjs`（人が編集する表。直接の P31 だけを見る。表に無いクラスは `fine`。複数の P31 を持つ場所は、いちばん粗いものを採る）。場所の項目の P31 は `pnpm wikidata:fetch-places`（wbgetentities）で取る。項目自身の座標（P625）は `fine`。
+     - **同じ「国」でも、プロパティで扱いを分ける。** P495（原産国）/ P17（国）は「そこで起きた」とは言っていないので、これしか無い項目は `none`（上の R4b-2 の決定のまま）。一方、戦争の P276（場所）や元素の P189（発見地）が国を指すなら、それは「そこで起きた」という主張で、粒度が粗いだけなので、`country` の場所として残す。
+       - 経緯: R4e の最初の版（PR #12 の 3c691b2）は、`country` の場所も「他に `fine` / `region` が無ければ `none`」にしていた。その結果、戦争 667 件を含む 836 件が地図から消えた（フランス革命 = 場所が「フランス」だけ、大同盟戦争 = 大陸4つと「アイルランド王国」だけ。件数の出所は、コミット 3c691b2 のメッセージに書かれた 2026-09-20 の build-app-data の出力）。R4b-2 の決定の対象は P495 / P17 だったので、それを P276 などに広げたのは誤りとして、上の規則に直した。
+     - `coarse` の場所は常に外す。`coarse` しか無い項目は `none`。
+     - `places` は `fine` → `region` → `country` の順に並べる。ラベルを付けるのは最初の1点なので、いちばん細かい場所にラベルが付く。
+     - 生成する JSON の各 place に `granularity`（`"region"` / `"country"`）を出す。`fine` は既定値なので書かない（`placeKind` の `"point"` と同じ扱い）。アプリは `country` の場所を拡大時に消す（「画面の状態と表示の制御」）。
+     - `place-overrides.json` は、粒度の規則より優先する。人が決めた場所の粒度は、`path` が `P625` なら根拠の項目の P31 から決まり、`P159>P625`（本部所在地）なら `fine`。ホロコースト（Q2763）は、Wikidata の P276 の7件から上海市を外して6か国だけにしている（上海ゲットーは避難先で、出来事の場所ではない。粒度の規則だけだと、`fine` の上海市が先頭になってラベルが付く）。
+     - Wikidata の場所が大陸・海洋だけの項目や、残った場所が不適切な項目（第一次世界大戦は P276 が大陸・海洋と「中華人民共和国」だけだった）は、`place-overrides.json` で人が代表的な地点を決める。`places` の先頭が primary（ラベルの付く点）で、Wikidata 由来の places は全部置き換わる。代表点の選び方を `note` に書く（第一次世界大戦は西部戦線のヴェルダン、ナポレオン戦争は起点の国の首都のパリ、など。2026-09-21 に 14 件）。
+     - 場所が大陸・海洋だけで `none` のまま残っている項目は、`pnpm wikidata:build-app-data` が `scripts/wikidata/coarse-only.md` に sitelinks 順で出す（次の overrides の候補。2026-09-21 で 44 件）。
+     - 未解決: ラベルは primary の1点にしか出さず、他のマーカーと重なると出ない。このため、周りが混んでいる primary ではラベルが出ないことがある（1916 年の第一次世界大戦のラベルは、ヴェルダンの周りの会戦のマーカーに阻まれて、zoom 2.5〜6 のどれでも出なかった。2026-09-21、ヘッドレス Chrome での実測）。
    - **作品類**（`lists.mjs` の `WORK_CLASSES`: 映画・テレビ番組・漫画・文学作品・楽曲・定期刊行物など）は、データに含めない。「どこで起きたか」が無いため。座標を持つ作品（建築物や、制作地・出版地が分かるもの）は残す。
    - **人が地点・起点を決めた項目**は `scripts/wikidata/place-overrides.json` に書き、`point`（特定の地点で起きた）または `origin`（広がる概念の起点。R6 で diffusion に変換する対象）にする。通貨は「導入年に発行を担った機関の所在地」を起点にする。
      - 座標はこのファイルに書かない。根拠にする Wikidata の項目の QID（と経路: その項目の P625、または P159 本部所在地の先の P625）を書き、座標は取得して反映する。**記憶や推測で座標を書かない。** QID は API の出力でラベルを照合してから書く。
      - 機関が導入年より後に移転している場合は、移転前の所在地を使う。P159 に始点・終点の修飾子があれば、導入年に該当するものを選ぶ（ユーロ → 2014 年までの所在地）。該当する所在地が Wikidata に無ければ、その旨を `note` に書いて、所在していた都市の項目を使う（スイス・フラン → ベルン）。
      - `start` / `end` / `kind` を Wikidata の値から変えるときも、このファイルに理由つきで書く（印象派の start、文化大革命と世界恐慌の period 化、人民幣の start）。
-   - **それ以外**は `placeKind: "none"`・`places: []` でデータに残す。地図には出ない。R5 で年表に出す（地図の外の一覧 UI は R4b-2 では作らない）。
+   - **それ以外**（地図に置ける場所が無い項目）は `placeKind: "none"`・`places: []` でデータに残す。地図には出ない。R5 で年表に出す（地図の外の一覧 UI は R4b-2 では作らない）。
    - 次に人が確認する候補を出すには `pnpm wikidata:place-overrides-draft`（sitelinks 上位100件の下書き。2026-09-20 に確認した版が `place-overrides.draft.md`）。
 3. **年表形式の記事（Timeline of …）は出典にしない。** Vital articles だけにする。年表の行から主題の記事を当てる方法は、主題の記事が無い行で組織名や言語名を拾った。
 4. **sitelinks が 2 未満の項目は除外する。** 個々の核実験や一括登録されたデータセットが大半を占めるため。
@@ -117,6 +128,7 @@
 ```bash
 pnpm wikidata:fetch             # 約25分。取得済みのチャンクは再利用する。取り直すなら data/raw/wikidata/chunks/ を消す
 pnpm wikidata:fetch-lists       # 約40分
+pnpm wikidata:fetch-places      # 約5分。場所の項目の P31（wbgetentities）
 pnpm wikidata:fetch-app-extras  # 20〜40分（Wikidata 側の混雑による）
 pnpm wikidata:report            # REPORT.md を作り直して、分布に大きな変化が無いか見る
 pnpm wikidata:build-app-data    # public/data/events/ を作り直す。件数とファイルの大きさが出る
@@ -162,11 +174,13 @@ node scripts/wikidata/count-markers.mjs 1500 1800 1950   # 世界全体の表示
 - イベントは `public/data/events/` から、現在年の窓と重なる区間のファイルだけを読む（`src/lib/useEvents.ts`、区間の選び方は `src/lib/eventData.ts`）。読んだファイルはページを開いている間だけメモリに持つ。読み込み中は直前のイベントを出し続け、必要なファイルが揃ってから差し替える（マーカーを一瞬消さない）。
 - 年スライダーの目盛りは、全区間を読まずに出せるよう、`manifest.json` に入っている要約（importance 3 のみ）から作る。
 - `placeKind` が `"none"` の項目は `places` が空なので地図に出ない（念のため MapLibre の filter 式でも除いている）。R5 で年表に出す。
+- 粒度が `country` の場所（国の代表点。`Place.granularity`）は、zoom 4（`src/lib/timeline.ts` の `COUNTRY_MAX_ZOOM`）以上でマーカーもラベルも出さない。世界全体の表示では「フランス革命はフランスで起きた」は正しいが、拡大すると、国の重心は場所として嘘になるため。`markerFilter`（`src/lib/mapFilters.ts`）に入れてあるので、マーカー・ラベル・ラベル除けのどのレイヤにも効く。
+  - importance 1 のマーカーが出始めるのも zoom 4 なので、場所が国しか無い importance 1 の項目は、どのズームでも地図に出ない。R5 の年表に出す。
 - 表示件数は、importance とズームレベルで絞る（3 → 常時、2 → zoom 2 以上、1 → zoom 4 以上。世界全体の表示で 1時点 500 マーカー以下を目安にする）。閾値は `src/lib/timeline.ts` の `MIN_ZOOM_BY_IMPORTANCE`、MapLibre の filter 式は `src/lib/mapFilters.ts`（ズームを変えても GeoJSON は作り直さない）。
 - マーカーの横にイベント名のラベルを出す（MapLibre の symbol レイヤ、`text-allow-overlap: false`）。閾値は `LABEL_MIN_ZOOM_BY_IMPORTANCE`（3 → 常時、2 → zoom 3 以上、1 → zoom 5 以上）で、マーカーより 1 段遅らせる。重なるラベルは MapLibre が間引き、importance の高いもの、同じなら現在年に近いものを残す（`symbol-sort-key`）。places が複数あるイベントは、最初の1点にだけラベルを出す。ホバーの吹き出しは併用する。
   - スタイルに `glyphs` の URL を置かない。MapLibre 6 は、`glyphs` が無ければ全グリフを端末のフォントで描くので、フォントファイルも外部 CDN も要らない（「運用費ゼロ」の方針のまま）。見た目の値は `design.ts` の `MAP_LABEL`（11px、白いハロー 2px）。
   - MapLibre の衝突判定は symbol どうしでしか働かず、circle レイヤのマーカーは避けてくれない。ラベルが他のマーカーを横切らないように、各マーカーと同じ位置に、マーカーの直径と同じ大きさの透明な文字（`events-label-blocker` レイヤ。`text-opacity: 0`、`text-allow-overlap: true`、`text-ignore-placement: false`）を置いて、マーカーの領域を占有させている。ラベルのレイヤより後ろ（＝上）に置くのは、MapLibre が上のレイヤの symbol から先に配置するため。
-  - 世界全体の表示でのラベル数（2026-09-20、実測。横長 1440×900、importance 3 のみ）: 1500年 9、1800年 23、1950年 28。マーカーを避ける前（R4c）は 11 / 27 / 49。
+  - 世界全体の表示でのラベル数（2026-09-20、ヘッドレス Chrome での実測。横長 1440×900、zoom 1.3、importance 3 のみ）: 1500年 8、1800年 20、1950年 24（マーカーは 13 / 40 / 110。国の代表点のマーカーを含む）。R4d では 9 / 23 / 28、マーカーを避ける前（R4c）は 11 / 27 / 49（R4d・R4c の値は、この文書の以前の版からの転記）。
 - 詳細パネルは、地図の何もない所をクリックすると閉じる。マーカー（またはラベル）をクリックすると、そのイベントに差し替わる。凡例やスライダーは地図の上に重なった別の要素なので、そこでのクリックでは閉じない。
 - 画面下部（年スライダー、R5 の年表）は地図の上の UI の下段として確保し、詳細パネルなどは上段に置く。
 
