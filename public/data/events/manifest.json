@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-09-20T14:39:32.066Z",
+ "generatedAt": "2026-09-20T15:36:01.481Z",
  "sources": {
   "wikidata": {
    "license": "CC0",
@@ -91,7 +91,7 @@
   },
   "placeOverrides": {
    "file": "scripts/wikidata/place-overrides.json",
-   "applied": 22
+   "applied": 36
   }
  },
  "total": 19789,
@@ -110,9 +110,9 @@
   "3": 829
  },
  "byPlaceKind": {
-  "none": 474,
-  "origin": 11,
-  "point": 19304
+  "none": 463,
+  "origin": 12,
+  "point": 19314
  },
  "byTitlePredicate": {
   "completion": 254,
@@ -127,11 +127,11 @@
   "region": 1554
  },
  "placesByGranularity": {
-  "country": 1121,
-  "fine": 18047,
-  "region": 1549
+  "country": 1116,
+  "fine": 18082,
+  "region": 1544
  },
- "countryOnlyEvents": 852,
+ "countryOnlyEvents": 851,
  "ticks": [
   {
    "kind": "period",
@@ -575,6 +575,12 @@
   {
    "kind": "instant",
    "start": 1000,
+   "domain": "polity"
+  },
+  {
+   "kind": "period",
+   "start": 1000,
+   "end": 1308,
    "domain": "polity"
   },
   {
@@ -1327,6 +1333,12 @@
    "domain": "conflict"
   },
   {
+   "kind": "period",
+   "start": 1701,
+   "end": 1714,
+   "domain": "conflict"
+  },
+  {
    "kind": "instant",
    "start": 1701,
    "domain": "polity"
@@ -1424,6 +1436,12 @@
    "kind": "instant",
    "start": 1748,
    "domain": "polity"
+  },
+  {
+   "kind": "period",
+   "start": 1754,
+   "end": 1763,
+   "domain": "conflict"
   },
   {
    "kind": "instant",
@@ -1568,6 +1586,12 @@
    "domain": "conflict"
   },
   {
+   "kind": "period",
+   "start": 1792,
+   "end": 1802,
+   "domain": "conflict"
+  },
+  {
    "kind": "instant",
    "start": 1792,
    "domain": "economy"
@@ -1628,6 +1652,12 @@
    "domain": "conflict"
   },
   {
+   "kind": "period",
+   "start": 1800,
+   "end": 1821,
+   "domain": "conflict"
+  },
+  {
    "kind": "instant",
    "start": 1801,
    "domain": "polity"
@@ -1647,6 +1677,12 @@
    "kind": "instant",
    "start": 1802,
    "domain": "polity"
+  },
+  {
+   "kind": "period",
+   "start": 1803,
+   "end": 1815,
+   "domain": "conflict"
   },
   {
    "kind": "period",
@@ -1734,6 +1770,12 @@
    "kind": "period",
    "start": 1812,
    "end": 1812,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
+   "start": 1812,
+   "end": 1815,
    "domain": "conflict"
   },
   {
@@ -3165,6 +3207,12 @@
   {
    "kind": "period",
    "start": 1967,
+   "end": 1967,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
+   "start": 1967,
    "end": 1975,
    "domain": "conflict"
   },
@@ -3232,6 +3280,12 @@
    "kind": "instant",
    "start": 1973,
    "domain": "culture"
+  },
+  {
+   "kind": "period",
+   "start": 1973,
+   "end": 1973,
+   "domain": "conflict"
   },
   {
    "kind": "instant",
@@ -3826,6 +3880,12 @@
    "domain": "population"
   },
   {
+   "kind": "period",
+   "start": 2010,
+   "end": 2012,
+   "domain": "polity"
+  },
+  {
    "kind": "instant",
    "start": 2010,
    "domain": "population"
@@ -4246,6 +4306,12 @@
    "domain": "conflict"
   },
   {
+   "kind": "period",
+   "start": 2025,
+   "end": 2025,
+   "domain": "conflict"
+  },
+  {
    "kind": "instant",
    "start": 2025,
    "domain": "population"
@@ -4384,28 +4450,28 @@
    "from": 1000,
    "to": 1100,
    "count": 216,
-   "bytes": 59361
+   "bytes": 59478
   },
   {
    "file": "1100.json",
    "from": 1100,
    "to": 1200,
-   "count": 281,
-   "bytes": 76402
+   "count": 282,
+   "bytes": 76773
   },
   {
    "file": "1200.json",
    "from": 1200,
    "to": 1300,
-   "count": 409,
-   "bytes": 111387
+   "count": 410,
+   "bytes": 111758
   },
   {
    "file": "1300.json",
    "from": 1300,
    "to": 1400,
-   "count": 467,
-   "bytes": 128326
+   "count": 468,
+   "bytes": 128697
   },
   {
    "file": "1400.json",
@@ -4433,28 +4499,28 @@
    "from": 1700,
    "to": 1800,
    "count": 1686,
-   "bytes": 465686
+   "bytes": 465913
   },
   {
    "file": "1800.json",
    "from": 1800,
    "to": 1900,
    "count": 3397,
-   "bytes": 935233
+   "bytes": 935902
   },
   {
    "file": "1900.json",
    "from": 1900,
    "to": 2000,
    "count": 5993,
-   "bytes": 1664544
+   "bytes": 1664478
   },
   {
    "file": "2000.json",
    "from": 2000,
    "to": 2100,
    "count": 3338,
-   "bytes": 923406
+   "bytes": 923745
   }
  ]
 }

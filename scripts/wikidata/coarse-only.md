@@ -5,23 +5,12 @@
 Wikidata の場所（戦争の P276 など）が大陸・海洋（粒度 coarse。`place-granularity.mjs`）しか無く、`placeKind: "none"` で地図に出ていない項目。
 `place-overrides.json` で人が場所を決めた項目は、ここから消える。P495 / P17 だけで none の項目は含まない（`pnpm wikidata:place-overrides-draft` のほう）。
 
-55 件。sitelinks の多い順。
+44 件。sitelinks の多い順。
 
 | sitelinks | 項目 | QID | 開始 | 終了 | 分類 | importance | 種別 | Wikidata の場所 |
 |---:|---|---|---:|---:|---|---:|---|---|
-| 112 | アラブの春 | Q33761 | 2010 | 2012 | polity | 3 | war | アラブ世界 |
-| 108 | 第三次中東戦争 | Q49077 | 1967 | 1967 | conflict | 3 | war | 中東 |
-| 100 | ナポレオン戦争 | Q78994 | 1803 | 1815 | conflict | 3 | war | ヨーロッパ |
-| 93 | 第四次中東戦争 | Q49100 | 1973 | 1973 | conflict | 3 | war | 近東 |
-| 89 | 米英戦争 | Q26013 | 1812 | 1815 | conflict | 3 | war | 北アメリカ、太平洋、大西洋 |
-| 79 | セルジューク朝 | Q3708255 | 1000 |  | polity | 3 | other | 西アジア |
-| 78 | スペイン継承戦争 | Q150701 | 1701 | 1714 | conflict | 3 | war | 南アメリカ、ヨーロッパ、北アメリカ |
-| 76 | 十二日間戦争 | Q134900605 | 2025 | 2025 | conflict | 3 | war | 中東 |
 | 68 | ロマネスク | Q46805 | 1000 |  | culture | 2 | other | ヨーロッパ |
-| 58 | フランス革命戦争 | Q207318 | 1792 | 1802 | conflict | 3 | war | ヨーロッパ |
-| 56 | フレンチ・インディアン戦争 | Q154697 | 1754 | 1763 | conflict | 3 | war | 北アメリカ |
 | 55 | ルネサンス音楽 | Q201405 | 1400 |  | culture | 2 | other | ヨーロッパ |
-| 54 | メキシコ独立革命 | Q68750 | 1800 | 1821 | conflict | 3 | war | Northern America and Mexico |
 | 53 | 大西洋の戦い | Q157627 | 1939 |  | conflict | 3 | other | 大西洋 |
 | 53 | アッシリア人大虐殺 | Q852236 | 1914 |  | conflict | 3 | other | 西アジア |
 | 47 | バウンティ号の反乱 | Q749811 | 1789 |  | conflict | 3 | war | 太平洋 |

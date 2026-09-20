@@ -4,7 +4,8 @@
     "下書き place-overrides.draft.md を 2026-09-20 に人が確認し、その指示をこの形に書き写した。ここに無い『国の代表点のみ』の項目は placeKind: none（places は空）になる。",
     "座標はこのファイルに書かない。places[].from の QID から、path の経路で Wikidata の P625 を引く（pnpm wikidata:fetch-app-extras が取得し、build-app-data.mjs が反映する）。",
     "path: \"P625\" は from の項目自身の座標。\"P159>P625\" は from の P159（本部所在地）の先の項目の座標で、P159 に始点・終点の修飾子があれば、その出来事の年（start の上書きがあればその年）に該当するものを選ぶ。",
-    "from の QID と fromLabel の対応は、2026-09-20 に wbgetentities / wbsearchentities の出力で照合した。QID を足すときも照合すること。",
+    "from の QID と fromLabel の対応は、2026-09-20 に wbgetentities / wbsearchentities の出力で照合した（戦争など 14 件ぶんは 2026-09-21）。QID を足すときも照合すること。",
+    "places は先頭が primary（ラベルの付く点）。Wikidata 由来の places は全部置き換わる。note に代表点の選び方を書く。",
     "label は地図に出す地名。省略すると from の日本語ラベルを使う。",
     "場所の粒度（fine / region / country）は書かない。path が P625 なら from の項目の P31 から決まり（place-granularity.mjs。P31 は pnpm wikidata:fetch-places が取得）、P159>P625 なら fine。",
     "start / end / kind は、Wikidata から導いた値の上書き。理由を note に書く。"
@@ -135,7 +136,165 @@
       "note": "欧州中央銀行の P625 は 2014 年 11 月に移った現在の建物の位置。導入年（1999）には、P159 のうち終点が 2014 の値（Q1794 フランクフルト）が該当する"
     },
 
-    { "qid": "Q131723", "title": "ビットコイン", "placeKind": "none", "note": "発行機関が無い" }
+    { "qid": "Q131723", "title": "ビットコイン", "placeKind": "none", "note": "発行機関が無い" },
+
+    {
+      "qid": "Q361",
+      "title": "第一次世界大戦",
+      "placeKind": "point",
+      "places": [
+        { "from": "Q154748", "fromLabel": "ヴェルダン", "path": "P625" },
+        { "from": "Q11194", "fromLabel": "サラエヴォ", "path": "P625" },
+        { "from": "Q545312", "fromLabel": "ステンバルク", "path": "P625", "label": "ステンバルク（タンネンベルク）" },
+        { "from": "Q192860", "fromLabel": "ガリポリ半島", "path": "P625" }
+      ],
+      "note": "西部戦線を代表点にした（先頭のヴェルダン）。サラエヴォは開戦の契機、ステンバルクはタンネンベルクの戦い（東部戦線）、ガリポリ半島は中東方面。Wikidata の P276 は大陸・海洋 9 件と中華人民共和国で、中華人民共和国は誤りとして外す"
+    },
+    {
+      "qid": "Q362",
+      "title": "第二次世界大戦",
+      "placeKind": "point",
+      "places": [
+        { "from": "Q914", "fromLabel": "ヴォルゴグラード", "path": "P625" },
+        { "from": "Q15878", "fromLabel": "ノルマンディー", "path": "P625" },
+        { "from": "Q18094", "fromLabel": "ホノルル", "path": "P625" },
+        { "from": "Q204439", "fromLabel": "エル・アラメイン", "path": "P625" },
+        { "from": "Q34664", "fromLabel": "広島市", "path": "P625" }
+      ],
+      "note": "東部戦線を代表点にした（先頭のヴォルゴグラード＝スターリングラード）。Wikidata の P276 の region 8・country 4 は置き換え"
+    },
+    {
+      "qid": "Q40949",
+      "title": "アメリカ独立戦争",
+      "placeKind": "point",
+      "places": [
+        { "from": "Q929667", "fromLabel": "レキシントン（マサチューセッツ州）", "path": "P625", "label": "レキシントン" },
+        { "from": "Q518097", "fromLabel": "サラトガ（ニューヨーク州の町）", "path": "P625", "label": "サラトガ" },
+        { "from": "Q938699", "fromLabel": "ヨークタウン（バージニア州）", "path": "P625", "label": "ヨークタウン" }
+      ],
+      "note": "開戦地を代表点にした（先頭のレキシントン）。Wikidata の P276 の地中海・カリブ海・北大西洋などは外す"
+    },
+    {
+      "qid": "Q78994",
+      "title": "ナポレオン戦争",
+      "placeKind": "point",
+      "places": [
+        { "from": "Q90", "fromLabel": "パリ", "path": "P625" },
+        { "from": "Q193724", "fromLabel": "スラフコフ・ウ・ブルナ", "path": "P625", "label": "スラフコフ・ウ・ブルナ（アウステルリッツ）" },
+        { "from": "Q2079", "fromLabel": "ライプツィヒ", "path": "P625" },
+        { "from": "Q179034", "fromLabel": "ワーテルロー", "path": "P625" },
+        { "from": "Q894049", "fromLabel": "ボロジノ", "path": "P625" }
+      ],
+      "note": "起点の国の首都を代表点にした（先頭のパリ）。残りは主な会戦地。Wikidata の P276 は「ヨーロッパ」（coarse）だけ"
+    },
+    {
+      "qid": "Q207318",
+      "title": "フランス革命戦争",
+      "placeKind": "point",
+      "places": [
+        { "from": "Q1060595", "fromLabel": "ヴァルミー", "path": "P625" },
+        { "from": "Q90", "fromLabel": "パリ", "path": "P625" }
+      ],
+      "note": "開戦の会戦地を代表点にした（先頭のヴァルミー）。Wikidata の P276 は「ヨーロッパ」（coarse）だけ"
+    },
+    {
+      "qid": "Q150701",
+      "title": "スペイン継承戦争",
+      "placeKind": "point",
+      "places": [
+        { "from": "Q2807", "fromLabel": "マドリード", "path": "P625" },
+        { "from": "Q514914", "fromLabel": "ブリントハイム", "path": "P625", "label": "ブリントハイム（ブレナム）" }
+      ],
+      "note": "継承が争われた王国の首都を代表点にした（先頭のマドリード）。ブリントハイムはブレナムの戦いの地。Wikidata の P276 は大陸 3 件（coarse）だけ"
+    },
+    {
+      "qid": "Q49077",
+      "title": "第三次中東戦争",
+      "placeKind": "point",
+      "places": [
+        { "from": "Q1218", "fromLabel": "エルサレム", "path": "P625" },
+        { "from": "Q36755", "fromLabel": "シナイ半島", "path": "P625" },
+        { "from": "Q83210", "fromLabel": "ゴラン高原", "path": "P625" }
+      ],
+      "note": "エルサレムを代表点にした（先頭）。シナイ半島とゴラン高原は、この戦争の戦域。Wikidata の P276 は「中東」（coarse）だけ"
+    },
+    {
+      "qid": "Q49100",
+      "title": "第四次中東戦争",
+      "placeKind": "point",
+      "places": [
+        { "from": "Q217156", "fromLabel": "イスマイリア", "path": "P625" },
+        { "from": "Q83210", "fromLabel": "ゴラン高原", "path": "P625" }
+      ],
+      "note": "スエズ運河渡河の地として、イスマイリアを代表点にした（先頭）。ゴラン高原はもう一方の戦線。Wikidata の P276 は「近東」（coarse）だけ"
+    },
+    {
+      "qid": "Q134900605",
+      "title": "十二日間戦争",
+      "placeKind": "point",
+      "places": [
+        { "from": "Q3616", "fromLabel": "テヘラン", "path": "P625" },
+        { "from": "Q33935", "fromLabel": "テルアビブ", "path": "P625" }
+      ],
+      "note": "テヘランを代表点にした（先頭）。Wikidata の P276 は「中東」（coarse）だけ"
+    },
+    {
+      "qid": "Q26013",
+      "title": "米英戦争",
+      "placeKind": "point",
+      "places": [
+        { "from": "Q61", "fromLabel": "ワシントンD.C.", "path": "P625" },
+        { "from": "Q172", "fromLabel": "トロント", "path": "P625", "label": "トロント（ヨーク）" },
+        { "from": "Q34404", "fromLabel": "ニューオーリンズ", "path": "P625" }
+      ],
+      "note": "ワシントンD.C. を代表点にした（先頭）。トロントは当時のヨーク。Wikidata の P276 は北アメリカ・太平洋・大西洋（coarse）だけ"
+    },
+    {
+      "qid": "Q154697",
+      "title": "フレンチ・インディアン戦争",
+      "placeKind": "point",
+      "places": [
+        { "from": "Q1342", "fromLabel": "ピッツバーグ", "path": "P625", "label": "ピッツバーグ（デュケーヌ砦）" },
+        { "from": "Q2145", "fromLabel": "ケベック市", "path": "P625" }
+      ],
+      "note": "デュケーヌ砦のあったピッツバーグを代表点にした（先頭）。Wikidata の P276 は「北アメリカ」（coarse）だけ"
+    },
+    {
+      "qid": "Q68750",
+      "title": "メキシコ独立革命",
+      "placeKind": "point",
+      "places": [
+        { "from": "Q17487868", "fromLabel": "Dolores Hidalgo（グアナフアト州の都市）", "path": "P625", "label": "ドロレス・イダルゴ" },
+        { "from": "Q1489", "fromLabel": "メキシコシティ", "path": "P625" }
+      ],
+      "note": "「ドロレスの叫び」の地を代表点にした（先頭）。ドロレス・イダルゴは、同名の基礎自治体（Q958153）ではなく都市の項目（日本語ラベルなし）を使う"
+    },
+    {
+      "qid": "Q3708255",
+      "title": "セルジューク朝",
+      "placeKind": "point",
+      "places": [
+        { "from": "Q42053", "fromLabel": "エスファハーン", "path": "P625", "label": "イスファハーン" },
+        { "from": "Q131350", "fromLabel": "ニーシャープール", "path": "P625" }
+      ],
+      "kind": "period",
+      "start": 1000,
+      "end": 1308,
+      "note": "首都を代表点にした（先頭のイスファハーン）。Wikidata の場所は「西アジア」（coarse）だけ。Wikidata には P580 / P582 が無く P571（1000 年）だけが使われて instant になっていたので、period にし、end は Wikidata の P576（1308 年。2026-09-21 に wbgetentities で確認）を使う"
+    },
+    {
+      "qid": "Q33761",
+      "title": "アラブの春",
+      "placeKind": "origin",
+      "places": [
+        { "from": "Q3572", "fromLabel": "チュニス", "path": "P625" },
+        { "from": "Q85", "fromLabel": "カイロ", "path": "P625" },
+        { "from": "Q3579", "fromLabel": "トリポリ（リビア）", "path": "P625", "label": "トリポリ" },
+        { "from": "Q3766", "fromLabel": "ダマスカス", "path": "P625" },
+        { "from": "Q2471", "fromLabel": "サヌア", "path": "P625", "label": "サナア" }
+      ],
+      "note": "起点のチュニスを代表点にした（先頭）。R6 diffusion 候補。Wikidata の P276 は「アラブ世界」（coarse）だけ"
+    }
   ],
   "exclude": [
     { "qid": "Q162297", "title": "衛生", "reason": "誤データ（概念の項目。年が前 3000 年）" },
