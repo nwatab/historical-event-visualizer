@@ -39,20 +39,62 @@ const sliceFilter = (slice) =>
   slice ? `FILTER(?t >= ${yearLiteral(slice.from)} && ?t < ${yearLiteral(slice.to)})` : "";
 
 /**
- * 1ルート（×1年代スライス）分の項目を取るクエリ。
- * 1項目が「座標の数 × 時点の数 × P31 の数」行に展開されて返る。結合は merge.mjs で行う。
- * @param {{ qid: string, subclasses: boolean }} root
- * @param {Slice | null} slice
+ * 取得クエリの種類（R4b-1）。ルートの group で決まる。
+ * - "items"      … 従来どおり。P625 必須。
+ * - "engagement" … 会戦。P625 必須で、P361（〜の一部）を親として併せて取る。
+ * - "war"        … 期間を持つ紛争。P625 は任意（無い項目も分母として残す）。P361 も取る。
+ * - "warloc"     … war と同じ項目の P276（場所）と、その先の P625。座標を持たない場所も行として返す。
+ * @typedef {"items" | "engagement" | "war" | "warloc"} QueryKind
  */
-export const buildItemsQuery = (root, slice) => `
-SELECT ?item ?links ?coord ?prop ?t ?prec ?p31 ?ja ?en WHERE {
-  ${rootPattern(root)}
-  ?item wdt:P625 ?coord ; wikibase:sitelinks ?links .
-  ${TIME_PATTERN}
-  ${sliceFilter(slice)}
+
+const LABELS_AND_P31 = `
   OPTIONAL { ?item wdt:P31 ?p31 }
   OPTIONAL { ?item rdfs:label ?ja FILTER(LANG(?ja) = "ja") }
-  OPTIONAL { ?item rdfs:label ?en FILTER(LANG(?en) = "en") }
+  OPTIONAL { ?item rdfs:label ?en FILTER(LANG(?en) = "en") }`;
+
+/**
+ * 1ルート（×1年代スライス）分の項目を取るクエリ。
+ * 1項目が「座標の数 × 時点の数 × P31 の数（× 親の数）」行に展開されて返る。結合は merge.mjs で行う。
+ * @param {{ qid: string, subclasses: boolean }} root
+ * @param {Slice | null} slice
+ * @param {QueryKind} [kind]
+ */
+export const buildItemsQuery = (root, slice, kind = "items") => {
+  if (kind === "warloc") {
+    // 年代で分割するときだけ時点を結合する（分割しないなら「年がある」ことだけ確かめれば足りる）
+    return `
+SELECT DISTINCT ?item ?loc ?locCoord WHERE {
+  ${rootPattern(root)}
+  ${slice ? `${TIME_PATTERN}\n  ${sliceFilter(slice)}` : "FILTER EXISTS { ?item wdt:P585|wdt:P580|wdt:P582 ?anyTime }"}
+  ?item wdt:P276 ?loc .
+  OPTIONAL { ?loc wdt:P625 ?locCoord }
+}`;
+  }
+  const coord = kind === "war" ? "OPTIONAL { ?item wdt:P625 ?coord }" : "?item wdt:P625 ?coord .";
+  const parent = kind === "items" ? "" : "OPTIONAL { ?item wdt:P361 ?parent }";
+  return `
+SELECT ?item ?links ?coord ?prop ?t ?prec ?p31 ?ja ?en ${kind === "items" ? "" : "?parent"} WHERE {
+  ${rootPattern(root)}
+  ?item wikibase:sitelinks ?links .
+  ${coord}
+  ${TIME_PATTERN}
+  ${sliceFilter(slice)}
+  ${parent}
+  ${LABELS_AND_P31}
+}`;
+};
+
+/**
+ * 親（P361 の先）のうち、取得済みの項目に含まれないものを引く。親が戦争かどうかを、
+ * P31 と、さらにその親（戦線 → 戦争 のような連鎖）から判断するため。
+ * @param {readonly string[]} qids
+ */
+export const buildParentsQuery = (qids) => `
+SELECT ?item ?links ?p31 ?parent ?ja ?en WHERE {
+  VALUES ?item { ${qids.map((q) => `wd:${q}`).join(" ")} }
+  ?item wikibase:sitelinks ?links .
+  OPTIONAL { ?item wdt:P361 ?parent }
+  ${LABELS_AND_P31}
 }`;
 
 /**
@@ -96,6 +138,63 @@ SELECT ?item ?links ?p31 ?coord ?prop ?t WHERE {
     VALUES (?w ?prop) { (wdt:P585 "P585") (wdt:P580 "P580") (wdt:P582 "P582") (wdt:P571 "P571") }
     ?item ?w ?t .
   }
+}`;
+
+/**
+ * 指定した項目のうち、war グループのルートのどれかの（下位クラスの）インスタンスであるもの。
+ * 親が「戦争」かどうかを、項目の取得と同じ基準（P31/P279*）で判定するため。
+ * @param {readonly string[]} qids @param {readonly string[]} warRootQids
+ */
+export const buildWarFlagsQuery = (qids, warRootQids) => `
+SELECT DISTINCT ?item WHERE {
+  VALUES ?item { ${qids.map((q) => `wd:${q}`).join(" ")} }
+  VALUES ?root { ${warRootQids.map((q) => `wd:${q}`).join(" ")} }
+  ?item wdt:P31/wdt:P279* ?root .
+}`;
+
+// ── 選抜リストの項目の属性（R4b-1）。QID を VALUES で渡すので、どれも軽い。
+
+/** @param {readonly string[]} qids */
+const valuesOf = (qids) => `VALUES ?item { ${qids.map((q) => `wd:${q}`).join(" ")} }`;
+
+/** sitelinks・ラベル・P31。 @param {readonly string[]} qids */
+export const buildListCoreQuery = (qids) => `
+SELECT ?item ?links ?p31 ?ja ?en WHERE {
+  ${valuesOf(qids)}
+  ?item wikibase:sitelinks ?links .
+  ${LABELS_AND_P31}
+}`;
+
+/** 年のプロパティ（精度つき、BestRank）。 @param {readonly string[]} qids @param {readonly string[]} props */
+export const buildListTimesQuery = (qids, props) => `
+SELECT ?item ?prop ?t ?prec WHERE {
+  ${valuesOf(qids)}
+  VALUES (?p ?psv ?prop) { ${props.map((p) => `(p:${p} psv:${p} "${p}")`).join(" ")} }
+  ?item ?p ?st . ?st a wikibase:BestRank ; ?psv ?v .
+  ?v wikibase:timeValue ?t ; wikibase:timePrecision ?prec .
+}`;
+
+/** 場所。P625 は項目自身の座標、それ以外は値の項目（?loc）が持つ座標。 @param {readonly string[]} qids @param {readonly string[]} props */
+export const buildListPlacesQuery = (qids, props) => `
+SELECT ?item ?prop ?loc ?coord WHERE {
+  ${valuesOf(qids)}
+  {
+    ?item wdt:P625 ?coord . BIND("P625" AS ?prop)
+  } UNION {
+    VALUES (?w ?prop) { ${props.filter((p) => p !== "P625").map((p) => `(wdt:${p} "${p}")`).join(" ")} }
+    ?item ?w ?loc . ?loc wdt:P625 ?coord .
+  }
+}`;
+
+/**
+ * 指定した項目のうち、人口（P1082）を持つもの。都市・国・地方を、P31 の種類を列挙せずに見分けるために使う
+ * （年表の行の主題から、地名のリンクを外す）。
+ * @param {readonly string[]} qids
+ */
+export const buildPopulatedQuery = (qids) => `
+SELECT DISTINCT ?item WHERE {
+  ${valuesOf(qids)}
+  ?item wdt:P1082 ?population .
 }`;
 
 // ── 応答の解釈（純粋関数） ──────────────────────────────────

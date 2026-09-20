@@ -31,8 +31,19 @@ export const CHUNK_DIR = join(RAW_DIR, "chunks");
 export const EVENTS_PATH = join(RAW_DIR, "events.json");
 export const CLASS_LABELS_PATH = join(RAW_DIR, "class-labels.json");
 export const COORD_LOSS_PATH = join(RAW_DIR, "coord-loss.json");
+export const PARENTS_PATH = join(RAW_DIR, "parents.json");
 export const MANUAL_ITEMS_PATH = join(RAW_DIR, "manual-items.json");
 export const FETCH_LOG_PATH = join(RAW_DIR, "fetch-log.json");
+// Wikipedia の選抜リスト（R4b-1）。これも作業用で、コミットしない。
+export const LISTS_DIR = join(ROOT_DIR, "data", "raw", "lists");
+export const LIST_PAGES_DIR = join(LISTS_DIR, "pages");
+export const LIST_TITLES_PATH = join(LISTS_DIR, "titles.json");
+export const LIST_ATTRS_PATH = join(LISTS_DIR, "attrs.json");
+/** 年表の主題の候補のうち、人口（P1082）を持つ項目（＝地名）。QID → true/false。 */
+export const LIST_POPULATED_PATH = join(LISTS_DIR, "populated.json");
+/** 年か場所が取れなかった項目を、理由付きで書き出す先（手入力の候補）。report.mjs が作る。 */
+export const LIST_MISSING_PATH = join(LISTS_DIR, "missing.json");
+
 export const REPORT_PATH = join(import.meta.dirname, "REPORT.md");
 
 // 地域判定に使う国ポリゴン。public/geo/ の陸地データと同じ Natural Earth（パブリックドメイン）。

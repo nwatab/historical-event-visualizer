@@ -10,20 +10,28 @@
 // （記憶で書いた QID のうち3件が別物だったため、追加するときも必ず照合すること）。
 // ルート同士が重なっていてもよい（結合時に QID で重複を除く）。
 
-/** @typedef {{ qid: string, label: string, subclasses: boolean }} Root */
+//
+// group（R4b-1 で追加）: 取得のしかたを変える。
+// - "war"        … 期間を持つ紛争。座標を必須にせず、P625 に加えて P276（場所）の先の座標も取る。
+//                   点で表せないために P625 を持たない項目が大半だから（R4a: war は年ありの 95% が座標なし）。
+// - "engagement" … 会戦。従来どおり P625 必須。P361（〜の一部）で親の戦争を記録する。
+// - 省略         … 従来どおり P625 必須。
+// 1つの項目が war と engagement の両方のルートから取れた場合は、war として扱う（analyze.mjs）。
+
+/** @typedef {{ qid: string, label: string, subclasses: boolean, group?: "war" | "engagement" }} Root */
 
 /** @type {readonly Root[]} */
 export const ROOTS = Object.freeze([
   // ── 紛争まわり
-  { qid: "Q178561", label: "battle", subclasses: true },
-  { qid: "Q198", label: "war", subclasses: true },
-  { qid: "Q188055", label: "siege", subclasses: true },
-  { qid: "Q124734", label: "rebellion", subclasses: true },
-  { qid: "Q8465", label: "civil war", subclasses: true },
+  { qid: "Q178561", label: "battle", subclasses: true, group: "engagement" },
+  { qid: "Q198", label: "war", subclasses: true, group: "war" },
+  { qid: "Q188055", label: "siege", subclasses: true, group: "engagement" },
+  { qid: "Q124734", label: "rebellion", subclasses: true, group: "war" },
+  { qid: "Q8465", label: "civil war", subclasses: true, group: "war" },
   { qid: "Q3199915", label: "massacre", subclasses: true },
   { qid: "Q41397", label: "genocide", subclasses: true },
   { qid: "Q177716", label: "pogrom", subclasses: true },
-  { qid: "Q645883", label: "military operation", subclasses: true },
+  { qid: "Q645883", label: "military operation", subclasses: true, group: "engagement" },
   { qid: "Q831663", label: "military campaign", subclasses: true },
   { qid: "Q350604", label: "armed conflict", subclasses: true },
   { qid: "Q124757", label: "riot", subclasses: true },
@@ -32,7 +40,7 @@ export const ROOTS = Object.freeze([
   { qid: "Q3882219", label: "assassination", subclasses: true },
 
   // ── 政体変動まわり
-  { qid: "Q10931", label: "revolution", subclasses: true },
+  { qid: "Q10931", label: "revolution", subclasses: true, group: "war" },
   { qid: "Q45382", label: "coup d'état", subclasses: true },
   { qid: "Q131569", label: "treaty", subclasses: true },
   { qid: "Q1464916", label: "declaration of independence", subclasses: true },

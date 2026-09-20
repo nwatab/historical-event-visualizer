@@ -1,4 +1,5 @@
-// R4a: data/raw/wikidata/ の取得結果から、分布レポート（scripts/wikidata/REPORT.md）を作る。
+// data/raw/ の取得結果（P31 ベースの項目 + 選抜リストの項目）から、分布レポート（scripts/wikidata/REPORT.md）を作る。
+// R4a で作り、R4b-1 で取得条件の変更（戦争の P276、会戦の P361、選抜リスト、importance の試算）に合わせて拡張した。
 //
 //   pnpm wikidata:report
 //
@@ -14,35 +15,47 @@ import {
   COUNTRIES_URL,
   EVENTS_PATH,
   FETCH_LOG_PATH,
+  LIST_ATTRS_PATH,
+  LIST_MISSING_PATH,
+  LIST_POPULATED_PATH,
+  LIST_TITLES_PATH,
   MANUAL_ITEMS_PATH,
+  PARENTS_PATH,
   REPORT_PATH,
   USER_AGENT,
 } from "./config.mjs";
-import { classify, isMappedClass } from "./classify.mjs";
+import { buildItems, listRecord, timelineSubject } from "./analyze.mjs";
+import { isMappedClass } from "./classify.mjs";
+import { pageFile, timelineEntries, vitalEntries, vitalPageTitle } from "./list-entries.mjs";
+import { TIMELINE_PAGES, VITAL_PAGES } from "./lists.mjs";
 import { DOMAIN_PRIORITY, P31_DOMAIN_MAP } from "./p31-domain-map.mjs";
-import { REGIONS, REGION_LABELS, buildCountryIndex, regionOf } from "./regions.mjs";
+import { REGIONS, buildCountryIndex, regionOf } from "./regions.mjs";
+import { missingRecords, r4aSubset, sectionComparison, sectionConflict, sectionImportance, sectionLists } from "./report-r4b.mjs";
+import {
+  COARSE_ERAS,
+  DOMAINS,
+  DOMAIN_LABELS,
+  REGION_KEYS,
+  coarseEra,
+  eraLabel,
+  eraOf,
+  formatYear,
+  regionLabel,
+} from "./report-common.mjs";
 import { ROOTS } from "./roots.mjs";
 import { countBy, fmt, histogram, mdTable, percent, summarize } from "./stats.mjs";
 
 /** @typedef {import("./merge.mjs").RawItem} RawItem */
-/** @typedef {import("./regions.mjs").Region} Region */
-
-// src/lib/domain.ts の DOMAINS / DOMAIN_LABELS と同じ並び・名称（.mjs から import できないため転記）。
-const DOMAINS = /** @type {const} */ (["conflict", "polity", "science", "technology", "economy", "culture", "population"]);
-const DOMAIN_LABELS = Object.freeze({
-  conflict: "紛争",
-  polity: "政体変動",
-  science: "科学",
-  technology: "技術",
-  economy: "経済・交易",
-  culture: "思想・宗教・文化",
-  population: "人口・環境",
-});
+/** @typedef {import("./analyze.mjs").Item} Item */
+/** @typedef {import("./analyze.mjs").AnyItem} AnyItem */
 
 // ── 読み込み（副作用） ──────────────────────────────────────
 
 /** @param {string} path */
 const readJson = async (path) => JSON.parse(await readFile(path, "utf8"));
+
+/** 選抜リストをまだ取得していなくてもレポートは作れるようにする。 @param {string} path @param {any} fallback */
+const readJsonOr = (path, fallback) => readJson(path).catch(() => fallback);
 
 const loadCountries = async () => {
   try {
@@ -59,69 +72,9 @@ const loadCountries = async () => {
 
 // ── 導出（純粋関数） ────────────────────────────────────────
 
-/** 天文年 → 表示。src/lib/year.ts の formatYear と同じ規則。 @param {number} y */
-const formatYear = (y) => (y <= 0 ? `前${1 - y}` : String(y));
-
-/**
- * 開始年の決め方: P585（時点）があればその最小、無ければ P580（開始）の最小、
- * それも無ければ P582（終了）の最小（終了しか分からない項目）。
- * @param {RawItem} item
- */
-const startOf = (item) => {
-  const source = /** @type {const} */ (["P585", "P580", "P582"]).find((p) => item.times[p].length > 0);
-  return source ? { ...item.times[source][0], source } : null;
-};
-
-/**
- * @param {readonly import("./regions.mjs").CountryPolygon[]} countryIndex
- * @returns {(item: RawItem) => ReturnType<typeof derive0>}
- */
-const deriveWith = (countryIndex) => (item) => derive0(countryIndex, item);
-
-/** @param {readonly import("./regions.mjs").CountryPolygon[]} countryIndex @param {RawItem} item */
-const derive0 = (countryIndex, item) => {
-  const start = startOf(item);
-  const end = item.times.P582.length > 0 ? item.times.P582[item.times.P582.length - 1].year : null;
-  const place = regionOf(countryIndex, item.coords[0]);
-  return {
-    ...item,
-    label: item.labels.ja ?? item.labels.en ?? item.qid,
-    start,
-    end,
-    inAppRange: start !== null && start.year >= APP_YEAR_MIN && start.year <= APP_YEAR_MAX,
-    region: place.region,
-    country: place.country,
-    regionMethod: place.method,
-    classification: classify(item.p31),
-  };
-};
-
-/** @typedef {ReturnType<typeof derive0>} Item */
-
-/** @param {Region | null} r */
-const regionLabel = (r) => (r ? REGION_LABELS[r] : "判定不能（外洋・極地）");
-const REGION_KEYS = /** @type {readonly (Region | null)[]} */ ([...REGIONS, null]);
-
-const ERA_STEP = 500;
-/**
- * 500年刻みの区間の番号。紀元前は「紀元前 N 年」の N で区切る（前500〜前1 が -1、前1000〜前501 が -2）。
- * 紀元後は 1〜500 が 1、501〜1000 が 2。天文年のまま floor すると「前501〜前2」のような半端な境界になるため。
- * @param {number} year 天文年
- */
-const eraOf = (year) => (year <= 0 ? -Math.ceil((1 - year) / ERA_STEP) : Math.ceil(year / ERA_STEP));
-/** @param {number} era */
-const eraLabel = (era) =>
-  era < 0
-    ? `前${-era * ERA_STEP}〜前${(-era - 1) * ERA_STEP + 1}`
-    : `${(era - 1) * ERA_STEP + 1}〜${Math.min(era * ERA_STEP, APP_YEAR_MAX)}`;
-
-/** @param {number} y */
-const coarseEra = (y) => (y < 500 ? "〜499" : y < 1500 ? "500〜1499" : y < 1800 ? "1500〜1799" : y < 1900 ? "1800〜1899" : "1900〜");
-const COARSE_ERAS = ["〜499", "500〜1499", "1500〜1799", "1800〜1899", "1900〜"];
-
 // ── 各節（純粋関数。Item[] → Markdown） ───────────────────────
 
-/** @param {readonly Item[]} mapped @param {readonly Item[]} all */
+/** @param {readonly Item[]} mapped @param {readonly AnyItem[]} all */
 const sectionRegions = (mapped, all) => {
   const rows = REGION_KEYS.map((r) => {
     const m = mapped.filter((i) => i.region === r);
@@ -145,7 +98,7 @@ const sectionRegions = (mapped, all) => {
     "",
     mdTable(["地域", "写像済み", "割合", "取得全体", "割合"], rows),
     "",
-    `地域は1つめの座標で判定した。国ポリゴンの内側に入らず、最も近い国に寄せた項目は ${nearest} 件（${percent(nearest, mapped.length)}）。`,
+    `地域は座標から判定した（座標が複数ある項目は、各座標の地域のうち最も多いもの）。国ポリゴンの内側に入らず、最も近い国に寄せた項目は ${nearest} 件（${percent(nearest, mapped.length)}）。`,
     "",
     "### ヨーロッパの件数は各地域の何倍か（写像済み）",
     "",
@@ -179,7 +132,7 @@ const sectionEras = (mapped) => {
   return [
     "## b) 年代別の件数",
     "",
-    `開始年（P585 → P580 → P582 の順で最初にあるもの）で数えた。アプリの表示範囲（${formatYear(APP_YEAR_MIN)}〜${APP_YEAR_MAX}年）の外は母集団から除いてある。`,
+    `開始年（P31 ベースの項目は P580 → P585 → P582、リスト由来の項目は P585 → P575 → P571 → P577 → P580 の順で最初にあるもの）で数えた。アプリの表示範囲（${formatYear(APP_YEAR_MIN)}〜${APP_YEAR_MAX}年）の外は母集団から除いてある。`,
     "",
     mdTable(["年代", "件数", "割合"], rows),
     "",
@@ -196,7 +149,7 @@ const sectionEras = (mapped) => {
   ].join("\n");
 };
 
-/** @param {readonly Item[]} inRange @param {readonly Item[]} mapped */
+/** @param {readonly AnyItem[]} inRange @param {readonly Item[]} mapped */
 const sectionDomains = (inRange, mapped) => {
   const domainOf = (/** @type {Item} */ i) => (i.classification.status === "mapped" ? i.classification.domain : "");
   const rows = DOMAINS.map((d) => {
@@ -287,10 +240,11 @@ const sectionSitelinks = (mapped) => {
 /**
  * @param {readonly Item[]} mapped
  * @param {readonly any[]} manual
- * @param {readonly Item[]} allItems
+ * @param {readonly AnyItem[]} allItems
  * @param {readonly import("./regions.mjs").CountryPolygon[]} countryIndex
+ * @param {readonly import("./analyze.mjs").ListRecord[]} listRecords
  */
-const sectionManual = (mapped, manual, allItems, countryIndex) => {
+const sectionManual = (mapped, manual, allItems, countryIndex, listRecords) => {
   // src/data/events.sample.ts の places（2026-09-20 に転記）。Wikidata に座標が無い項目の地域判定に使う。
   const samplePlaces = /** @type {Record<string, { lon: number, lat: number }>} */ ({
     Q28573: { lon: -71.97, lat: -13.53 },
@@ -299,23 +253,28 @@ const sectionManual = (mapped, manual, allItems, countryIndex) => {
     Q705553: { lon: 38.9, lat: -8.5 },
   });
   const rows = manual.map((m) => {
-    const fetched = allItems.find((i) => i.qid === m.qid);
+    const inPopulation = mapped.find((i) => i.qid === m.qid);
+    const known = allItems.find((i) => i.qid === m.qid);
+    const listed = listRecords.find((r) => r.qid === m.qid);
     const hasTime = m.P585.length + m.P580.length + m.P582.length > 0;
-    const reason = fetched
-      ? fetched.classification.status === "mapped"
-        ? "取得できた"
-        : `取得できたが ${fetched.classification.status}`
-      : [!m.hasCoord ? "P625（座標）が無い" : "", !hasTime ? "P585/P580/P582 が無い" : ""].filter(Boolean).join("、") ||
-        "どのルートの下位クラスでもない";
-    const region = regionOf(countryIndex, samplePlaces[m.qid]).region;
+    const how = inPopulation
+      ? `取得できた（場所: ${inPopulation.places[0].via}、分類: ${inPopulation.classification.by === "list" ? "リストの節" : "P31"}${inPopulation.vital ? "、Vital articles" : ""}）`
+      : known
+        ? [known.places.length === 0 ? "座標が付かない" : "", known.classification.status !== "mapped" ? `分類が ${known.classification.status}` : ""].filter(Boolean).join("、")
+        : listed
+          ? `リスト（${listed.source}）にはあるが、${listed.reasons.join("、")}。missing.json に入っている`
+          : [!m.hasCoord ? "P625（座標）が無い" : "", !hasTime ? "P585/P580/P582 が無い" : ""].filter(Boolean).join("、") ||
+            "どのルート・リストからも取れない";
+    const region = inPopulation?.region ?? regionOf(countryIndex, samplePlaces[m.qid]).region;
     const rank = 1 + mapped.filter((i) => i.sitelinks > m.sitelinks).length;
     const inRegion = mapped.filter((i) => i.region === region);
     const regionRank = 1 + inRegion.filter((i) => i.sitelinks > m.sitelinks).length;
     return [
       `${m.name}（${m.qid}）`,
       m.sitelinks,
-      fetched ? "○" : "×",
-      reason,
+      inPopulation ? "○" : "×",
+      how,
+      inPopulation ? inPopulation.importance : "–",
       `${rank} 位 / ${mapped.length}（上位 ${percent(rank, mapped.length)}）`,
       `${regionLabel(region)}で ${regionRank} 位 / ${inRegion.length}`,
     ];
@@ -323,9 +282,9 @@ const sectionManual = (mapped, manual, allItems, countryIndex) => {
   return [
     "## e) R3a で手動追加した4件",
     "",
-    "順位は「写像済みの項目を sitelinks の多い順に並べたとき、この sitelinks 数なら何位に入るか」（同数は同順位）。取得できなかった項目も、仮に取得できていた場合の順位として出している。",
+    "順位は「母集団の項目を sitelinks の多い順に並べたとき、この sitelinks 数なら何位に入るか」（同数は同順位）。取得できなかった項目も、仮に取得できていた場合の順位として出している。",
     "",
-    mdTable(["項目", "sitelinks", "取得", "理由", "全体での順位", "地域内での順位"], rows, ["l", "r", "l", "l", "l", "l"]),
+    mdTable(["項目", "sitelinks", "取得", "経路・理由", "importance", "全体での順位", "地域内での順位"], rows, ["l", "r", "l", "l", "r", "l", "l"]),
   ].join("\n");
 };
 
@@ -374,7 +333,7 @@ const sectionTop = (mapped) => {
 };
 
 /**
- * @param {readonly Item[]} inRange
+ * @param {readonly AnyItem[]} inRange
  * @param {Record<string, { ja?: string, en?: string }>} classLabels
  */
 const sectionUnmapped = (inRange, classLabels) => {
@@ -400,7 +359,7 @@ const sectionUnmapped = (inRange, classLabels) => {
 };
 
 /**
- * @param {readonly Item[]} allItems
+ * @param {readonly AnyItem[]} allItems
  * @param {readonly Item[]} mapped
  */
 const sectionQuality = (allItems, mapped) => {
@@ -484,7 +443,7 @@ const sectionQuality = (allItems, mapped) => {
 /**
  * @param {readonly any[]} log
  * @param {Record<string, any>} coordLoss
- * @param {readonly Item[]} allItems
+ * @param {readonly AnyItem[]} allItems
  */
 const sectionFetch = (log, coordLoss, allItems) => {
   const ok = log.filter((c) => c.status === "ok");
@@ -512,11 +471,14 @@ const sectionFetch = (log, coordLoss, allItems) => {
     "",
     `- 取得日時（UTC）: ${dates[0] ?? "–"} 〜 ${dates[dates.length - 1] ?? "–"}`,
     `- ルート ${ROOTS.length} 個、成功したクエリ ${ok.length} 回、タイムアウトして年代で分割したクエリ ${timeouts.length} 回、取得を諦めたチャンク ${failed.length} 個`,
-    `- 取得できた項目（座標あり・年あり、ルート間の重複を除く）: **${allItems.length} 件**`,
+    `- P31 ベースで取得できた項目（年あり。ルート間の重複を除く。戦争のルートは座標の無い項目も含む）: **${allItems.filter((i) => i.fromP31).length} 件**`,
+    `- 選抜リストだけから来た項目（年・場所あり）: ${allItems.filter((i) => !i.fromP31).length} 件。合わせて ${allItems.length} 件`,
+    "- 取得日時の幅が広いのは、R4a で取得したチャンク（P625 必須のルート）を再利用しているため。戦争・会戦のルートと選抜リストは R4b-1 で取得した。",
     "",
     "### ルート別の件数と、座標が無くて落ちた割合",
     "",
     "「年あり」は P585/P580/P582 のどれかを持つ項目数（座標の有無を問わない）。「座標なしで脱落」はそのうち P625 を持たない割合。",
+    "戦争のルート（war / rebellion / civil war / revolution）は R4b-1 から座標を必須にしていないので、「取得項目数」には座標の無い項目も含む。",
     "「P276 経由で救える数」は、P625 は無いが P276（場所）の先の項目に P625 がある数。ルート同士は重なっているので、列の合計に意味は無い。",
     "",
     mdTable(["ルート", "成功", "分割", "取得項目数", "年あり", "座標なしで脱落", "P276 経由で救える数"], perRoot),
@@ -532,27 +494,69 @@ const sectionFetch = (log, coordLoss, allItems) => {
 
 /** @type {readonly RawItem[]} */
 const rawItems = await readJson(EVENTS_PATH);
-const [classLabels, coordLoss, manual, log, countries] = await Promise.all([
+const [classLabels, coordLoss, manual, log, countries, outsideParents, titles, attrs, populated] = await Promise.all([
   readJson(CLASS_LABELS_PATH),
   readJson(COORD_LOSS_PATH),
   readJson(MANUAL_ITEMS_PATH),
   readJson(FETCH_LOG_PATH),
   loadCountries(),
+  readJsonOr(PARENTS_PATH, {}),
+  readJsonOr(LIST_TITLES_PATH, {}),
+  readJsonOr(LIST_ATTRS_PATH, {}),
+  readJsonOr(LIST_POPULATED_PATH, {}),
 ]);
 
+// 選抜リスト: 保存済みのページ → 項目 → QID・属性を引き当てる
+const vitalPages = (
+  await Promise.all(VITAL_PAGES.map(async (cfg) => ({ cfg, page: await readJsonOr(pageFile(vitalPageTitle(cfg)), null) })))
+).filter((p) => p.page !== null);
+const timelinePages = (
+  await Promise.all(TIMELINE_PAGES.map(async (cfg) => ({ cfg, page: await readJsonOr(pageFile(cfg.page), null) })))
+).filter((p) => p.page !== null);
+const listRecords = [
+  ...vitalPages.flatMap(({ cfg, page }) =>
+    vitalEntries(cfg, page.wikitext).map((e) => {
+      const qid = titles[e.title]?.qid ?? null;
+      return listRecord({ source: e.source, domain: e.domain, title: e.title, listKind: "vital", level: e.level }, qid, qid ? attrs[qid] : undefined);
+    }),
+  ),
+  ...timelinePages.flatMap(({ cfg, page }) =>
+    timelineEntries(cfg, page.wikitext).map((e) => {
+      const subject = timelineSubject(e, titles, attrs, populated);
+      return listRecord(
+        { source: e.source, domain: e.domain, title: subject?.title ?? e.links[0], listKind: "timeline", yearLabel: e.yearLabel, text: e.text },
+        subject?.qid ?? null,
+        subject ? attrs[subject.qid] : undefined,
+      );
+    }),
+  ),
+];
+const listRevisions = [...vitalPages, ...timelinePages].map(({ page }) => `${page.page}（rev ${page.revid}）`);
+
 const countryIndex = buildCountryIndex(countries);
-const allItems = rawItems.map(deriveWith(countryIndex));
-const inRange = allItems.filter((i) => i.inAppRange);
-const mapped = inRange.filter((i) => i.classification.status === "mapped");
+const { all: allItems, population: mapped, thresholds } = buildItems({ rawItems, outsideParents, listRecords, countryIndex });
+const inRange = allItems.filter((i) => i.inAppRange && i.places.length > 0);
 
 const report = [
-  "# R4a: Wikidata 取得結果の分布レポート",
+  "# Wikidata 取得結果の分布レポート（R4b-1）",
   "",
   "> このファイルは `pnpm wikidata:report`（scripts/wikidata/report.mjs）が自動生成する。手で編集しない。",
-  "> 数値の出所はすべて、`pnpm wikidata:fetch` が data/raw/wikidata/ に保存した SPARQL の取得結果（コミット対象外）。",
-  "> 数値の読み方と所見は [FINDINGS.md](FINDINGS.md) にある。",
+  "> 数値の出所はすべて、`pnpm wikidata:fetch` と `pnpm wikidata:fetch-lists` が data/raw/ に保存した取得結果（コミット対象外）。",
+  "> 数値の読み方と所見は [FINDINGS.md](FINDINGS.md)。R4a 時点のレポートは [REPORT-R4a.md](REPORT-R4a.md)。",
+  "",
+  "母集団は「開始年がアプリの表示範囲内にあり、座標が1つ以上あり、7分類のどれかに入った項目」。以降、断りが無ければこの母集団で数える。",
   "",
   sectionFetch(log, coordLoss, allItems),
+  "",
+  sectionComparison(mapped),
+  "",
+  sectionConflict(allItems, mapped),
+  "",
+  sectionLists(listRecords, mapped),
+  "",
+  sectionImportance(mapped, thresholds),
+  "",
+  "# 全体の分布（R4a と同じ集計を、新しい母集団で）",
   "",
   sectionRegions(mapped, inRange),
   "",
@@ -562,15 +566,25 @@ const report = [
   "",
   sectionSitelinks(mapped),
   "",
-  sectionManual(mapped, manual, allItems, countryIndex),
+  sectionManual(mapped, manual, allItems, countryIndex, listRecords),
   "",
   sectionTop(mapped),
   "",
-  sectionUnmapped(inRange, classLabels),
+  sectionUnmapped(inRange.filter((i) => i.fromP31), classLabels),
   "",
   sectionQuality(allItems, mapped),
+  "",
+  "## 出典リストの版",
+  "",
+  "英語版 Wikipedia（CC BY-SA 4.0）。取得した版:",
+  "",
+  ...listRevisions.map((r) => `- ${r}`),
   "",
 ].join("\n");
 
 await writeFile(REPORT_PATH, report);
-console.log(`${allItems.length} 件（表示範囲内 ${inRange.length}、写像済み ${mapped.length}）→ ${REPORT_PATH}`);
+await writeFile(LIST_MISSING_PATH, JSON.stringify(missingRecords(listRecords), null, 1));
+console.log(
+  `${allItems.length} 件（母集団 ${mapped.length}、うち R4a 条件 ${r4aSubset(mapped).length}）→ ${REPORT_PATH}\n` +
+    `年か場所が取れなかったリスト項目 ${missingRecords(listRecords).length} 件 → ${LIST_MISSING_PATH}`,
+);
