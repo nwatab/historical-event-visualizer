@@ -11,6 +11,7 @@ import {
   yearOf,
 } from "./report-common.mjs";
 import { countBy, fmt, mdTable, percent, summarize } from "./stats.mjs";
+import { isChemicalElement } from "./title-predicates.mjs";
 
 /** @typedef {import("./analyze.mjs").Item} Item */
 /** @typedef {import("./analyze.mjs").AnyItem} AnyItem */
@@ -339,7 +340,9 @@ export const sectionImportance = (population, thresholds) => {
       i.kind === "war" ? "戦争" : i.kind === "engagement" ? "会戦" : i.classification.by === "list" ? "リスト" : "",
       i.sitelinks,
     ]);
-  const cappedTop = [...capped].sort((a, b) => b.sitelinks - a.sitelinks).slice(0, 10);
+  const cappedEngagements = capped.filter((i) => i.kind === "engagement");
+  const cappedElements = capped.filter((i) => isChemicalElement(i.p31));
+  const cappedTop = [...cappedEngagements].sort((a, b) => b.sitelinks - a.sitelinks).slice(0, 10);
 
   // 由来別の sitelinks の水準。出来事の記事と、物・概念・作品・組織の記事とでは、sitelinks の桁が違う
   const origins = /** @type {const} */ ([
@@ -358,13 +361,14 @@ export const sectionImportance = (population, thresholds) => {
   return [
     "## 3. importance",
     "",
-    "規則（importance.mjs）: 年代5区分ごとに sitelinks の上位 5% → 3、上位 25% → 2、それ以外 → 1。会戦は親の戦争が見つかれば上限 2。Vital articles に載っている項目は下限 2。",
+    "規則（importance.mjs）: 年代5区分ごとに sitelinks の上位 5% → 3、上位 25% → 2、それ以外 → 1。会戦は親の戦争が見つかれば上限 2。化学元素も上限 2。Vital articles に載っている項目は下限 2。",
     "パーセンタイルは由来別に取る（「P31 で分類した項目」と「Vital articles の節で分類した項目」は別の母集団）。",
     "「上位 5%」は区分内の 95% 点以上として判定する（同じ sitelinks の項目を同じ扱いにするため、5% を少し超えることがある）。",
     "",
     mdTable(["importance", "件数", "割合", "（参考）上限・下限を掛ける前の件数"], levelRows, ["r", "r", "r", "r"]),
     "",
-    `- 会戦の上限で 3 → 2 に下がった項目: ${capped.filter((i) => i.kind === "engagement").length} 件。例: ${cappedTop.map((i) => `${i.label}（${i.sitelinks}）`).join("、")}`,
+    `- 会戦の上限で 3 → 2 に下がった項目: ${cappedEngagements.length} 件。例: ${cappedTop.map((i) => `${i.label}（${i.sitelinks}）`).join("、")}`,
+    `- 化学元素の上限で 3 → 2 に下がった項目: ${cappedElements.length} 件（母集団の化学元素は ${population.filter((i) => isChemicalElement(i.p31)).length} 件）`,
     `- Vital articles の下限で 1 → 2 に上がった項目: ${raised.length} 件`,
     "",
     "### 由来別の sitelinks の水準と、importance 3 になる割合",

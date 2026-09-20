@@ -12,6 +12,7 @@ import {
   WORK_CLASSES,
 } from "./lists.mjs";
 import { regionOf } from "./regions.mjs";
+import { isChemicalElement } from "./title-predicates.mjs";
 import { ROOTS } from "./roots.mjs";
 
 /** @typedef {import("./merge.mjs").RawItem} RawItem */
@@ -247,7 +248,7 @@ export const buildItems = ({ rawItems, outsideParents, listRecords, countryIndex
       {
         year: /** @type {NonNullable<typeof i.start>} */ (i.start).year,
         sitelinks: i.sitelinks,
-        cappedAsEngagement: i.kind === "engagement" && i.parentWar !== null,
+        cappedAt2: (i.kind === "engagement" && i.parentWar !== null) || isChemicalElement(i.p31),
         vital: i.vital,
       },
       thresholds[i.classification.by],
