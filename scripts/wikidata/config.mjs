@@ -63,6 +63,8 @@ export const OVERRIDE_PLACES_PATH = join(APP_RAW_DIR, "override-places.json");
 export const PLACE_CANDIDATES_PATH = join(APP_RAW_DIR, "place-candidates.json");
 export const PLACE_CANDIDATE_LABELS_PATH = join(APP_RAW_DIR, "place-candidate-labels.json");
 /** 人が確認するための下書き（コミットする）。承認後の表は place-overrides.json */
+/** 場所が大陸・海洋（coarse）だけで、地図に出ない項目の一覧（build-app-data.mjs が作り直す。place-overrides の候補） */
+export const COARSE_ONLY_PATH = join(import.meta.dirname, "coarse-only.md");
 export const PLACE_OVERRIDES_DRAFT_PATH = join(import.meta.dirname, "place-overrides.draft.md");
 /** 生成したアプリ用データの出力先。こちらはコミットする。 */
 export const APP_DATA_DIR = join(ROOT_DIR, "public", "data", "events");

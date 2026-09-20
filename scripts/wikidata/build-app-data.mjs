@@ -13,6 +13,7 @@ import {
   APP_YEAR_MAX,
   APP_YEAR_MIN,
   ARTICLES_PATH,
+  COARSE_ONLY_PATH,
   MUL_LABELS_PATH,
   OVERRIDE_PLACES_PATH,
   PLACE_CLASS_LABELS_PATH,
@@ -182,6 +183,33 @@ const splitToFit = (events, bin) => {
 const countBy = (xs, key) =>
   Object.fromEntries([...Map.groupBy(xs, key).entries()].map(([k, g]) => [k, g.length]).sort((a, b) => String(a[0]).localeCompare(String(b[0]))));
 
+/**
+ * 場所が大陸・海洋（coarse）だけで none になった項目の一覧（Markdown）。sitelinks の多い順。
+ * place-overrides.json で人が場所を決める候補を見つけるためのもの。
+ * @param {readonly Item[]} items @param {(p: import("./analyze.mjs").GradedPlace) => string} placeName @param {string} generatedAt
+ */
+export const coarseOnlyMarkdown = (items, placeName, generatedAt) =>
+  [
+    "# 場所が大陸・海洋だけの項目",
+    "",
+    `\`pnpm wikidata:build-app-data\` が作り直す（${generatedAt} 生成）。手で編集しない。`,
+    "",
+    "Wikidata の場所（戦争の P276 など）が大陸・海洋（粒度 coarse。`place-granularity.mjs`）しか無く、`placeKind: \"none\"` で地図に出ていない項目。",
+    "`place-overrides.json` で人が場所を決めた項目は、ここから消える。P495 / P17 だけで none の項目は含まない（`pnpm wikidata:place-overrides-draft` のほう）。",
+    "",
+    `${items.length} 件。sitelinks の多い順。`,
+    "",
+    "| sitelinks | 項目 | QID | 開始 | 終了 | 分類 | importance | 種別 | Wikidata の場所 |",
+    "|---:|---|---|---:|---:|---|---:|---|---|",
+    ...[...items]
+      .sort((a, b) => b.sitelinks - a.sitelinks || a.qid.localeCompare(b.qid))
+      .map(
+        (i) =>
+          `| ${i.sitelinks} | ${i.label} | ${i.qid} | ${i.start?.year ?? ""} | ${i.end ?? ""} | ${i.classification.status === "mapped" ? i.classification.domain : ""} | ${i.importance} | ${i.kind} | ${i.allPlaces.map(placeName).join("、")} |`,
+      ),
+    "",
+  ].join("\n");
+
 // ── メイン ────────────────────────────────────────────────
 
 const { population, dropped, fetchLog, listPages, placeOverrides, placeClasses } = await loadAnalysis();
@@ -300,8 +328,12 @@ console.log(`母集団 ${population.length} 件 → ラベルなしで除外 ${n
 console.log(`手書きサンプル ${sample.length} 件（うち Wikidata 由来と QID が重複 ${duplicates.length} 件、手書きを優先）→ 合計 ${events.length} 件`);
 console.log("分類別:", JSON.stringify(manifest.byDomain));
 console.log("importance 別:", JSON.stringify(manifest.byImportance), " placeKind 別:", JSON.stringify(manifest.byPlaceKind));
-const describePlace = (/** @type {import("./analyze.mjs").GradedPlace} */ p) =>
-  `${p.loc ? (placeLabels[p.loc]?.ja ?? placeLabels[p.loc]?.en ?? p.loc) : "自身の座標"}[${p.granularity}]`;
+const placeName = (/** @type {import("./analyze.mjs").GradedPlace} */ p) =>
+  p.loc ? (placeLabels[p.loc]?.ja ?? placeLabels[p.loc]?.en ?? placeClasses[p.loc]?.ja ?? placeClasses[p.loc]?.en ?? p.loc) : "自身の座標";
+const describePlace = (/** @type {import("./analyze.mjs").GradedPlace} */ p) => `${placeName(p)}[${p.granularity}]`;
+const coarseOnly = placeImpact.filter((x) => x.becameNone).map((x) => x.item);
+await writeFile(COARSE_ONLY_PATH, coarseOnlyMarkdown(coarseOnly, placeName, manifest.generatedAt.slice(0, 10)));
+console.log(`場所が大陸・海洋だけで none の項目 ${coarseOnly.length} 件 → ${COARSE_ONLY_PATH}`);
 console.log("場所の項目（P276 などの先）の粒度:", JSON.stringify(granularityCounts));
 console.log(
   `場所の粒度の影響: places が減った ${placeImpact.filter((x) => x.reduced).length} 件、none に変わった ${placeImpact.filter((x) => x.becameNone).length} 件` +
