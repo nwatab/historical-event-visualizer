@@ -28,6 +28,9 @@ import { ROOTS } from "./roots.mjs";
 /** これ未満の sitelinks の項目は母集団に入れない（R4b-2 の決定4）。 */
 export const MIN_SITELINKS = 2;
 
+/** 地図に置く場所の粒度。細かい順（places の並び順）。 @type {readonly Exclude<Granularity, "coarse">[]} */
+const USABLE_FINEST_FIRST = Object.freeze(["fine", "region", "country"]);
+
 const WAR_ROOTS = new Set(ROOTS.filter((r) => r.group === "war").map((r) => r.qid));
 const ENGAGEMENT_ROOTS = new Set(ROOTS.filter((r) => r.group === "engagement").map((r) => r.qid));
 
@@ -189,12 +192,14 @@ export const buildItems = ({ rawItems, outsideParents, listRecords, countryIndex
           ? granularityOf(placeClasses[p.loc]?.p31 ?? [])
           : "fine",
     }));
-    // 使うのは fine と region だけ（fine が先。ラベルを付ける最初の1点を、いちばん細かい場所にするため）。
-    // coarse は常に外し、country は fine / region があれば外す。fine も region も無ければ、地図に置ける場所が無い
-    const usable = [
-      ...allPlaces.filter((p) => p.granularity === "fine"),
-      ...allPlaces.filter((p) => p.granularity === "region"),
-    ];
+    // 地図に置くのは「そこで起きた」と言っている場所だけ（R4e）:
+    // - coarse（大陸・海洋）は外す
+    // - P495（原産国）/ P17（国）は外す。「そこで起きた」とは言っていないため（R4b-2 の決定2）
+    // - P276 / P189 などの先が国（country）の場所は残す。「そこで起きた」という主張で、粒度が粗いだけなので。
+    //   粒度は JSON に出し、アプリが拡大時に country のマーカーを消す（mapFilters.ts）
+    // 並びは fine → region → country（ラベルを付ける最初の1点を、いちばん細かい場所にするため）
+    const onMap = allPlaces.filter((p) => p.granularity !== "coarse" && !COUNTRY_LEVEL_PLACE_PROPS.includes(p.via));
+    const usable = USABLE_FINEST_FIRST.flatMap((g) => onMap.filter((p) => p.granularity === g));
     // 地域の集計には、置ける場所が無い項目でも元の場所を使う（国の代表点でも地域は分かる）
     const places = usable.length > 0 ? usable : allPlaces;
     const p31 = raw?.p31 ?? first?.attrs?.p31 ?? [];
@@ -230,8 +235,8 @@ export const buildItems = ({ rawItems, outsideParents, listRecords, countryIndex
       places,
       coords: places,
       allPlaces,
-      // 地図に置ける場所（fine / region）が無く、国や大陸の代表点しか無い項目。データには残すが、地図には出さない
-      // （R4b-2 の決定2。R4e で、P495 / P17 だけでなく、P276 などの先が国・大陸・海洋の場合にも広げた）
+      // 地図に置ける場所が無い項目（P495 / P17 の国の代表点しか無い、または大陸・海洋しか無い）。
+      // データには残すが、地図には出さない（R4b-2 の決定2。R4e で、大陸・海洋しか無い項目にも広げた）
       countryLevelPlace: allPlaces.length > 0 && usable.length === 0,
       region: place.region,
       country: place.country,

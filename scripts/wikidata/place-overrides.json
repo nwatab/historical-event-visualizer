@@ -1,11 +1,12 @@
 {
   "about": [
-    "国の代表点しか場所が無い項目（Wikidata の P495 / P17 のみ）のうち、人が確認して地点・起点を決めたものの表。",
+    "国の代表点しか場所が無い項目（Wikidata の P495 / P17 のみ）などのうち、人が確認して地点・起点を決めたものの表。Wikidata の場所（P276 など）を人が直した項目も書く（ホロコースト）。",
     "下書き place-overrides.draft.md を 2026-09-20 に人が確認し、その指示をこの形に書き写した。ここに無い『国の代表点のみ』の項目は placeKind: none（places は空）になる。",
     "座標はこのファイルに書かない。places[].from の QID から、path の経路で Wikidata の P625 を引く（pnpm wikidata:fetch-app-extras が取得し、build-app-data.mjs が反映する）。",
     "path: \"P625\" は from の項目自身の座標。\"P159>P625\" は from の P159（本部所在地）の先の項目の座標で、P159 に始点・終点の修飾子があれば、その出来事の年（start の上書きがあればその年）に該当するものを選ぶ。",
     "from の QID と fromLabel の対応は、2026-09-20 に wbgetentities / wbsearchentities の出力で照合した。QID を足すときも照合すること。",
     "label は地図に出す地名。省略すると from の日本語ラベルを使う。",
+    "場所の粒度（fine / region / country）は書かない。path が P625 なら from の項目の P31 から決まり（place-granularity.mjs。P31 は pnpm wikidata:fetch-places が取得）、P159>P625 なら fine。",
     "start / end / kind は、Wikidata から導いた値の上書き。理由を note に書く。"
   ],
   "overrides": [
@@ -28,6 +29,20 @@
         { "from": "Q100", "fromLabel": "ボストン", "path": "P625", "label": "ベル" },
         { "from": "Q1297", "fromLabel": "シカゴ", "path": "P625", "label": "グレイ" }
       ]
+    },
+    {
+      "qid": "Q2763",
+      "title": "ホロコースト",
+      "placeKind": "point",
+      "places": [
+        { "from": "Q7318", "fromLabel": "ナチス・ドイツ", "path": "P625" },
+        { "from": "Q172579", "fromLabel": "イタリア王国", "path": "P625" },
+        { "from": "Q203493", "fromLabel": "ルーマニア王国", "path": "P625" },
+        { "from": "Q218272", "fromLabel": "フランス領アルジェリア", "path": "P625" },
+        { "from": "Q600018", "fromLabel": "ハンガリー王国", "path": "P625" },
+        { "from": "Q907234", "fromLabel": "フランス領モロッコ", "path": "P625" }
+      ],
+      "note": "Wikidata の P276 の7件から上海市を外し、6か国のみにする。上海ゲットーは避難先で、出来事の場所ではない。R6 diffusion 候補。6件とも粒度は country なので、拡大すると消える"
     },
     {
       "qid": "Q8690",

@@ -1,4 +1,4 @@
-// 場所の項目（戦争の P276、リスト項目の P189 / P276 / P159 / P740 / P291 / P495 / P17 の先）の P31 を取得して
+// 場所の項目（戦争の P276、リスト項目の P189 / P276 / P159 / P740 / P291 / P495 / P17 の先、place-overrides.json の根拠の項目）の P31 を取得して
 // data/raw/app/place-classes.json に保存する。場所の粒度（place-granularity.mjs）の判定に使う。
 //
 //   pnpm wikidata:fetch-places
@@ -14,6 +14,7 @@ import {
   LIST_ATTRS_PATH,
   PLACE_CLASSES_PATH,
   PLACE_CLASS_LABELS_PATH,
+  PLACE_OVERRIDES_PATH,
   RETRY_DELAYS_MS,
   USER_AGENT,
   WIKIDATA_API,
@@ -72,11 +73,15 @@ const fill = async (path, qids, props, pick) => {
 };
 
 await mkdir(APP_RAW_DIR, { recursive: true });
-const [events, attrs] = await Promise.all([readJson(EVENTS_PATH), readJsonOr(LIST_ATTRS_PATH, {})]);
+const [events, attrs, placeOverrides] = await Promise.all([readJson(EVENTS_PATH), readJsonOr(LIST_ATTRS_PATH, {}), readJson(PLACE_OVERRIDES_PATH)]);
 const placeQids = [
   ...new Set([
     ...events.flatMap((/** @type {any} */ e) => [...(e.locations ?? []).map((/** @type {any} */ l) => l.qid), ...(e.locationsWithoutCoord ?? [])]),
     ...Object.values(attrs).flatMap((/** @type {any} */ a) => a.places.flatMap((/** @type {any} */ p) => (p.loc ? [p.loc] : []))),
+    // 人が決めた場所のうち、根拠の項目そのものの座標を使うもの（本部所在地の先の座標は fine として扱うので要らない）
+    ...placeOverrides.overrides.flatMap((/** @type {import("./place-overrides.mjs").PlaceOverride} */ o) =>
+      (o.places ?? []).flatMap((p) => (p.path === "P625" ? [p.from] : [])),
+    ),
   ]),
 ];
 console.log(`[1/2] 場所の項目の P31（${placeQids.length} 件）`);

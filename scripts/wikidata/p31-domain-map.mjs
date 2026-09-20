@@ -52,6 +52,13 @@ export const P31_DOMAIN_MAP = Object.freeze([
   // ── conflict（紛争）: 組織的な武力衝突そのもの
   { qid: "Q178561", label: "battle", domain: "conflict" },
   { qid: "Q198", label: "war", domain: "conflict" },
+  { qid: "Q103495", label: "world war", domain: "conflict", note: "第一次・第二次世界大戦の P31 はこれと historical period だけ（R4e）" },
+  {
+    qid: "Q1006311",
+    label: "war of national liberation",
+    domain: "conflict",
+    note: "アメリカ独立戦争の P31 はこれだけ。ラベルは 2026-09-20 に wbgetentities で照合（ja: 民族解放戦争。R4e）",
+  },
   { qid: "Q188055", label: "siege", domain: "conflict" },
   { qid: "Q124734", label: "rebellion", domain: "conflict" },
   { qid: "Q8465", label: "civil war", domain: "conflict" },

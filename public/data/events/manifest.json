@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-09-20T09:47:38.903Z",
+ "generatedAt": "2026-09-20T12:28:06.463Z",
  "sources": {
   "wikidata": {
    "license": "CC0",
@@ -91,13 +91,13 @@
   },
   "placeOverrides": {
    "file": "scripts/wikidata/place-overrides.json",
-   "applied": 21
+   "applied": 22
   }
  },
- "total": 19712,
+ "total": 19789,
  "byDomain": {
-  "conflict": 14797,
-  "culture": 901,
+  "conflict": 14818,
+  "culture": 957,
   "economy": 320,
   "polity": 990,
   "population": 2180,
@@ -105,14 +105,14 @@
   "technology": 407
  },
  "byImportance": {
-  "1": 13454,
-  "2": 5436,
-  "3": 822
+  "1": 13457,
+  "2": 5503,
+  "3": 829
  },
  "byPlaceKind": {
-  "none": 1252,
+  "none": 474,
   "origin": 11,
-  "point": 18449
+  "point": 19304
  },
  "byTitlePredicate": {
   "completion": 254,
@@ -121,11 +121,17 @@
   "introduction": 16
  },
  "placeGranularity": {
-  "coarse": 99,
-  "country": 1626,
+  "coarse": 120,
+  "country": 1707,
   "fine": 1105,
-  "region": 1540
+  "region": 1554
  },
+ "placesByGranularity": {
+  "country": 1121,
+  "fine": 18047,
+  "region": 1549
+ },
+ "countryOnlyEvents": 852,
  "ticks": [
   {
    "kind": "period",
@@ -157,6 +163,11 @@
    "kind": "instant",
    "start": -2333,
    "domain": "polity"
+  },
+  {
+   "kind": "instant",
+   "start": -2100,
+   "domain": "culture"
   },
   {
    "kind": "instant",
@@ -229,6 +240,12 @@
   },
   {
    "kind": "period",
+   "start": -498,
+   "end": -448,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
    "start": -430,
    "end": -403,
    "domain": "conflict"
@@ -252,6 +269,12 @@
    "kind": "instant",
    "start": -300,
    "domain": "polity"
+  },
+  {
+   "kind": "period",
+   "start": -263,
+   "end": -145,
+   "domain": "conflict"
   },
   {
    "kind": "instant",
@@ -520,6 +543,11 @@
   },
   {
    "kind": "instant",
+   "start": 907,
+   "domain": "polity"
+  },
+  {
+   "kind": "instant",
    "start": 910,
    "domain": "polity"
   },
@@ -738,6 +766,12 @@
   },
   {
    "kind": "period",
+   "start": 1337,
+   "end": 1453,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
    "start": 1347,
    "end": 1351,
    "domain": "population"
@@ -830,6 +864,12 @@
    "domain": "technology"
   },
   {
+   "kind": "period",
+   "start": 1455,
+   "end": 1487,
+   "domain": "conflict"
+  },
+  {
    "kind": "instant",
    "start": 1464,
    "domain": "polity"
@@ -882,6 +922,11 @@
    "domain": "culture"
   },
   {
+   "kind": "instant",
+   "start": 1519,
+   "domain": "conflict"
+  },
+  {
    "kind": "period",
    "start": 1520,
    "end": 1520,
@@ -891,6 +936,12 @@
    "kind": "period",
    "start": 1521,
    "end": 1523,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
+   "start": 1521,
+   "end": 1526,
    "domain": "conflict"
   },
   {
@@ -945,6 +996,12 @@
    "domain": "culture"
   },
   {
+   "kind": "period",
+   "start": 1546,
+   "end": 1547,
+   "domain": "conflict"
+  },
+  {
    "kind": "instant",
    "start": 1547,
    "domain": "polity"
@@ -968,6 +1025,12 @@
    "kind": "period",
    "start": 1558,
    "end": 1583,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
+   "start": 1562,
+   "end": 1598,
    "domain": "conflict"
   },
   {
@@ -1088,6 +1151,12 @@
   },
   {
    "kind": "period",
+   "start": 1638,
+   "end": 1651,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
    "start": 1640,
    "end": 1668,
    "domain": "conflict"
@@ -1096,6 +1165,12 @@
    "kind": "instant",
    "start": 1642,
    "domain": "polity"
+  },
+  {
+   "kind": "period",
+   "start": 1642,
+   "end": 1651,
+   "domain": "conflict"
   },
   {
    "kind": "period",
@@ -1110,6 +1185,12 @@
   },
   {
    "kind": "period",
+   "start": 1648,
+   "end": 1657,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
    "start": 1652,
    "end": 1654,
    "domain": "conflict"
@@ -1118,6 +1199,18 @@
    "kind": "period",
    "start": 1652,
    "end": 1784,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
+   "start": 1655,
+   "end": 1660,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
+   "start": 1655,
+   "end": 1660,
    "domain": "conflict"
   },
   {
@@ -1178,6 +1271,12 @@
   },
   {
    "kind": "period",
+   "start": 1675,
+   "end": 1678,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
    "start": 1676,
    "end": 1681,
    "domain": "conflict"
@@ -1185,6 +1284,12 @@
   {
    "kind": "instant",
    "start": 1683,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
+   "start": 1683,
+   "end": 1699,
    "domain": "conflict"
   },
   {
@@ -1197,6 +1302,12 @@
    "kind": "instant",
    "start": 1687,
    "domain": "science"
+  },
+  {
+   "kind": "period",
+   "start": 1688,
+   "end": 1697,
+   "domain": "conflict"
   },
   {
    "kind": "period",
@@ -1269,6 +1380,18 @@
    "domain": "polity"
   },
   {
+   "kind": "period",
+   "start": 1733,
+   "end": 1735,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
+   "start": 1736,
+   "end": 1739,
+   "domain": "conflict"
+  },
+  {
    "kind": "instant",
    "start": 1739,
    "domain": "polity"
@@ -1276,6 +1399,12 @@
   {
    "kind": "period",
    "start": 1739,
+   "end": 1748,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
+   "start": 1740,
    "end": 1748,
    "domain": "conflict"
   },
@@ -1330,6 +1459,12 @@
   },
   {
    "kind": "period",
+   "start": 1765,
+   "end": 1783,
+   "domain": "polity"
+  },
+  {
+   "kind": "period",
    "start": 1767,
    "end": 1773,
    "domain": "population"
@@ -1362,6 +1497,12 @@
    "domain": "polity"
   },
   {
+   "kind": "period",
+   "start": 1775,
+   "end": 1783,
+   "domain": "conflict"
+  },
+  {
    "kind": "instant",
    "start": 1776,
    "domain": "polity"
@@ -1370,6 +1511,12 @@
    "kind": "instant",
    "start": 1776,
    "domain": "technology"
+  },
+  {
+   "kind": "period",
+   "start": 1778,
+   "end": 1779,
+   "domain": "conflict"
   },
   {
    "kind": "instant",
@@ -1393,8 +1540,20 @@
    "domain": "polity"
   },
   {
+   "kind": "period",
+   "start": 1789,
+   "end": 1799,
+   "domain": "polity"
+  },
+  {
    "kind": "instant",
    "start": 1789,
+   "domain": "polity"
+  },
+  {
+   "kind": "period",
+   "start": 1791,
+   "end": 1804,
    "domain": "polity"
   },
   {
@@ -1425,6 +1584,12 @@
    "domain": "conflict"
   },
   {
+   "kind": "period",
+   "start": 1794,
+   "end": 1794,
+   "domain": "conflict"
+  },
+  {
    "kind": "instant",
    "start": 1795,
    "domain": "polity"
@@ -1442,6 +1607,12 @@
   },
   {
    "kind": "period",
+   "start": 1798,
+   "end": 1798,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
    "start": 1799,
    "end": 1799,
    "domain": "polity"
@@ -1450,6 +1621,11 @@
    "kind": "instant",
    "start": 1800,
    "domain": "polity"
+  },
+  {
+   "kind": "instant",
+   "start": 1800,
+   "domain": "conflict"
   },
   {
    "kind": "instant",
@@ -1528,8 +1704,9 @@
    "domain": "conflict"
   },
   {
-   "kind": "instant",
+   "kind": "period",
    "start": 1808,
+   "end": 1809,
    "domain": "conflict"
   },
   {
@@ -1554,6 +1731,12 @@
    "domain": "polity"
   },
   {
+   "kind": "period",
+   "start": 1812,
+   "end": 1812,
+   "domain": "conflict"
+  },
+  {
    "kind": "instant",
    "start": 1812,
    "domain": "polity"
@@ -1562,6 +1745,12 @@
    "kind": "period",
    "start": 1813,
    "end": 1814,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
+   "start": 1814,
+   "end": 1816,
    "domain": "conflict"
   },
   {
@@ -1596,6 +1785,12 @@
    "domain": "conflict"
   },
   {
+   "kind": "period",
+   "start": 1821,
+   "end": 1829,
+   "domain": "conflict"
+  },
+  {
    "kind": "instant",
    "start": 1821,
    "domain": "polity"
@@ -1622,11 +1817,6 @@
    "domain": "conflict"
   },
   {
-   "kind": "instant",
-   "start": 1826,
-   "domain": "polity"
-  },
-  {
    "kind": "period",
    "start": 1828,
    "end": 1829,
@@ -1644,6 +1834,18 @@
    "domain": "polity"
   },
   {
+   "kind": "period",
+   "start": 1830,
+   "end": 1831,
+   "domain": "polity"
+  },
+  {
+   "kind": "period",
+   "start": 1830,
+   "end": 1831,
+   "domain": "conflict"
+  },
+  {
    "kind": "instant",
    "start": 1832,
    "domain": "polity"
@@ -1655,8 +1857,32 @@
   },
   {
    "kind": "period",
+   "start": 1839,
+   "end": 1842,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
+   "start": 1839,
+   "end": 1860,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
+   "start": 1839,
+   "end": 1842,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
    "start": 1845,
    "end": 1846,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
+   "start": 1846,
+   "end": 1848,
    "domain": "conflict"
   },
   {
@@ -1668,7 +1894,25 @@
   {
    "kind": "period",
    "start": 1848,
+   "end": 1849,
+   "domain": "polity"
+  },
+  {
+   "kind": "period",
+   "start": 1848,
    "end": 1848,
+   "domain": "polity"
+  },
+  {
+   "kind": "period",
+   "start": 1848,
+   "end": 1848,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
+   "start": 1848,
+   "end": 1851,
    "domain": "conflict"
   },
   {
@@ -1705,6 +1949,12 @@
    "domain": "polity"
   },
   {
+   "kind": "period",
+   "start": 1856,
+   "end": 1860,
+   "domain": "conflict"
+  },
+  {
    "kind": "instant",
    "start": 1858,
    "domain": "polity"
@@ -1721,8 +1971,20 @@
    "domain": "conflict"
   },
   {
+   "kind": "period",
+   "start": 1863,
+   "end": 1864,
+   "domain": "conflict"
+  },
+  {
    "kind": "instant",
    "start": 1863,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
+   "start": 1864,
+   "end": 1864,
    "domain": "conflict"
   },
   {
@@ -1769,6 +2031,12 @@
   },
   {
    "kind": "period",
+   "start": 1870,
+   "end": 1871,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
    "start": 1871,
    "end": 1871,
    "domain": "conflict"
@@ -1790,14 +2058,50 @@
    "domain": "technology"
   },
   {
+   "kind": "period",
+   "start": 1877,
+   "end": 1878,
+   "domain": "conflict"
+  },
+  {
    "kind": "instant",
    "start": 1878,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
+   "start": 1878,
+   "end": 1880,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
+   "start": 1879,
+   "end": 1884,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
+   "start": 1879,
+   "end": 1879,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
+   "start": 1880,
+   "end": 1881,
    "domain": "conflict"
   },
   {
    "kind": "instant",
    "start": 1881,
    "domain": "polity"
+  },
+  {
+   "kind": "period",
+   "start": 1881,
+   "end": 1899,
+   "domain": "conflict"
   },
   {
    "kind": "instant",
@@ -1880,6 +2184,18 @@
   },
   {
    "kind": "period",
+   "start": 1894,
+   "end": 1896,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
+   "start": 1896,
+   "end": 1898,
+   "domain": "polity"
+  },
+  {
+   "kind": "period",
    "start": 1896,
    "end": 1899,
    "domain": "economy"
@@ -1888,6 +2204,12 @@
    "kind": "instant",
    "start": 1897,
    "domain": "science"
+  },
+  {
+   "kind": "period",
+   "start": 1897,
+   "end": 1897,
+   "domain": "conflict"
   },
   {
    "kind": "period",
@@ -1909,6 +2231,17 @@
   },
   {
    "kind": "instant",
+   "start": 1899,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
+   "start": 1899,
+   "end": 1902,
+   "domain": "conflict"
+  },
+  {
+   "kind": "instant",
    "start": 1900,
    "domain": "technology"
   },
@@ -1926,6 +2259,17 @@
   },
   {
    "kind": "instant",
+   "start": 1904,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
+   "start": 1905,
+   "end": 1907,
+   "domain": "polity"
+  },
+  {
+   "kind": "instant",
    "start": 1905,
    "domain": "science"
   },
@@ -1933,6 +2277,11 @@
    "kind": "instant",
    "start": 1906,
    "domain": "population"
+  },
+  {
+   "kind": "instant",
+   "start": 1908,
+   "domain": "polity"
   },
   {
    "kind": "instant",
@@ -1945,9 +2294,21 @@
    "domain": "polity"
   },
   {
+   "kind": "period",
+   "start": 1910,
+   "end": 1920,
+   "domain": "polity"
+  },
+  {
    "kind": "instant",
    "start": 1910,
    "domain": "science"
+  },
+  {
+   "kind": "period",
+   "start": 1911,
+   "end": 1912,
+   "domain": "polity"
   },
   {
    "kind": "period",
@@ -1987,6 +2348,17 @@
    "kind": "instant",
    "start": 1914,
    "domain": "polity"
+  },
+  {
+   "kind": "period",
+   "start": 1914,
+   "end": 1918,
+   "domain": "conflict"
+  },
+  {
+   "kind": "instant",
+   "start": 1915,
+   "domain": "population"
   },
   {
    "kind": "period",
@@ -2041,8 +2413,24 @@
   },
   {
    "kind": "instant",
+   "start": 1917,
+   "domain": "polity"
+  },
+  {
+   "kind": "instant",
    "start": 1918,
    "domain": "polity"
+  },
+  {
+   "kind": "instant",
+   "start": 1918,
+   "domain": "polity"
+  },
+  {
+   "kind": "period",
+   "start": 1918,
+   "end": 1918,
+   "domain": "conflict"
   },
   {
    "kind": "instant",
@@ -2087,6 +2475,12 @@
    "domain": "conflict"
   },
   {
+   "kind": "period",
+   "start": 1919,
+   "end": 1923,
+   "domain": "conflict"
+  },
+  {
    "kind": "instant",
    "start": 1919,
    "domain": "polity"
@@ -2126,6 +2520,11 @@
   },
   {
    "kind": "instant",
+   "start": 1921,
+   "domain": "polity"
+  },
+  {
+   "kind": "instant",
    "start": 1922,
    "domain": "polity"
   },
@@ -2133,6 +2532,12 @@
    "kind": "instant",
    "start": 1922,
    "domain": "polity"
+  },
+  {
+   "kind": "period",
+   "start": 1922,
+   "end": 1923,
+   "domain": "conflict"
   },
   {
    "kind": "period",
@@ -2231,8 +2636,20 @@
   },
   {
    "kind": "period",
+   "start": 1935,
+   "end": 1937,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
    "start": 1936,
    "end": 1939,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
+   "start": 1937,
+   "end": 1945,
    "domain": "conflict"
   },
   {
@@ -2263,12 +2680,39 @@
   },
   {
    "kind": "instant",
-   "start": 1939,
-   "domain": "polity"
+   "start": 1938,
+   "domain": "conflict"
   },
   {
    "kind": "instant",
    "start": 1939,
+   "domain": "conflict"
+  },
+  {
+   "kind": "instant",
+   "start": 1939,
+   "domain": "polity"
+  },
+  {
+   "kind": "period",
+   "start": 1939,
+   "end": 1940,
+   "domain": "conflict"
+  },
+  {
+   "kind": "instant",
+   "start": 1939,
+   "domain": "conflict"
+  },
+  {
+   "kind": "instant",
+   "start": 1939,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
+   "start": 1939,
+   "end": 1945,
    "domain": "conflict"
   },
   {
@@ -2280,7 +2724,28 @@
   {
    "kind": "instant",
    "start": 1940,
+   "domain": "conflict"
+  },
+  {
+   "kind": "instant",
+   "start": 1940,
+   "domain": "conflict"
+  },
+  {
+   "kind": "instant",
+   "start": 1940,
    "domain": "polity"
+  },
+  {
+   "kind": "instant",
+   "start": 1940,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
+   "start": 1940,
+   "end": 1941,
+   "domain": "conflict"
   },
   {
    "kind": "instant",
@@ -2310,6 +2775,17 @@
   {
    "kind": "period",
    "start": 1941,
+   "end": 1944,
+   "domain": "conflict"
+  },
+  {
+   "kind": "instant",
+   "start": 1941,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
+   "start": 1941,
    "end": 1955,
    "domain": "conflict"
   },
@@ -2321,6 +2797,12 @@
   {
    "kind": "instant",
    "start": 1941,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
+   "start": 1941,
+   "end": 1941,
    "domain": "conflict"
   },
   {
@@ -2350,6 +2832,11 @@
    "domain": "conflict"
   },
   {
+   "kind": "instant",
+   "start": 1943,
+   "domain": "conflict"
+  },
+  {
    "kind": "period",
    "start": 1943,
    "end": 1944,
@@ -2370,6 +2857,11 @@
    "kind": "period",
    "start": 1944,
    "end": 1944,
+   "domain": "conflict"
+  },
+  {
+   "kind": "instant",
+   "start": 1944,
    "domain": "conflict"
   },
   {
@@ -2379,6 +2871,12 @@
    "domain": "conflict"
   },
   {
+   "kind": "period",
+   "start": 1944,
+   "end": 1944,
+   "domain": "conflict"
+  },
+  {
    "kind": "instant",
    "start": 1944,
    "domain": "conflict"
@@ -2398,6 +2896,12 @@
    "kind": "instant",
    "start": 1944,
    "domain": "conflict"
+  },
+  {
+   "kind": "period",
+   "start": 1945,
+   "end": 1949,
+   "domain": "polity"
   },
   {
    "kind": "period",
@@ -2431,6 +2935,18 @@
    "domain": "polity"
   },
   {
+   "kind": "period",
+   "start": 1946,
+   "end": 1949,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
+   "start": 1946,
+   "end": 1954,
+   "domain": "conflict"
+  },
+  {
    "kind": "instant",
    "start": 1947,
    "domain": "conflict"
@@ -2456,6 +2972,11 @@
    "kind": "instant",
    "start": 1948,
    "domain": "polity"
+  },
+  {
+   "kind": "instant",
+   "start": 1948,
+   "domain": "population"
   },
   {
    "kind": "period",
@@ -2485,6 +3006,17 @@
    "domain": "polity"
   },
   {
+   "kind": "instant",
+   "start": 1952,
+   "domain": "polity"
+  },
+  {
+   "kind": "period",
+   "start": 1952,
+   "end": 1960,
+   "domain": "conflict"
+  },
+  {
    "kind": "period",
    "start": 1952,
    "end": 1952,
@@ -2494,6 +3026,23 @@
    "kind": "instant",
    "start": 1953,
    "domain": "polity"
+  },
+  {
+   "kind": "period",
+   "start": 1953,
+   "end": 1953,
+   "domain": "conflict"
+  },
+  {
+   "kind": "instant",
+   "start": 1953,
+   "domain": "polity"
+  },
+  {
+   "kind": "period",
+   "start": 1954,
+   "end": 1962,
+   "domain": "conflict"
   },
   {
    "kind": "instant",
@@ -2522,6 +3071,12 @@
    "domain": "conflict"
   },
   {
+   "kind": "period",
+   "start": 1956,
+   "end": 1956,
+   "domain": "conflict"
+  },
+  {
    "kind": "instant",
    "start": 1956,
    "domain": "culture"
@@ -2542,6 +3097,17 @@
    "domain": "science"
   },
   {
+   "kind": "period",
+   "start": 1959,
+   "end": 1975,
+   "domain": "conflict"
+  },
+  {
+   "kind": "instant",
+   "start": 1960,
+   "domain": "conflict"
+  },
+  {
    "kind": "instant",
    "start": 1960,
    "domain": "population"
@@ -2549,6 +3115,12 @@
   {
    "kind": "instant",
    "start": 1960,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
+   "start": 1961,
+   "end": 1991,
    "domain": "conflict"
   },
   {
@@ -2566,6 +3138,11 @@
    "kind": "instant",
    "start": 1963,
    "domain": "polity"
+  },
+  {
+   "kind": "instant",
+   "start": 1964,
+   "domain": "conflict"
   },
   {
    "kind": "period",
@@ -2586,14 +3163,37 @@
    "domain": "conflict"
   },
   {
+   "kind": "period",
+   "start": 1967,
+   "end": 1975,
+   "domain": "conflict"
+  },
+  {
    "kind": "instant",
    "start": 1968,
    "domain": "conflict"
   },
   {
    "kind": "instant",
+   "start": 1968,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
+   "start": 1969,
+   "end": 1969,
+   "domain": "conflict"
+  },
+  {
+   "kind": "instant",
    "start": 1969,
    "domain": "polity"
+  },
+  {
+   "kind": "period",
+   "start": 1970,
+   "end": 1971,
+   "domain": "conflict"
   },
   {
    "kind": "instant",
@@ -2635,6 +3235,34 @@
   },
   {
    "kind": "instant",
+   "start": 1973,
+   "domain": "polity"
+  },
+  {
+   "kind": "instant",
+   "start": 1974,
+   "domain": "polity"
+  },
+  {
+   "kind": "period",
+   "start": 1974,
+   "end": 1991,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
+   "start": 1975,
+   "end": 2002,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
+   "start": 1975,
+   "end": 1990,
+   "domain": "conflict"
+  },
+  {
+   "kind": "instant",
    "start": 1975,
    "domain": "economy"
   },
@@ -2642,6 +3270,11 @@
    "kind": "instant",
    "start": 1976,
    "domain": "conflict"
+  },
+  {
+   "kind": "instant",
+   "start": 1976,
+   "domain": "economy"
   },
   {
    "kind": "instant",
@@ -2665,6 +3298,24 @@
    "domain": "conflict"
   },
   {
+   "kind": "period",
+   "start": 1977,
+   "end": 1991,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
+   "start": 1978,
+   "end": 1979,
+   "domain": "polity"
+  },
+  {
+   "kind": "period",
+   "start": 1978,
+   "end": 1978,
+   "domain": "polity"
+  },
+  {
    "kind": "instant",
    "start": 1978,
    "domain": "polity"
@@ -2673,6 +3324,18 @@
    "kind": "period",
    "start": 1979,
    "end": 1981,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
+   "start": 1979,
+   "end": 1979,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
+   "start": 1979,
+   "end": 1989,
    "domain": "conflict"
   },
   {
@@ -2701,6 +3364,18 @@
    "kind": "instant",
    "start": 1982,
    "domain": "polity"
+  },
+  {
+   "kind": "period",
+   "start": 1982,
+   "end": 1985,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
+   "start": 1983,
+   "end": 2009,
+   "domain": "conflict"
   },
   {
    "kind": "instant",
@@ -2750,9 +3425,20 @@
    "domain": "polity"
   },
   {
+   "kind": "period",
+   "start": 1989,
+   "end": 1989,
+   "domain": "polity"
+  },
+  {
    "kind": "instant",
    "start": 1989,
    "domain": "population"
+  },
+  {
+   "kind": "instant",
+   "start": 1989,
+   "domain": "conflict"
   },
   {
    "kind": "instant",
@@ -2772,14 +3458,61 @@
   },
   {
    "kind": "period",
+   "start": 1990,
+   "end": 1992,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
+   "start": 1990,
+   "end": 1991,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
    "start": 1991,
    "end": 1991,
    "domain": "polity"
   },
   {
+   "kind": "period",
+   "start": 1991,
+   "end": 2001,
+   "domain": "conflict"
+  },
+  {
+   "kind": "instant",
+   "start": 1991,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
+   "start": 1991,
+   "end": 1995,
+   "domain": "conflict"
+  },
+  {
    "kind": "instant",
    "start": 1991,
    "domain": "polity"
+  },
+  {
+   "kind": "period",
+   "start": 1991,
+   "end": 2002,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
+   "start": 1992,
+   "end": 1994,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
+   "start": 1992,
+   "end": 1997,
+   "domain": "conflict"
   },
   {
    "kind": "period",
@@ -2796,6 +3529,11 @@
    "kind": "instant",
    "start": 1993,
    "domain": "polity"
+  },
+  {
+   "kind": "instant",
+   "start": 1994,
+   "domain": "conflict"
   },
   {
    "kind": "period",
@@ -2845,6 +3583,23 @@
    "domain": "technology"
   },
   {
+   "kind": "period",
+   "start": 1996,
+   "end": 2006,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
+   "start": 1996,
+   "end": 1997,
+   "domain": "conflict"
+  },
+  {
+   "kind": "instant",
+   "start": 1997,
+   "domain": "culture"
+  },
+  {
    "kind": "instant",
    "start": 1997,
    "domain": "technology"
@@ -2853,6 +3608,18 @@
    "kind": "period",
    "start": 1998,
    "end": 1999,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
+   "start": 1998,
+   "end": 2003,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
+   "start": 1998,
+   "end": 2000,
    "domain": "conflict"
   },
   {
@@ -2898,6 +3665,12 @@
    "domain": "conflict"
   },
   {
+   "kind": "period",
+   "start": 2001,
+   "end": 2021,
+   "domain": "conflict"
+  },
+  {
    "kind": "instant",
    "start": 2001,
    "domain": "conflict"
@@ -2924,9 +3697,25 @@
    "domain": "conflict"
   },
   {
+   "kind": "instant",
+   "start": 2003,
+   "domain": "conflict"
+  },
+  {
    "kind": "period",
    "start": 2003,
    "end": 2020,
+   "domain": "conflict"
+  },
+  {
+   "kind": "instant",
+   "start": 2003,
+   "domain": "polity"
+  },
+  {
+   "kind": "period",
+   "start": 2003,
+   "end": 2011,
    "domain": "conflict"
   },
   {
@@ -2971,6 +3760,12 @@
   },
   {
    "kind": "period",
+   "start": 2005,
+   "end": 2005,
+   "domain": "polity"
+  },
+  {
+   "kind": "period",
    "start": 2006,
    "end": 2006,
    "domain": "conflict"
@@ -2993,6 +3788,12 @@
    "domain": "conflict"
   },
   {
+   "kind": "period",
+   "start": 2008,
+   "end": 2008,
+   "domain": "conflict"
+  },
+  {
    "kind": "instant",
    "start": 2008,
    "domain": "polity"
@@ -3001,6 +3802,11 @@
    "kind": "instant",
    "start": 2009,
    "domain": "population"
+  },
+  {
+   "kind": "instant",
+   "start": 2009,
+   "domain": "conflict"
   },
   {
    "kind": "instant",
@@ -3035,6 +3841,12 @@
    "domain": "population"
   },
   {
+   "kind": "period",
+   "start": 2011,
+   "end": 2024,
+   "domain": "conflict"
+  },
+  {
    "kind": "instant",
    "start": 2011,
    "domain": "population"
@@ -3043,6 +3855,12 @@
    "kind": "instant",
    "start": 2011,
    "domain": "conflict"
+  },
+  {
+   "kind": "period",
+   "start": 2011,
+   "end": 2012,
+   "domain": "polity"
   },
   {
    "kind": "period",
@@ -3063,6 +3881,17 @@
   {
    "kind": "instant",
    "start": 2011,
+   "domain": "conflict"
+  },
+  {
+   "kind": "period",
+   "start": 2011,
+   "end": 2011,
+   "domain": "conflict"
+  },
+  {
+   "kind": "instant",
+   "start": 2012,
    "domain": "conflict"
   },
   {
@@ -3114,6 +3943,12 @@
    "domain": "population"
   },
   {
+   "kind": "period",
+   "start": 2014,
+   "end": 2020,
+   "domain": "conflict"
+  },
+  {
    "kind": "instant",
    "start": 2014,
    "domain": "conflict"
@@ -3269,6 +4104,11 @@
    "domain": "population"
   },
   {
+   "kind": "instant",
+   "start": 2020,
+   "domain": "polity"
+  },
+  {
    "kind": "period",
    "start": 2020,
    "end": 2020,
@@ -3283,6 +4123,11 @@
    "kind": "period",
    "start": 2021,
    "end": 2021,
+   "domain": "conflict"
+  },
+  {
+   "kind": "instant",
+   "start": 2021,
    "domain": "conflict"
   },
   {
@@ -3414,6 +4259,11 @@
    "kind": "instant",
    "start": 2025,
    "domain": "conflict"
+  },
+  {
+   "kind": "instant",
+   "start": 2025,
+   "domain": "polity"
   }
  ],
  "files": [
@@ -3422,14 +4272,14 @@
    "from": -3000,
    "to": -2500,
    "count": 12,
-   "bytes": 3362
+   "bytes": 3485
   },
   {
    "file": "-2500.json",
    "from": -2500,
    "to": -2000,
-   "count": 12,
-   "bytes": 3054
+   "count": 13,
+   "bytes": 3566
   },
   {
    "file": "-2000.json",
@@ -3443,168 +4293,168 @@
    "from": -1500,
    "to": -1000,
    "count": 21,
-   "bytes": 5659
+   "bytes": 5792
   },
   {
    "file": "-1000.json",
    "from": -1000,
    "to": -500,
    "count": 68,
-   "bytes": 18651
+   "bytes": 19166
   },
   {
    "file": "-500.json",
    "from": -500,
    "to": 0,
-   "count": 592,
-   "bytes": 163006
+   "count": 594,
+   "bytes": 169678
   },
   {
    "file": "0.json",
    "from": 0,
    "to": 100,
-   "count": 48,
-   "bytes": 13181
+   "count": 49,
+   "bytes": 14566
   },
   {
    "file": "100.json",
    "from": 100,
    "to": 200,
    "count": 40,
-   "bytes": 11120
+   "bytes": 12093
   },
   {
    "file": "200.json",
    "from": 200,
    "to": 300,
    "count": 74,
-   "bytes": 20010
+   "bytes": 21169
   },
   {
    "file": "300.json",
    "from": 300,
    "to": 400,
    "count": 80,
-   "bytes": 22171
+   "bytes": 24014
   },
   {
    "file": "400.json",
    "from": 400,
    "to": 500,
    "count": 90,
-   "bytes": 25151
+   "bytes": 27076
   },
   {
    "file": "500.json",
    "from": 500,
    "to": 600,
    "count": 110,
-   "bytes": 30348
+   "bytes": 31899
   },
   {
    "file": "600.json",
    "from": 600,
    "to": 700,
    "count": 166,
-   "bytes": 46411
+   "bytes": 48349
   },
   {
    "file": "700.json",
    "from": 700,
    "to": 800,
    "count": 120,
-   "bytes": 33382
+   "bytes": 34763
   },
   {
    "file": "800.json",
    "from": 800,
    "to": 900,
    "count": 151,
-   "bytes": 40702
+   "bytes": 41783
   },
   {
    "file": "900.json",
    "from": 900,
    "to": 1000,
    "count": 122,
-   "bytes": 33522
+   "bytes": 34494
   },
   {
    "file": "1000.json",
    "from": 1000,
    "to": 1100,
    "count": 216,
-   "bytes": 58019
+   "bytes": 59361
   },
   {
    "file": "1100.json",
    "from": 1100,
    "to": 1200,
    "count": 281,
-   "bytes": 74957
+   "bytes": 76402
   },
   {
    "file": "1200.json",
    "from": 1200,
    "to": 1300,
    "count": 409,
-   "bytes": 109010
+   "bytes": 111387
   },
   {
    "file": "1300.json",
    "from": 1300,
    "to": 1400,
-   "count": 465,
-   "bytes": 124290
+   "count": 467,
+   "bytes": 128326
   },
   {
    "file": "1400.json",
    "from": 1400,
    "to": 1500,
    "count": 543,
-   "bytes": 146492
+   "bytes": 151154
   },
   {
    "file": "1500.json",
    "from": 1500,
    "to": 1600,
-   "count": 934,
-   "bytes": 251907
+   "count": 935,
+   "bytes": 258520
   },
   {
    "file": "1600.json",
    "from": 1600,
    "to": 1700,
-   "count": 1117,
-   "bytes": 301375
+   "count": 1118,
+   "bytes": 309197
   },
   {
    "file": "1700.json",
    "from": 1700,
    "to": 1800,
-   "count": 1684,
-   "bytes": 456813
+   "count": 1686,
+   "bytes": 465686
   },
   {
    "file": "1800.json",
    "from": 1800,
    "to": 1900,
-   "count": 3375,
-   "bytes": 910290
+   "count": 3397,
+   "bytes": 935233
   },
   {
    "file": "1900.json",
    "from": 1900,
    "to": 2000,
-   "count": 5954,
-   "bytes": 1616934
+   "count": 5993,
+   "bytes": 1664544
   },
   {
    "file": "2000.json",
    "from": 2000,
    "to": 2100,
-   "count": 3332,
-   "bytes": 913898
+   "count": 3338,
+   "bytes": 923406
   }
  ]
 }
