@@ -38,6 +38,7 @@ const PERIOD_HALO_LAYER_ID = "events-period-halo";
 const PERIOD_LAYER_ID = "events-period";
 const SELECTED_LAYER_ID = "events-selected";
 const LABEL_LAYER_ID = "events-label";
+const LABEL_BLOCKER_LAYER_ID = "events-label-blocker";
 
 /** ホバーの対象になるレイヤー */
 const INTERACTIVE_LAYER_IDS = [EVENTS_LAYER_ID, PERIOD_LAYER_ID];
@@ -100,6 +101,16 @@ const labelOffset: ExpressionSpecification = [
   ["+", markerRadius, MARKER.strokeWidth + MAP_LABEL.gap],
   MAP_LABEL.fontSize,
 ];
+
+/**
+ * マーカーの領域を、ラベルの衝突判定に占有させるための見えない symbol（events-label-blocker レイヤ）。
+ * MapLibre の衝突判定は symbol どうしでしか働かず、circle レイヤのマーカーは避けてくれないので、
+ * ラベルが他のマーカーを横切ってしまう。そこで、各マーカーと同じ位置に、マーカーの直径と同じ大きさの
+ * 透明な文字を置く（必ず置かれ、場所を占有する）。ラベルのレイヤより後ろ（＝上）に置くのは、
+ * MapLibre が上のレイヤの symbol から先に配置するため。
+ */
+const BLOCKER_TEXT = "●";
+const blockerSize: ExpressionSpecification = ["*", 2, ["+", markerRadius, MARKER.strokeWidth]];
 
 /**
  * ラベルを置く優先順。symbol-sort-key は小さいほど先に置かれる（＝重なったときに残る）ので、
@@ -216,6 +227,22 @@ const createStyle = (landUrl: string, markers: EventMarkerCollection): StyleSpec
         "text-halo-width": MAP_LABEL.haloWidth,
         "text-opacity": markerOpacity(null),
       },
+    },
+    {
+      id: LABEL_BLOCKER_LAYER_ID,
+      type: "symbol",
+      source: EVENTS_SOURCE_ID,
+      // 地図に出ているマーカーすべて（ラベルと違い、places の全点・マーカーと同じズームの閾値）
+      filter: markerFilter([]),
+      layout: {
+        "text-field": BLOCKER_TEXT,
+        "text-font": [...MAP_LABEL.fontStack],
+        "text-size": blockerSize,
+        "text-padding": 0,
+        "text-allow-overlap": true,
+        "text-ignore-placement": false,
+      },
+      paint: { "text-opacity": 0 },
     },
   ],
 });
@@ -442,5 +469,6 @@ const applyViewState = (map: MapLibreMap, view: MapViewState): void => {
   });
   map.setFilter(SELECTED_LAYER_ID, selectedFilter(view.hiddenDomains, view.selectedIds));
   map.setFilter(LABEL_LAYER_ID, labelFilter(view.hiddenDomains));
+  map.setFilter(LABEL_BLOCKER_LAYER_ID, markerFilter(view.hiddenDomains));
   map.setPaintProperty(LABEL_LAYER_ID, "text-opacity", opacity);
 };

@@ -19,7 +19,9 @@ import {
 } from "./config.mjs";
 import { loadAnalysis, readJsonOr } from "./load-analysis.mjs";
 import { loadSampleEvents } from "./load-ts.mjs";
+import { isMappedClass } from "./classify.mjs";
 import { pickResolved, placeKey } from "./place-overrides.mjs";
+import { PREDICATE_SUFFIX, predicateFor } from "./title-predicates.mjs";
 
 /** @typedef {import("./analyze.mjs").Item} Item */
 /** @typedef {{ from: number, to: number }} Bin 天文年の半開区間 [from, to) */
@@ -88,8 +90,12 @@ const overridePlaces = (override, year, resolved) =>
  */
 export const toHistEvent = (item, articles, placeLabels, override, resolved, mulLabel) => {
   // 日本語 → 英語 → 多言語共通（mul）。mul は、どの言語でも同じ表記の名前（AK-47 など）で、英語ラベルの代わりに入っている
-  const title = item.labels.ja ?? item.labels.en ?? mulLabel;
-  if (!title || item.start === null || item.classification.status !== "mapped") return null;
+  const label = item.labels.ja ?? item.labels.en ?? mulLabel;
+  if (!label || item.start === null || item.classification.status !== "mapped") return null;
+  // 物や組織の名前には述語を足して、出来事として読めるようにする（「ナトリウム」→「ナトリウムの発見」。title-predicates.mjs）。
+  // 足すのは表示用の title.ja だけで、英語の title.en は Wikidata のラベルのまま
+  const predicate = predicateFor(item.p31, isMappedClass);
+  const title = predicate ? `${label}${PREDICATE_SUFFIX[predicate]}` : label;
   const start = override?.start ?? item.start.year;
   const temporal = temporalOf(item, start);
   const end = override?.end ?? ("end" in temporal ? temporal.end : undefined);
@@ -191,6 +197,13 @@ const events = [...sample, ...generated.filter((e) => !sampleIds.has(/** @type {
   (a, b) => a.start - b.start || b.importance - a.importance || String(a.id).localeCompare(String(b.id)),
 );
 
+// 述語を足した件数（手書きを優先して置き換えた項目は数えない）
+const keptIds = new Set(events.map((e) => e.id).filter((id) => !sampleIds.has(id)));
+const byPredicate = countBy(
+  population.filter((i) => keptIds.has(i.qid)).flatMap((i) => predicateFor(i.p31, isMappedClass) ?? []),
+  (p) => p,
+);
+
 const files = baseBins(APP_YEAR_MIN, APP_YEAR_MAX)
   .flatMap((bin) => splitToFit(events, bin))
   .filter((f) => f.events.length > 0)
@@ -222,6 +235,8 @@ const manifest = {
   byDomain: countBy(events, (e) => e.domain),
   byImportance: countBy(events, (e) => e.importance),
   byPlaceKind: countBy(events, (e) => e.placeKind ?? "point"),
+  // title に述語（〜の発見 / 〜の導入 / 〜の設立 / 〜の完成）を足した件数
+  byTitlePredicate: byPredicate,
   // 年スライダーの目盛り用の要約。全区間のファイルを読まなくても目盛りを出せるように、importance 3 の項目だけを入れる
   // （全件だとほぼ毎年に目盛りが付き、目盛りの意味が無くなる）。地図に出ない項目（places が空）は除く。
   ticks: events
@@ -238,6 +253,7 @@ console.log(`母集団 ${population.length} 件 → ラベルなしで除外 ${n
 console.log(`手書きサンプル ${sample.length} 件（うち Wikidata 由来と QID が重複 ${duplicates.length} 件、手書きを優先）→ 合計 ${events.length} 件`);
 console.log("分類別:", JSON.stringify(manifest.byDomain));
 console.log("importance 別:", JSON.stringify(manifest.byImportance), " placeKind 別:", JSON.stringify(manifest.byPlaceKind));
+console.log("title に述語を足した件数:", JSON.stringify(byPredicate));
 console.log("kind 別:", JSON.stringify(countBy(events, (e) => e.kind)));
 console.log("出典別:", JSON.stringify(countBy(events, (e) => (e.source ?? "").replace(/^https:\/\/([^/]+)\/.*$/, "$1") || "なし")));
 console.log(manifest.files.map((f) => `  ${f.file.padStart(10)}  ${String(f.count).padStart(5)} 件  ${(f.bytes / 1024).toFixed(0).padStart(5)} KB`).join("\n"));
