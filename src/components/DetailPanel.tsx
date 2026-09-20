@@ -22,22 +22,25 @@ interface SourceInfo {
 
 const WIKIPEDIA_LANG_LABELS: Readonly<Record<string, string>> = { ja: "日本語版", en: "英語版" };
 
-/** 出典 URL から表示名とライセンス表記を作る。 */
+/**
+ * 出典 URL から表示名とライセンス表記を作る。
+ * 表示名は「Wikipedia（日本語版）」「Wikipedia（英語版）」「Wikidata」。CC BY-SA の表記は Wikipedia の場合だけ
+ * （Wikidata のデータは CC0 で、表記の義務が無い）。
+ */
 const sourceInfo = (url: string): SourceInfo => {
   const parsed = new URL(url);
-  const page = decodeURIComponent(parsed.pathname.split("/").pop() ?? "").replace(/_/g, " ");
   const wikipedia = parsed.hostname.match(/^([a-z-]+)\.wikipedia\.org$/);
   if (wikipedia) {
     const lang = wikipedia[1];
     return {
-      label: `Wikipedia（${WIKIPEDIA_LANG_LABELS[lang] ?? lang}）「${page}」`,
+      label: `Wikipedia（${WIKIPEDIA_LANG_LABELS[lang] ?? lang}）`,
       license: {
         name: "CC BY-SA 4.0",
         url: `https://creativecommons.org/licenses/by-sa/4.0/deed.${lang === "ja" ? "ja" : "en"}`,
       },
     };
   }
-  if (parsed.hostname === "www.wikidata.org") return { label: `Wikidata ${page}`, license: null };
+  if (parsed.hostname === "www.wikidata.org") return { label: "Wikidata", license: null };
   return { label: parsed.hostname, license: null };
 };
 

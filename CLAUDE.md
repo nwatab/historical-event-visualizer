@@ -59,6 +59,61 @@
 - `id` は Wikidata QID を優先する。QID を使うのは、その項目が出来事そのもの、または出来事で生まれた作品・構造物を指す場合。人物項目しか無い場合などは kebab-case の slug にする。
 - `source` には Wikipedia（日本語版を優先）または Wikidata の URL を入れる。
 
+## データパイプライン
+
+イベントデータは、Wikidata と英語版 Wikipedia の Vital articles から取得し、手書きのサンプルと統合して `public/data/events/` に出力する。
+スクリプトは `scripts/wikidata/` にある。取得した生データ（`data/raw/`）はコミットせず、生成した JSON（`public/data/events/`）はコミットする
+（取得に1時間以上かかり、Wikidata 側の混雑にも左右されるので、CI では生成しない）。
+
+### 流れ
+
+| 段 | コマンド | 内容 | 出力 |
+|---|---|---|---|
+| 取得 | `pnpm wikidata:fetch` | Wikidata の SPARQL から、`roots.mjs` のクラスごとに項目を取る。会戦は P625 必須で P361（親）も取る。戦争は座標を必須にせず、P276（場所）の先の座標を取る | `data/raw/wikidata/` |
+| 取得 | `pnpm wikidata:fetch-lists` | `lists.mjs` の Vital articles（Level 5）のページから記事名を取り、QID と年・場所を引く | `data/raw/lists/` |
+| 取得 | `pnpm wikidata:fetch-app-extras` | 母集団の項目の Wikipedia 記事名（出典 URL 用）と、場所のラベル | `data/raw/app/` |
+| 分析 | `pnpm wikidata:report` | `analyze.mjs` で開始年・場所・地域・分類・importance を導出し、分布を `scripts/wikidata/REPORT.md` に出す。年か場所が取れなかったリスト項目は `data/raw/lists/missing.json` | `REPORT.md` |
+| 生成 | `pnpm wikidata:build-app-data` | 母集団を `HistEvent` に変換し、手書きのサンプル（`src/data/events.sample.ts`）と統合して、区間ごとの JSON と `manifest.json` に分けて出す | `public/data/events/` |
+
+- 生データには導出値を持たせない。開始年・分類・importance などの規則は `analyze.mjs` / `classify.mjs` / `importance.mjs` に集め、レポートと生成が同じ関数を使う。
+- 人が編集する表は `roots.mjs`（取得の入口のクラス）、`p31-domain-map.mjs`（P31 → 7分類）、`lists.mjs`（Vital articles のページと分類）。QID を足すときは、ラベルを API の出力で照合する（記憶で書いた QID は R4a で 55 件中 3 件が別物だった）。
+- Wikidata・Wikipedia への問い合わせは直列で、間隔を空け、User-Agent にリポジトリの URL を入れ、429 / 5xx は Retry-After に従って再試行する。取得済みの分はキャッシュから読む。
+- 各時点の分析結果と、そこから下した判断の根拠は `scripts/wikidata/FINDINGS-R4a.md`・`FINDINGS-R4b1.md` にある（対応するレポートは `REPORT-R4a.md`・`REPORT-R4b1.md` として凍結してある）。
+
+### 母集団と importance の決定事項（R4b-2）
+
+母集団は「開始年が表示範囲内・座標が1つ以上ある・7分類のどれかに入る・sitelinks が 2 以上・日本語か英語のラベルがある」項目。
+
+1. **importance は由来別にパーセンタイルを取る。** 「P31 で分類した項目」と「Vital articles の節で分類した項目」を別の母集団とし、それぞれ年代5区分（〜499 / 500〜1499 / 1500〜1799 / 1800〜1899 / 1900〜）ごとに、sitelinks の上位 5% → 3、上位 25% → 2、それ以外 → 1。会戦は、P361 を辿って親の戦争が見つかれば上限 2。Vital articles に載っている項目は下限 2。
+   - 理由: 出来事の記事と、物・作品・組織の記事とでは sitelinks の水準が一桁違い（中央値で 5 と 45）、混ぜるとリスト由来の項目が importance 3 の 7 割を占めた（FINDINGS-R4b1.md）。
+2. **国の代表点しか場所が無い項目**（Wikidata の P495 原産国 / P17 国 から取った座標）は、データには含めるが `placeQuality: "country"` を付け、地図には出さない。アメリカ合衆国の代表点1か所に 500 件以上が重なるため。
+   - `placeKind`（`point` / `origin` / `none`）で場所の性質を表す。国の代表点しか無い項目は、人が地点を決めるまで `none` として扱い、地図ではなく一覧（場所を特定できない出来事）に出す。
+   - 人が地点を決めるための下書きは `scripts/wikidata/place-overrides.draft.md`（sitelinks 上位100件）。座標の候補は必ず Wikidata の他の項目の P625 から取り、根拠の QID を書く。記憶や推測で座標を書かない。
+3. **年表形式の記事（Timeline of …）は出典にしない。** Vital articles だけにする。年表の行から主題の記事を当てる方法は、主題の記事が無い行で組織名や言語名を拾った。
+4. **sitelinks が 2 未満の項目は除外する。** 個々の核実験や一括登録されたデータセットが大半を占めるため。
+5. **地域の偏りと、入れ子の国家**（ローマ帝国／共和政ローマなど）**は、まだ対処していない。** importance 3 に占めるサハラ以南アフリカの割合は、母集団での割合より低い（REPORT.md）。
+
+### 生成データの形
+
+- `public/data/events/<from>.json`: 天文年の区間 `[from, to)` に存在する項目の配列。紀元前は 500年ごと、それ以降は 100年ごとで、2MB を超える区間は半分に割る。
+  - instant は開始年の区間に入る。**period は、期間が重なる区間すべてに入る**（開始年の区間だけに入れると、アプリは現在年の前後しか読まないので、長く続く項目が途中の年で消える）。アプリ側で id の重複を除く。
+- `manifest.json`: 生成日時、使った取得データの日時と Vital articles の版番号、区間の一覧（件数・バイト数）、年スライダーの目盛り用の要約（importance 3 のみ）。
+- 手書きのサンプルとの統合: QID が同じ項目は手書きを優先する（座標と説明が正確なため）。slug の id の項目はそのまま足す。
+- `title.ja` には日本語ラベルを入れ、無ければ英語ラベルを入れる。`source` は日本語版 Wikipedia → 英語版 → Wikidata の順。`description` は付けない（Wikipedia の本文は取得していない）。
+
+### 再生成の手順
+
+```bash
+pnpm wikidata:fetch             # 約25分。取得済みのチャンクは再利用する。取り直すなら data/raw/wikidata/chunks/ を消す
+pnpm wikidata:fetch-lists       # 約40分
+pnpm wikidata:fetch-app-extras  # 20〜40分（Wikidata 側の混雑による）
+pnpm wikidata:report            # REPORT.md を作り直して、分布に大きな変化が無いか見る
+pnpm wikidata:build-app-data    # public/data/events/ を作り直す。件数とファイルの大きさが出る
+node scripts/wikidata/count-markers.mjs 1500 1800 1950   # 世界全体の表示でのマーカー数（500 を超えたら MIN_ZOOM_BY_IMPORTANCE を見直す）
+```
+
+写像表や規則だけを変えたときは、取得をやり直さずに `report` 以降だけを実行すればよい。
+
 ## デザイン
 
 主役は地図。UI は地図より前に出ない。値はすべて `src/lib/design.ts` に定数として置き、コンポーネントや CSS に直接書かない（CSS からは `cssVariables` 経由の `var(--hv-…)` で参照する）。
@@ -93,7 +148,10 @@
 
 - 共有したい画面の状態（年・非表示の分類・詳細パネルの選択）は `src/lib/appState.ts` の `AppState` に集め、純粋な reducer で更新する。R7 で URL クエリに載せる前提。ホバー中の分類のような一時的な状態は含めない。localStorage は使わない。
 - 凡例はフィルタを兼ねる。クリック（Enter / Space）で表示／非表示、ホバー・フォーカスで強調。
-- 表示件数は、importance とズームレベルで絞る。閾値は `src/lib/timeline.ts` の `MIN_ZOOM_BY_IMPORTANCE`、MapLibre の filter 式は `src/lib/mapFilters.ts`（ズームを変えても GeoJSON は作り直さない）。
+- イベントは `public/data/events/` から、現在年の窓と重なる区間のファイルだけを読む（`src/lib/useEvents.ts`、区間の選び方は `src/lib/eventData.ts`）。読んだファイルはページを開いている間だけメモリに持つ。読み込み中は直前のイベントを出し続け、必要なファイルが揃ってから差し替える（マーカーを一瞬消さない）。
+- 年スライダーの目盛りは、全区間を読まずに出せるよう、`manifest.json` に入っている要約（importance 3 のみ）から作る。
+- `placeKind` が `"none"` の項目（場所の概念が無い、または国の代表点しか分からない項目）は、MapLibre の filter 式で地図から除き、現在年の窓に入るものを凡例の下の一覧（場所を特定できない出来事）に出す。件数が多い年は importance 3 だけにする。R5 で年表に移す。
+- 表示件数は、importance とズームレベルで絞る（3 → 常時、2 → zoom 2 以上、1 → zoom 4 以上。世界全体の表示で 1時点 500 マーカー以下を目安にする）。閾値は `src/lib/timeline.ts` の `MIN_ZOOM_BY_IMPORTANCE`、MapLibre の filter 式は `src/lib/mapFilters.ts`（ズームを変えても GeoJSON は作り直さない）。
 - 画面下部（年スライダー、R5 の年表）は地図の上の UI の下段として確保し、詳細パネルなどは上段に置く。
 
 ## basePath
