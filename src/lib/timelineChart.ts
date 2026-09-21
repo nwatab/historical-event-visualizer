@@ -113,8 +113,13 @@ export const byTimelinePriority =
     a.start - b.start ||
     a.id.localeCompare(b.id);
 
-/** 描く順（後に描いたものが上）。period の帯が下、instant の点が上。どちらも importance の高いものを上にする。 */
+/**
+ * 描く順（後に描いたものが上）。period の帯が下、instant の点が上。どちらも importance の高いものを上にする。
+ * 地図に出ない項目（offMap）は、レーンの最後に描く。中抜きの点は、同じ年の塗りつぶしの点の下になると見えないが、
+ * 上に描けば、塗りつぶしの点の上に白い穴として見える（紀元前 3001 年のシュメール文学とストーンヘンジの完成）。
+ */
 export const byTimelinePaintOrder = (a: TimelineItem, b: TimelineItem): number =>
+  Number(a.offMap) - Number(b.offMap) ||
   (a.kind === "period" ? 0 : 1) - (b.kind === "period" ? 0 : 1) ||
   a.importance - b.importance ||
   (b.end - b.start) - (a.end - a.start);

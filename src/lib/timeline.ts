@@ -172,7 +172,7 @@ export const MIN_ZOOM_BY_IMPORTANCE: Readonly<Record<HistEvent["importance"], nu
  * 理由: 古代は importance 3 の項目が無い年が多く（importance は年代の区分ごとの sitelinks の上位 5% で、区分「〜499 年」は 3500 年ぶんある）、
  * 固定の閾値だと、世界全体の表示で地図が空になる。
  */
-export const DENSITY_FLOOR = 30;
+export const DENSITY_FLOOR = 15;
 
 /** 密度による繰り上げの段階。0: しない、1: importance 2 を 3 と同じ扱いに、2: importance 1 も。 */
 export type DensityLevel = 0 | 1 | 2;

@@ -278,6 +278,11 @@ export const TIMELINE = {
    */
   offMapDash: `${SPACE[4]} ${SPACE[4]}`,
   /**
+   * 地図に出ない instant の点の、中心の白い穴の半径（点の半径に対する割合。地図の period の輪と同じ割合）。
+   * 同じ年の塗りつぶしの点の上に重なったとき、点の色を残したまま、穴として見えるようにする。
+   */
+  offMapHoleRatio: MARKER.periodHoleRatio,
+  /**
    * ヒストグラム（項目が多すぎるレーン）の塗りの不透明度。分類色の薄い塗りで、輪郭は付けない。
    * 上に caption のラベルを置いても読める濃さにする。
    */

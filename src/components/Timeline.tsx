@@ -539,17 +539,33 @@ export function Timeline({
                         ...(selected ? { "data-selected": true } : {}),
                       };
                       return item.kind === "instant" ? (
-                        <circle
-                          key={item.id}
-                          {...common}
-                          cx={(x0 + x1) / 2}
-                          cy={cy}
-                          r={POINT_RADIUS}
-                          // 地図に出ない項目は、塗りつぶさずに分類色の輪郭だけにする（中は面の色で抜く。下の帯や線が透けて見えないように）
-                          fill={item.offMap ? GRAY.surface : color}
-                          stroke={selected ? SELECTION_RING.color : item.offMap ? color : GRAY.surface}
-                          strokeWidth={selected ? SELECTION_RING.width : TIMELINE.bandStrokeWidth}
-                        />
+                        item.offMap ? (
+                          // 地図に出ない項目: 塗りつぶさず、分類色の輪郭と、中心の白い穴だけを描く。レーンの最後に描くので（byTimelinePaintOrder）、
+                          // 同じ年に塗りつぶしの点があれば、その上に白い穴として見える。単独なら、輪郭だけの点に見える
+                          <g key={item.id}>
+                            <circle cx={(x0 + x1) / 2} cy={cy} r={POINT_RADIUS * TIMELINE.offMapHoleRatio} fill={GRAY.surface} />
+                            <circle
+                              {...common}
+                              cx={(x0 + x1) / 2}
+                              cy={cy}
+                              r={POINT_RADIUS}
+                              fill="none"
+                              stroke={selected ? SELECTION_RING.color : color}
+                              strokeWidth={selected ? SELECTION_RING.width : TIMELINE.bandStrokeWidth}
+                            />
+                          </g>
+                        ) : (
+                          <circle
+                            key={item.id}
+                            {...common}
+                            cx={(x0 + x1) / 2}
+                            cy={cy}
+                            r={POINT_RADIUS}
+                            fill={color}
+                            stroke={selected ? SELECTION_RING.color : GRAY.surface}
+                            strokeWidth={selected ? SELECTION_RING.width : TIMELINE.bandStrokeWidth}
+                          />
+                        )
                       ) : (
                         <rect
                           key={item.id}
