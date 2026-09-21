@@ -52,11 +52,12 @@ html {
   background: var(--hv-gray-weak);
 }
 
-/* ── MapLibre のポップアップを共通の「面」に揃える ── */
+/* ── MapLibre のポップアップを共通の「面」に揃える（.hv-popup-content は、年表のホバーの吹き出し。同じ見た目にする） ── */
 .maplibregl-map {
   font-family: var(--hv-font-family);
 }
-.maplibregl-popup-content {
+.maplibregl-popup-content,
+.hv-popup-content {
   background: var(--hv-gray-surface);
   border-radius: var(--hv-radius-medium);
   box-shadow: var(--hv-shadow);

@@ -134,3 +134,26 @@ export const LABEL_MIN_ZOOM_BY_IMPORTANCE: Readonly<Record<HistEvent["importance
   2: 3,
   1: 5,
 };
+
+// ── 年表（画面下段） ──────────────────────────────────────
+
+/** 年表の窓の片側の幅（年）。初期値と、ホイールで変えられる範囲。窓の幅はこの 2 倍。 */
+export const TIMELINE_HALF_SPAN = { initial: 50, min: 10, max: 500 } as const;
+
+/**
+ * 年表に出す importance の下限。窓の幅（＝ 2 × halfSpan。年）が広いほど絞る。上から順に見て、最初に当たったものを使う。
+ * 窓 200 年以上 → 3 のみ、60 年以上 200 年未満 → 2 以上、60 年未満 → 全部。
+ * 地図の MIN_ZOOM_BY_IMPORTANCE と同じ考え方（広く見ているときは最重要のものだけ）。
+ * 近現代は件数が多く、±100 年（窓 200 年）で importance 3 だけでも 1950 年に 470 件ある（2026-09-21 に生成データで数えた）。
+ */
+export const TIMELINE_IMPORTANCE_BY_WINDOW: readonly {
+  readonly minWindowYears: number;
+  readonly minImportance: HistEvent["importance"];
+}[] = [
+  { minWindowYears: 200, minImportance: 3 },
+  { minWindowYears: 60, minImportance: 2 },
+  { minWindowYears: 0, minImportance: 1 },
+];
+
+/** ホイールの回転量 (deltaY) あたりの、窓の幅の変化率（指数）。100 で約 1.22 倍。 */
+export const TIMELINE_WHEEL_SENSITIVITY = 0.002;

@@ -1,0 +1,234 @@
+import type { Domain, HistEvent, Year } from "@/types/event";
+import { DOMAINS } from "./domain";
+import { TIMELINE_IMPORTANCE_BY_WINDOW } from "./timeline";
+import { axisLabelText, type AxisTick } from "./yearAxis";
+
+/*
+ * 年表（画面下段。横軸が年、縦軸が分類のレーン）の位置計算。Timeline コンポーネントの描画から切り離した純粋関数。
+ * 横軸は、現在年を中心とした窓 [center − halfSpan, center + halfSpan]。現在年は常に中央に来る。
+ */
+
+export interface TimelineWindow {
+  /** 現在年（窓の中心） */
+  readonly center: Year;
+  /** 窓の片側の幅（年）。窓の幅は 2 × halfSpan */
+  readonly halfSpan: number;
+}
+
+export const windowYears = (window: TimelineWindow): number => 2 * window.halfSpan;
+
+/** 年 → 年表の左端からの x 座標 (px)。窓の外の年は、範囲外の値になる。 */
+export const timelineX = (year: number, window: TimelineWindow, width: number): number =>
+  ((year - (window.center - window.halfSpan)) / windowYears(window)) * width;
+
+/** 横方向の移動量 (px) → 年の差。年表を右に引くと過去に動くので、符号は呼び出し側で反転する。 */
+export const pxToYears = (dx: number, window: TimelineWindow, width: number): number =>
+  width === 0 ? 0 : (dx / width) * windowYears(window);
+
+/**
+ * ホイールの回転量から、次の halfSpan を求める。下（手前）に回すと広がり、上に回すと狭まる。
+ * 倍率で変えるので、±10 年でも ±500 年でも同じ手応えになる。
+ */
+export const zoomedHalfSpan = (halfSpan: number, deltaY: number, sensitivity: number): number =>
+  halfSpan * Math.exp(deltaY * sensitivity);
+
+// ── 出す件数 ──────────────────────────────────────────────
+
+/** 窓の幅（年）から、出す importance の下限を決める。閾値は timeline.ts の TIMELINE_IMPORTANCE_BY_WINDOW。 */
+export const timelineMinImportance = (
+  years: number,
+  thresholds: typeof TIMELINE_IMPORTANCE_BY_WINDOW = TIMELINE_IMPORTANCE_BY_WINDOW,
+): HistEvent["importance"] =>
+  thresholds.find((t) => years >= t.minWindowYears)?.minImportance ?? 1;
+
+/** 表示中の分類のレーン。凡例と同じ順。非表示の分類のレーンは消し、残りで高さを詰める。 */
+export const timelineLanes = (hiddenDomains: readonly Domain[]): readonly Domain[] =>
+  DOMAINS.filter((domain) => !hiddenDomains.includes(domain));
+
+export interface TimelineItem {
+  readonly id: string;
+  readonly title: string;
+  readonly domain: Domain;
+  readonly importance: HistEvent["importance"];
+  readonly kind: "instant" | "period";
+  readonly start: Year;
+  /** period の終了年。instant は start と同じ */
+  readonly end: Year;
+}
+
+/**
+ * 窓に入るイベントを、年表の項目にする。
+ * - instant は start が窓の中、period は [start, end] が窓と重なるもの
+ * - 地図と違い、placeKind が "none" の項目（places が空）も出す。年表に場所は要らないため
+ * - diffusion は R6 まで出さない（地図と同じ）
+ */
+export const timelineItems = (
+  events: readonly HistEvent[],
+  window: TimelineWindow,
+  hiddenDomains: readonly Domain[],
+): readonly TimelineItem[] => {
+  const from = window.center - window.halfSpan;
+  const to = window.center + window.halfSpan;
+  const minImportance = timelineMinImportance(windowYears(window));
+  return events.flatMap((event): TimelineItem[] => {
+    if (event.kind === "diffusion" || event.importance < minImportance) return [];
+    if (hiddenDomains.includes(event.domain)) return [];
+    const end = event.kind === "period" ? (event.end ?? event.start) : event.start;
+    if (event.start > to || end < from) return [];
+    return [
+      {
+        id: event.id,
+        title: event.title.ja,
+        domain: event.domain,
+        importance: event.importance,
+        kind: event.kind,
+        start: event.start,
+        end,
+      },
+    ];
+  });
+};
+
+/** 現在年からの距離。period は、現在年を含んでいれば 0。 */
+const distanceFrom = (item: TimelineItem, year: Year): number =>
+  year < item.start ? item.start - year : year > item.end ? year - item.end : 0;
+
+/** importance の高いもの、同じなら現在年に近いものが先。ラベルを置く順と、重なった項目を一覧に出す順に使う。 */
+export const byTimelinePriority =
+  (center: Year) =>
+  (a: TimelineItem, b: TimelineItem): number =>
+    b.importance - a.importance ||
+    distanceFrom(a, center) - distanceFrom(b, center) ||
+    a.start - b.start ||
+    a.id.localeCompare(b.id);
+
+/** 描く順（後に描いたものが上）。period の帯が下、instant の点が上。どちらも importance の高いものを上にする。 */
+export const byTimelinePaintOrder = (a: TimelineItem, b: TimelineItem): number =>
+  (a.kind === "period" ? 0 : 1) - (b.kind === "period" ? 0 : 1) ||
+  a.importance - b.importance ||
+  (b.end - b.start) - (a.end - a.start);
+
+// ── 項目の位置 ────────────────────────────────────────────
+
+export interface TimelineGeometry {
+  readonly width: number;
+  /** instant の点の半径 (px) */
+  readonly pointRadius: number;
+  /** period の帯を、窓の幅が狭くても見える最小の幅 (px) */
+  readonly minBandWidth: number;
+}
+
+/** 項目が占める x の範囲 [x0, x1]（窓の外にはみ出した帯は、年表の幅で切る）。 */
+export const itemExtent = (
+  item: TimelineItem,
+  window: TimelineWindow,
+  geometry: TimelineGeometry,
+): readonly [number, number] => {
+  if (item.kind === "instant") {
+    const x = timelineX(item.start, window, geometry.width);
+    return [x - geometry.pointRadius, x + geometry.pointRadius];
+  }
+  const x0 = Math.max(0, timelineX(item.start, window, geometry.width));
+  const x1 = Math.min(geometry.width, timelineX(item.end, window, geometry.width));
+  return [x0, Math.max(x1, x0 + geometry.minBandWidth)];
+};
+
+/** x の位置（± tolerance）にある、そのレーンの項目。優先順（importance、現在年への近さ）で返す。 */
+export const itemsAtX = (
+  items: readonly TimelineItem[],
+  domain: Domain,
+  x: number,
+  tolerance: number,
+  window: TimelineWindow,
+  geometry: TimelineGeometry,
+): readonly TimelineItem[] =>
+  items
+    .filter((item) => {
+      if (item.domain !== domain) return false;
+      const [x0, x1] = itemExtent(item, window, geometry);
+      return x >= x0 - tolerance && x <= x1 + tolerance;
+    })
+    .sort(byTimelinePriority(window.center));
+
+// ── ラベル ────────────────────────────────────────────────
+
+/**
+ * 文字列の幅の見積もり (px)。全角（CJK など）は 1em、それ以外は 0.6em とする。
+ * DOM で測らないのは、位置計算を純粋関数に保つため。ラベルは重なりを避けるための見積もりなので、厳密でなくてよい。
+ */
+export const estimateTextWidth = (text: string, fontSize: number): number =>
+  [...text].reduce((sum, ch) => sum + ((ch.codePointAt(0) ?? 0) > 0x2e7f ? 1 : 0.6) * fontSize, 0);
+
+export interface TimelineLabel {
+  readonly id: string;
+  readonly domain: Domain;
+  readonly text: string;
+  /** ラベルの左端 */
+  readonly x: number;
+  readonly width: number;
+}
+
+/**
+ * ラベルを置く。レーンごとに、優先順（importance の高いもの、同じなら現在年に近いもの）で見ていき、
+ * 既に置いたラベルと重なるもの、他の項目の点（instant）や短い帯に重なるもの、年表の右端からはみ出すものは出さない。
+ * - 点を避けるのは、白いハローを付けない（背景が白の前提）ので、点の上に乗った文字が読めなくなるため。
+ *   長い period の帯は薄い塗りなので、その上には置いてよい。
+ * - ラベルは項目の右隣に置く（period は帯の左端から）。
+ */
+export const timelineLabels = (
+  items: readonly TimelineItem[],
+  window: TimelineWindow,
+  geometry: TimelineGeometry,
+  label: { readonly fontSize: number; readonly gap: number },
+): readonly TimelineLabel[] =>
+  timelineLanes([]).flatMap((domain) => {
+    const lane = items.filter((item) => item.domain === domain);
+    // 避ける対象: 点と、点と同じくらい短い帯（輪郭の縦線が文字を横切る）
+    const points = lane
+      .map((item) => ({ id: item.id, kind: item.kind, extent: itemExtent(item, window, geometry) }))
+      .filter((p) => p.kind === "instant" || p.extent[1] - p.extent[0] <= 4 * geometry.pointRadius);
+    return [...lane].sort(byTimelinePriority(window.center)).reduce<readonly TimelineLabel[]>((placed, item) => {
+      const [x0, x1] = itemExtent(item, window, geometry);
+      const x = (item.kind === "instant" ? x1 : x0) + label.gap;
+      const width = estimateTextWidth(item.title, label.fontSize);
+      const fits = x >= 0 && x + width <= geometry.width;
+      const hitsLabel = placed.some((p) => x < p.x + p.width + label.gap && p.x < x + width + label.gap);
+      const hitsPoint = points.some((p) => p.id !== item.id && x < p.extent[1] && p.extent[0] < x + width);
+      return fits && !hitsLabel && !hitsPoint ? [...placed, { id: item.id, domain, text: item.title, x, width }] : placed;
+    }, []);
+  });
+
+// ── 時間軸 ────────────────────────────────────────────────
+
+/** 目盛りの間隔の候補（年）。 */
+export const TIMELINE_AXIS_STEPS: readonly number[] = [10, 50, 100, 500];
+
+/** 隣り合うラベルの間隔が minSpacing (px) 以上になる、最小の間隔。どれも詰まるなら最大のもの。 */
+export const timelineAxisStep = (
+  window: TimelineWindow,
+  width: number,
+  minSpacing: number,
+  steps: readonly number[] = TIMELINE_AXIS_STEPS,
+): number => {
+  const pxPerYear = width / windowYears(window);
+  return steps.find((step) => step * pxPerYear >= minSpacing) ?? steps[steps.length - 1];
+};
+
+/**
+ * 窓の中の目盛り。年スライダーの時間軸（yearAxis.ts）と同じ規約で、暦の上での通し番号
+ * （紀元前 N 年 → −N、紀元元年 → 0、N 年 → N）が step の倍数になる年に打つ。紀元元年は天文年 1（0 は紀元前1年）。
+ */
+export const timelineAxisTicks = (window: TimelineWindow, step: number): readonly AxisTick[] => {
+  const calendarOf = (year: number): number => (year >= 1 ? year : year - 1);
+  const first = Math.ceil(calendarOf(Math.ceil(window.center - window.halfSpan)) / step) * step;
+  const last = calendarOf(Math.floor(window.center + window.halfSpan));
+  const count = Math.max(0, Math.floor((last - first) / step) + 1);
+  return Array.from({ length: count }, (_, i) => first + i * step).map((calendar) => ({
+    // 通し番号 0 は紀元元年（天文年 1）、−N は紀元前 N 年（天文年 1 − N）
+    year: calendar > 0 ? calendar : calendar === 0 ? 1 : 1 + calendar,
+    calendar,
+    epoch: calendar === 0,
+  }));
+};
+
+export const timelineAxisLabel = axisLabelText;

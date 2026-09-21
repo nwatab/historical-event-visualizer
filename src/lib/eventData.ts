@@ -1,4 +1,4 @@
-import type { Domain, HistEvent, TemporalKind, Year } from "@/types/event";
+import type { HistEvent, Year } from "@/types/event";
 
 /**
  * public/data/events/ のデータの読み方（純粋関数）。
@@ -14,26 +14,18 @@ export interface EventFile {
   readonly bytes: number;
 }
 
-/** 年スライダーの目盛り用の、イベントの要約（importance 3 のみ）。 */
-export interface EventTickSource {
-  readonly kind: TemporalKind;
-  readonly start: Year;
-  readonly end?: Year;
-  readonly domain: Domain;
-}
-
 export interface EventManifest {
   readonly generatedAt: string;
   readonly total: number;
   readonly files: readonly EventFile[];
-  readonly ticks: readonly EventTickSource[];
 }
 
 export const MANIFEST_PATH = "/data/events/manifest.json" as const;
 export const eventFilePath = (file: string): `/${string}` => `/data/events/${file}`;
 
 /**
- * 現在年の表示に要るファイル。窓 [year − margin, year + margin] と重なる区間すべて。
+ * 現在年の表示に要るファイル。窓 [year − margin, year + margin] と重なる区間すべて
+ * （margin は、地図の窓と年表の窓の広いほう）。
  * period は重なる区間すべてのファイルに入っているので、進行中の period を出すために過去の区間を読む必要は無い。
  */
 export const filesForYear = (
