@@ -1,12 +1,12 @@
 import type { FeatureCollection, Point } from "geojson";
-import type { Domain, HistEvent, PlaceGranularity, PlaceKind, TemporalKind, Year } from "@/types/event";
+import type { DiffusionStage, Domain, HistEvent, Place, PlaceGranularity, PlaceKind, TemporalKind, Year } from "@/types/event";
 
 /** 年スライダーの範囲（天文年）。 */
 export const YEAR_MIN: Year = -3000;
 export const YEAR_MAX: Year = 2025;
 export const INITIAL_YEAR: Year = 1687;
 
-/** instant イベントを表示する窓幅。|start - 現在年| がこの値以下なら表示する。 */
+/** instant イベントを表示する窓幅。|start - 現在年| がこの値以下なら表示する。diffusion を end の後に残す年数にも使う。 */
 export const EVENT_WINDOW_YEARS = 20;
 
 /**
@@ -15,8 +15,17 @@ export const EVENT_WINDOW_YEARS = 20;
  */
 export const EVENT_EDGE_SCALE = 0.5;
 
-/** 地図に描く時間種別。diffusion は R6 で実装する（それまでは地図に出さない）。 */
-export type MarkerKind = Extract<TemporalKind, "instant" | "period">;
+/** 地図に描く時間種別（R6 から diffusion も描く）。 */
+export type MarkerKind = TemporalKind;
+
+/**
+ * マーカーの役割。
+ * - event:  instant / period のマーカー（places の各点）
+ * - origin: diffusion の起点。二重輪で描く
+ * - stage:  diffusion の到達点。大きさは MARKER.minRadius で固定
+ * - front:  現在年に到達した到達点（stage.year が現在年）。その年だけ instant と同じ大きさで描く（進行中の先端）
+ */
+export type MarkerRole = "event" | "origin" | "stage" | "front";
 
 export interface EventMarkerProperties {
   readonly id: string;
@@ -24,16 +33,17 @@ export interface EventMarkerProperties {
   readonly domain: Domain;
   readonly importance: HistEvent["importance"];
   readonly kind: MarkerKind;
+  readonly role: MarkerRole;
   /** "none" は地図に出さない（mapFilters.ts の filter 式で除く。生成データの none は places が空なので、そもそもマーカーにならない） */
   readonly placeKind: PlaceKind;
   /** その点の粒度。"country" は国の代表点で、COUNTRY_MAX_ZOOM 以上では出さない（mapFilters.ts） */
   readonly granularity: PlaceGranularity;
   /**
    * そのイベントの places のうち最初の1点か。イベント名のラベルはこの点にだけ出す
-   * （複数の国にまたがる戦争で、同じ名前が地図じゅうに並ばないように）。
+   * （複数の国にまたがる戦争で、同じ名前が地図じゅうに並ばないように）。diffusion では起点。
    */
   readonly primary: boolean;
-  /** 年の差に応じた大きさの倍率（EVENT_EDGE_SCALE〜1）。period は常に 1。 */
+  /** 年の差に応じた大きさの倍率（EVENT_EDGE_SCALE〜1）。period は常に 1。diffusion は期間中 1、end の後は instant と同じ規則。 */
   readonly fade: number;
 }
 
@@ -59,19 +69,54 @@ export const eventFade = (
 export const periodFade = (start: Year, end: Year, year: Year): number | null =>
   start <= year && year <= end ? 1 : null;
 
+/**
+ * diffusion は start 以上 end 以下の年に 1 倍で表示し、end の後も EVENT_WINDOW_YEARS だけ経路全体を残して、
+ * instant と同じ規則（end との差）で縮める。start の前には出さない。
+ * period と同じ規則にしないのは、黒死病のように数年で終わる伝播が、スライダーで通り過ぎやすいため。
+ */
+export const diffusionFade = (
+  start: Year,
+  end: Year,
+  year: Year,
+  windowYears: number = EVENT_WINDOW_YEARS,
+): number | null => (year < start ? null : year <= end ? 1 : eventFade(end, year, windowYears));
+
 /** 現在年での大きさの倍率。表示しないなら null。 */
-const markerFade = (event: HistEvent, year: Year): number | null => {
+export const markerFade = (event: HistEvent, year: Year): number | null => {
   switch (event.kind) {
     case "instant":
       return eventFade(event.start, year);
     case "period":
       return event.end === undefined ? null : periodFade(event.start, event.end, year);
     case "diffusion":
-      return null;
+      return event.end === undefined ? null : diffusionFade(event.start, event.end, year);
   }
 };
 
-/** 現在年に表示すべき instant / period イベントを、places の全点ぶんのマーカーに展開する。 */
+// ── diffusion の到達点 ──────────────────────────────────────
+
+export interface ReachedStage {
+  /** stages の中の位置 */
+  readonly index: number;
+  readonly stage: DiffusionStage;
+  /** どこから来たか。起点なら -1、それ以外は stages の中の位置 */
+  readonly from: number;
+}
+
+/** stage の from を解決する。省略時は 1 つ前の stage（最初の stage なら起点 = -1）。 */
+export const stageFrom = (stage: DiffusionStage, index: number): number => stage.from ?? index - 1;
+
+/** 現在年までに到達した stage（stage.year ≤ 現在年）。stages の順のまま返す。 */
+export const reachedStages = (event: HistEvent, year: Year): readonly ReachedStage[] =>
+  (event.stages ?? []).flatMap((stage, index) =>
+    stage.year <= year ? [{ index, stage, from: stageFrom(stage, index) }] : [],
+  );
+
+/**
+ * 現在年に表示すべきイベントを、マーカーに展開する。
+ * - instant / period: places の全点
+ * - diffusion: 起点（places の最初の 1 点）と、現在年までに到達した stage
+ */
 export const eventMarkers = (
   events: readonly HistEvent[],
   year: Year,
@@ -79,23 +124,26 @@ export const eventMarkers = (
   type: "FeatureCollection",
   features: events.flatMap((event) => {
     const fade = markerFade(event, year);
-    if (fade === null || event.kind === "diffusion") return [];
-    const kind: MarkerKind = event.kind;
-    return event.places.map((place, index) => ({
+    if (fade === null) return [];
+    const base = {
+      id: event.id,
+      title: event.title.ja,
+      domain: event.domain,
+      importance: event.importance,
+      kind: event.kind,
+      placeKind: event.placeKind ?? "point",
+      fade,
+    };
+    const feature = (place: Place, role: MarkerRole, primary: boolean) => ({
       type: "Feature" as const,
       geometry: { type: "Point" as const, coordinates: [place.lon, place.lat] },
-      properties: {
-        id: event.id,
-        title: event.title.ja,
-        domain: event.domain,
-        importance: event.importance,
-        kind,
-        placeKind: event.placeKind ?? "point",
-        granularity: place.granularity ?? "fine",
-        primary: index === 0,
-        fade,
-      },
-    }));
+      properties: { ...base, role, granularity: place.granularity ?? "fine", primary },
+    });
+    if (event.kind !== "diffusion") return event.places.map((place, index) => feature(place, "event", index === 0));
+    return [
+      ...event.places.slice(0, 1).map((place) => feature(place, "origin", true)),
+      ...reachedStages(event, year).map(({ stage }) => feature(stage.place, stage.year === year ? "front" : "stage", false)),
+    ];
   }),
 });
 

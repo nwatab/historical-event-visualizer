@@ -102,6 +102,21 @@ export const MARKER = {
   periodHoleRatio: 0.5,
 } as const;
 
+/**
+ * diffusion（広がる出来事）の描き方。
+ * - 起点は二重輪: instant と同じ塗りつぶしの円と白い縁取りの外側に、分類色の輪をもう 1 本描き、その外側にも白い縁取りを付ける。
+ *   輪の色が接するのは内側も外側も白だけなので、白に対する 3:1 の要件はそのまま満たす。輪の太さは縁取りと同じ 2px。
+ * - 到達点は MARKER.minRadius の円で固定（現在年に到達した点だけ、その年は instant と同じ大きさ）。
+ * - 経路は分類色の線。マーカーと同じ考え方で、線の両側に白い縁（lineCasingWidth）を付けて、分類色が陸や海の色に直接
+ *   接しないようにする。線はマーカーより細いので、縁はマーカーの 2px より細い 1px。
+ *   end の後は、太さに fade（0.5〜1）を掛ける。
+ */
+export const DIFFUSION = {
+  ringWidth: MARKER.strokeWidth,
+  lineWidth: 2,
+  lineCasingWidth: 1,
+} as const;
+
 /** 選択中のマーカーの輪（白い縁取りの外側に付ける）。既存の値を使う。 */
 export const SELECTION_RING = {
   color: GRAY.strong,
@@ -158,20 +173,40 @@ export const textStyle = {
   },
 } as const satisfies Record<string, CSSProperties>;
 
-/** 時間種別の見本（凡例用）。instant は塗りつぶしの円、period は中抜きの輪。分類色は使わずグレーで描く。 */
-export const kindSwatchStyle = (kind: "instant" | "period"): CSSProperties => ({
-  width: SPACE[8],
-  height: SPACE[8],
-  borderRadius: RADIUS.small,
+/**
+ * 時間種別の見本（凡例用）。instant は塗りつぶしの円、period は中抜きの輪、diffusion は二重輪（起点のマーカーと同じ形）。
+ * 分類色は使わずグレーで描く。diffusion は、輪と中の点が潰れないように 16px にし、中の点（kindSwatchDotStyle）を子要素に置く
+ * （輪 2px・白 2px・点 8px。角丸は 8px と 4px で、どちらも円になる）。
+ */
+export const kindSwatchStyle = (kind: "instant" | "period" | "diffusion"): CSSProperties => ({
+  width: kind === "diffusion" ? SPACE[16] : SPACE[8],
+  height: kind === "diffusion" ? SPACE[16] : SPACE[8],
+  borderRadius: kind === "diffusion" ? RADIUS.medium : RADIUS.small,
   boxSizing: "border-box",
   flexShrink: 0,
   ...(kind === "instant"
     ? { backgroundColor: GRAY.weak }
-    : {
-        backgroundColor: GRAY.surface,
-        border: `${SPACE[8] * 0.5 * (1 - MARKER.periodHoleRatio)}px solid ${GRAY.weak}`,
-      }),
+    : kind === "period"
+      ? {
+          backgroundColor: GRAY.surface,
+          border: `${SPACE[8] * 0.5 * (1 - MARKER.periodHoleRatio)}px solid ${GRAY.weak}`,
+        }
+      : {
+          backgroundColor: GRAY.surface,
+          border: `${DIFFUSION.ringWidth}px solid ${GRAY.weak}`,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }),
 });
+
+/** diffusion の見本の、中の点 */
+export const kindSwatchDotStyle: CSSProperties = {
+  width: SPACE[8],
+  height: SPACE[8],
+  borderRadius: RADIUS.small,
+  backgroundColor: GRAY.weak,
+};
 
 /** 分類の色見本（マーカーと同じ円）。直径 8px・角丸 4px。 */
 export const swatchStyle = (domain: Domain): CSSProperties => ({
@@ -194,6 +229,8 @@ export const DETAIL_PANEL = {
   width: 320,
   /** 狭い画面で上部に出すシートの最大の高さ（地図を完全には塞がない） */
   sheetMaxHeight: "50%",
+  /** diffusion の到達点の一覧を、折りたたまずに出す件数。これを超えたら残りを折りたたむ */
+  stagesCollapsedCount: 8,
 } as const;
 
 /**

@@ -14,7 +14,8 @@
     "wikidata:fetch-places": "node scripts/wikidata/fetch-places.mjs",
     "wikidata:report": "node scripts/wikidata/report.mjs",
     "wikidata:build-app-data": "node scripts/wikidata/build-app-data.mjs",
-    "wikidata:place-overrides-draft": "node scripts/wikidata/build-place-overrides-draft.mjs"
+    "wikidata:place-overrides-draft": "node scripts/wikidata/build-place-overrides-draft.mjs",
+    "wikidata:diffusion-draft": "node scripts/wikidata/build-diffusion-draft.mjs"
   },
   "dependencies": {
     "maplibre-gl": "6.10.0",

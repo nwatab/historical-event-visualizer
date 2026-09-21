@@ -66,6 +66,10 @@ export const PLACE_CANDIDATE_LABELS_PATH = join(APP_RAW_DIR, "place-candidate-la
 /** 場所が大陸・海洋（coarse）だけで、地図に出ない項目の一覧（build-app-data.mjs が作り直す。place-overrides の候補） */
 export const COARSE_ONLY_PATH = join(import.meta.dirname, "coarse-only.md");
 export const PLACE_OVERRIDES_DRAFT_PATH = join(import.meta.dirname, "place-overrides.draft.md");
+/** 人が書いた、広がる出来事（diffusion）の起点と到達点の表。1 イベント 1 ファイル（コミットする）。座標は書かず、QID から引く */
+export const DIFFUSION_DIR = join(ROOT_DIR, "data", "diffusion");
+/** 人が確認するための、diffusion の下書きの表（build-diffusion-draft.mjs が作る） */
+export const DIFFUSION_DRAFT_PATH = join(import.meta.dirname, "diffusion.draft.md");
 /** 生成したアプリ用データの出力先。こちらはコミットする。 */
 export const APP_DATA_DIR = join(ROOT_DIR, "public", "data", "events");
 

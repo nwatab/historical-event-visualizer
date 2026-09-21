@@ -50,17 +50,18 @@ export interface TimelineItem {
   readonly title: string;
   readonly domain: Domain;
   readonly importance: HistEvent["importance"];
+  /** 年表では diffusion を period と区別しない（どちらも start〜end の帯） */
   readonly kind: "instant" | "period";
   readonly start: Year;
-  /** period の終了年。instant は start と同じ */
+  /** period / diffusion の終了年。instant は start と同じ */
   readonly end: Year;
 }
 
 /**
  * 窓に入るイベントを、年表の項目にする。
- * - instant は start が窓の中、period は [start, end] が窓と重なるもの
+ * - instant は start が窓の中、period / diffusion は [start, end] が窓と重なるもの
  * - 地図と違い、placeKind が "none" の項目（places が空）も出す。年表に場所は要らないため
- * - diffusion は R6 まで出さない（地図と同じ）
+ * - diffusion は period と同じ帯にする。地図のように end の後まで残すことはしない
  */
 export const timelineItems = (
   events: readonly HistEvent[],
@@ -71,9 +72,10 @@ export const timelineItems = (
   const to = window.center + window.halfSpan;
   const minImportance = timelineMinImportance(windowYears(window));
   return events.flatMap((event): TimelineItem[] => {
-    if (event.kind === "diffusion" || event.importance < minImportance) return [];
+    if (event.importance < minImportance) return [];
     if (hiddenDomains.includes(event.domain)) return [];
-    const end = event.kind === "period" ? (event.end ?? event.start) : event.start;
+    const kind = event.kind === "instant" ? "instant" : "period";
+    const end = kind === "period" ? (event.end ?? event.start) : event.start;
     if (event.start > to || end < from) return [];
     return [
       {
@@ -81,7 +83,7 @@ export const timelineItems = (
         title: event.title.ja,
         domain: event.domain,
         importance: event.importance,
-        kind: event.kind,
+        kind,
         start: event.start,
         end,
       },

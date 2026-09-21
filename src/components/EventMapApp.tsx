@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { appReducer, initialAppState, type AppAction, type AppState } from "@/lib/appState";
 import { SCREEN_INSET, SLIDER_PANEL_MAX_WIDTH, SPACE } from "@/lib/design";
+import { diffusionLines } from "@/lib/diffusion";
 import {
   EVENT_WINDOW_YEARS,
   INITIAL_YEAR,
@@ -78,6 +79,7 @@ export function EventMapApp() {
     playback.playing ? playback.speed * PLAYBACK_PREFETCH_SECONDS : 0,
   );
   const markers = useMemo(() => eventMarkers(events, state.year), [events, state.year]);
+  const lines = useMemo(() => diffusionLines(events, state.year), [events, state.year]);
 
   // キーハンドラは一度だけ登録し、最新の状態は ref から読む
   const stateRef = useRef(state);
@@ -131,6 +133,7 @@ export function EventMapApp() {
     <div className="relative h-full w-full">
       <WorldMapClient
         markers={markers}
+        lines={lines}
         highlightedDomain={hoveredDomain}
         hiddenDomains={state.hiddenDomains}
         selectedIds={selectedIds}

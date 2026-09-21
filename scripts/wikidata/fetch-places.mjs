@@ -1,4 +1,5 @@
-// 場所の項目（戦争の P276、リスト項目の P189 / P276 / P159 / P740 / P291 / P495 / P17 の先、place-overrides.json の根拠の項目）の P31 を取得して
+// 場所の項目（戦争の P276、リスト項目の P189 / P276 / P159 / P740 / P291 / P495 / P17 の先、place-overrides.json の根拠の項目、
+// data/diffusion/*.json の起点・到達点）の P31 を取得して
 // data/raw/app/place-classes.json に保存する。場所の粒度（place-granularity.mjs）の判定に使う。
 //
 //   pnpm wikidata:fetch-places
@@ -19,6 +20,7 @@ import {
   USER_AGENT,
   WIKIDATA_API,
 } from "./config.mjs";
+import { loadDiffusionFiles } from "./diffusion.mjs";
 import { readJson, readJsonOr } from "./load-analysis.mjs";
 import { sleep } from "./sparql.mjs";
 
@@ -73,7 +75,12 @@ const fill = async (path, qids, props, pick) => {
 };
 
 await mkdir(APP_RAW_DIR, { recursive: true });
-const [events, attrs, placeOverrides] = await Promise.all([readJson(EVENTS_PATH), readJsonOr(LIST_ATTRS_PATH, {}), readJson(PLACE_OVERRIDES_PATH)]);
+const [events, attrs, placeOverrides, diffusionFiles] = await Promise.all([
+  readJson(EVENTS_PATH),
+  readJsonOr(LIST_ATTRS_PATH, {}),
+  readJson(PLACE_OVERRIDES_PATH),
+  loadDiffusionFiles(),
+]);
 const placeQids = [
   ...new Set([
     ...events.flatMap((/** @type {any} */ e) => [...(e.locations ?? []).map((/** @type {any} */ l) => l.qid), ...(e.locationsWithoutCoord ?? [])]),
@@ -82,6 +89,8 @@ const placeQids = [
     ...placeOverrides.overrides.flatMap((/** @type {import("./place-overrides.mjs").PlaceOverride} */ o) =>
       (o.places ?? []).flatMap((p) => (p.path === "P625" ? [p.from] : [])),
     ),
+    // 広がる出来事（diffusion）の起点・到達点（下書きのぶんも取る）
+    ...diffusionFiles.flatMap(({ data }) => [data.origin, ...data.stages].map((p) => p.qid)),
   ]),
 ];
 console.log(`[1/2] 場所の項目の P31（${placeQids.length} 件）`);

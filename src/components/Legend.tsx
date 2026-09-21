@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { GRAY, SPACE, kindSwatchStyle, surfaceStyle, swatchStyle, textStyle } from "@/lib/design";
+import { GRAY, SPACE, kindSwatchDotStyle, kindSwatchStyle, surfaceStyle, swatchStyle, textStyle } from "@/lib/design";
 import { DOMAINS, DOMAIN_LABELS } from "@/lib/domain";
 import type { Domain } from "@/types/event";
 
@@ -14,6 +14,13 @@ interface LegendProps {
   readonly onToggle: (domain: Domain) => void;
   readonly onShowAll: () => void;
 }
+
+/** 時間種別の見本と名前（形で区別する） */
+const KIND_SWATCHES = [
+  { kind: "instant", label: "一時点の出来事" },
+  { kind: "period", label: "期間中の出来事" },
+  { kind: "diffusion", label: "広がる出来事" },
+] as const;
 
 /** 色見本。非表示の分類は GRAY.line で塗る。 */
 const legendSwatch = (domain: Domain, visible: boolean) => ({
@@ -118,15 +125,19 @@ export function Legend({ hiddenDomains, highlighted, onHover, onToggle, onShowAl
         </ul>
         {/* 一部だけ非表示のときはここに置く（全分類が非表示のときは折りたたみの外に出す） */}
         {hiddenDomains.length > 0 && !allHidden && showAllButton}
-        {/* 時間種別の見分け方（形で区別する。色は分類にだけ使う） */}
+        {/* 時間種別の見分け方（形で区別する。色は分類にだけ使う）。広がる出来事（diffusion）は、起点の二重輪 */}
         <p
-          className="flex items-center"
-          style={{ gap: SPACE[4], marginTop: SPACE[8], ...textStyle.caption }}
+          className="flex flex-wrap items-center"
+          style={{ columnGap: SPACE[12], rowGap: SPACE[4], marginTop: SPACE[8], ...textStyle.caption }}
         >
-          <span style={kindSwatchStyle("instant")} aria-hidden />
-          <span>一時点の出来事</span>
-          <span style={{ ...kindSwatchStyle("period"), marginLeft: SPACE[8] }} aria-hidden />
-          <span>期間中の出来事</span>
+          {KIND_SWATCHES.map(({ kind, label }) => (
+            <span key={kind} className="flex items-center whitespace-nowrap" style={{ gap: SPACE[4] }}>
+              <span style={kindSwatchStyle(kind)} aria-hidden>
+                {kind === "diffusion" && <span style={kindSwatchDotStyle} />}
+              </span>
+              <span>{label}</span>
+            </span>
+          ))}
         </p>
       </div>
     </nav>

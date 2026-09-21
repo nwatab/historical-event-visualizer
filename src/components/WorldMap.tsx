@@ -16,6 +16,7 @@ import {
 import "maplibre-gl/dist/maplibre-gl.css";
 import { publicPath } from "@/lib/config";
 import {
+  DIFFUSION,
   DOMAIN_COLORS,
   GRAY,
   MAP_COLORS,
@@ -29,11 +30,17 @@ import {
 import { DOMAINS } from "@/lib/domain";
 import { markerFilter } from "@/lib/mapFilters";
 import { popupContent, type PopupItem } from "@/lib/popupContent";
+import type { DiffusionLineCollection } from "@/lib/diffusion";
 import { LABEL_MIN_ZOOM_BY_IMPORTANCE, type EventMarkerCollection, type MarkerKind } from "@/lib/timeline";
 import type { Domain } from "@/types/event";
 
 const EVENTS_SOURCE_ID = "events";
+const LINES_SOURCE_ID = "diffusion-lines";
 const EVENTS_LAYER_ID = "events-circle";
+const LINE_CASING_LAYER_ID = "diffusion-line-casing";
+const LINE_LAYER_ID = "diffusion-line";
+const ORIGIN_HALO_LAYER_ID = "diffusion-origin-halo";
+const ORIGIN_RING_LAYER_ID = "diffusion-origin-ring";
 const PERIOD_HALO_LAYER_ID = "events-period-halo";
 const PERIOD_LAYER_ID = "events-period";
 const SELECTED_LAYER_ID = "events-selected";
@@ -43,18 +50,24 @@ const PRIORITY_LABEL_LAYER_ID = "events-label-priority";
 /** イベント名のラベルのレイヤ（フィルタと不透明度を同じように更新する） */
 const LABEL_LAYER_IDS = [LABEL_LAYER_ID, PRIORITY_LABEL_LAYER_ID];
 
-/** ホバーの対象になるレイヤー */
-const INTERACTIVE_LAYER_IDS = [EVENTS_LAYER_ID, PERIOD_LAYER_ID];
+/** ホバーの対象になるレイヤー。diffusion の起点・到達点の円は、instant と同じ EVENTS_LAYER_ID に入る */
+const INTERACTIVE_LAYER_IDS = [EVENTS_LAYER_ID, PERIOD_LAYER_ID, ORIGIN_RING_LAYER_ID];
 /** クリックで選択できるレイヤー。ラベルをクリックしても、そのイベントを選ぶ */
 const CLICKABLE_LAYER_IDS = [...INTERACTIVE_LAYER_IDS, ...LABEL_LAYER_IDS];
 
-const kindIs = (kind: MarkerKind): ExpressionSpecification => ["==", ["get", "kind"], kind];
+const kindIn = (...kinds: readonly MarkerKind[]): ExpressionSpecification => ["in", ["get", "kind"], ["literal", [...kinds]]];
+const isOrigin: ExpressionSpecification = ["==", ["get", "role"], "origin"];
 
-/** マーカーのレイヤーと、それぞれが描く時間種別 */
-const MARKER_LAYERS: readonly { readonly id: string; readonly kind: MarkerKind }[] = [
-  { id: PERIOD_HALO_LAYER_ID, kind: "period" },
-  { id: PERIOD_LAYER_ID, kind: "period" },
-  { id: EVENTS_LAYER_ID, kind: "instant" },
+/**
+ * マーカーのレイヤーと、それぞれが描くもの。
+ * diffusion の起点・到達点は instant と同じ塗りつぶしの円で描き、起点にはその外側の輪（ORIGIN_*）を足す。
+ */
+const MARKER_LAYERS: readonly { readonly id: string; readonly only: ExpressionSpecification }[] = [
+  { id: ORIGIN_HALO_LAYER_ID, only: isOrigin },
+  { id: ORIGIN_RING_LAYER_ID, only: isOrigin },
+  { id: PERIOD_HALO_LAYER_ID, only: kindIn("period") },
+  { id: PERIOD_LAYER_ID, only: kindIn("period") },
+  { id: EVENTS_LAYER_ID, only: kindIn("instant", "diffusion") },
 ];
 
 /** domain プロパティから分類色を引く式 */
@@ -74,15 +87,37 @@ const markerOpacity = (highlighted: Domain | null): ExpressionSpecification | nu
     ? 1
     : ["case", ["==", ["get", "domain"], highlighted], 1, MARKER.dimOpacity];
 
-/** importance による基準半径 × 年の差による倍率（fade）。MARKER.minRadius を下回らない。 */
+/**
+ * importance による基準半径 × 年の差による倍率（fade）。MARKER.minRadius を下回らない。
+ * diffusion の到達点（role が "stage"）は MARKER.minRadius で固定。現在年に到達した点（"front"）は、その年だけ他と同じ式。
+ */
 const markerRadius: ExpressionSpecification = [
-  "max",
-  [
-    "*",
-    ["match", ["get", "importance"], 3, MARKER.radius[3], 2, MARKER.radius[2], MARKER.radius[1]],
-    ["get", "fade"],
-  ],
+  "case",
+  ["==", ["get", "role"], "stage"],
   MARKER.minRadius,
+  [
+    "max",
+    [
+      "*",
+      ["match", ["get", "importance"], 3, MARKER.radius[3], 2, MARKER.radius[2], MARKER.radius[1]],
+      ["get", "fade"],
+    ],
+    MARKER.minRadius,
+  ],
+];
+
+/** diffusion の起点の、外側の輪の内径（＝円の白い縁取りの外側）。 */
+const originRingInnerRadius: ExpressionSpecification = ["+", markerRadius, MARKER.strokeWidth];
+
+/**
+ * マーカーが占める半径（白い縁取りの外側まで）。diffusion の起点は、外側の輪とその白い縁取りのぶん大きい。
+ * 選択中の輪、ラベルの位置、ラベル除けの大きさに使う。
+ */
+const markerOuterRadius: ExpressionSpecification = [
+  "+",
+  markerRadius,
+  MARKER.strokeWidth,
+  ["case", isOrigin, DIFFUSION.ringWidth + MARKER.strokeWidth, 0],
 ];
 
 /** period の輪の内側（白で抜く部分）の半径。輪の太さは markerRadius との差。 */
@@ -95,14 +130,14 @@ const markerSortKey = (highlighted: Domain | null): ExpressionSpecification =>
     : ["+", ["get", "importance"], ["case", ["==", ["get", "domain"], highlighted], 10, 0]];
 
 /**
- * 優先ラベルの対象: importance 3 の period（世界大戦のような、長く続く最重要の出来事）。
+ * 優先ラベルの対象: importance 3 の period と diffusion（世界大戦のような、長く続く最重要の出来事）。
  * こういう出来事の primary の周りは、その戦争の会戦のマーカーで埋まっていることが多く、マーカーを避ける通常のラベルだと
  * どのズームでも出ない（1916 年の第一次世界大戦）。そこで、マーカーを避けない別のレイヤ（events-label-priority）に出す。
  */
 const isPriorityLabel: ExpressionSpecification = [
   "all",
   ["==", ["get", "importance"], 3],
-  ["==", ["get", "kind"], "period"],
+  kindIn("period", "diffusion"),
 ];
 
 /**
@@ -117,11 +152,7 @@ const labelFilter = (hiddenDomains: readonly Domain[], priority: boolean): Expre
   );
 
 /** マーカーの白い縁取りの外側から MAP_LABEL.gap だけ離す（text-radial-offset は em 単位）。 */
-const labelOffset: ExpressionSpecification = [
-  "/",
-  ["+", markerRadius, MARKER.strokeWidth + MAP_LABEL.gap],
-  MAP_LABEL.fontSize,
-];
+const labelOffset: ExpressionSpecification = ["/", ["+", markerOuterRadius, MAP_LABEL.gap], MAP_LABEL.fontSize];
 
 /**
  * マーカーの領域を、ラベルの衝突判定に占有させるための見えない symbol（events-label-blocker レイヤ）。
@@ -131,7 +162,7 @@ const labelOffset: ExpressionSpecification = [
  * MapLibre が上のレイヤの symbol から先に配置するため。
  */
 const BLOCKER_TEXT = "●";
-const blockerSize: ExpressionSpecification = ["*", 2, ["+", markerRadius, MARKER.strokeWidth]];
+const blockerSize: ExpressionSpecification = ["*", 2, markerOuterRadius];
 
 /**
  * ラベルを置く優先順。symbol-sort-key は小さいほど先に置かれる（＝重なったときに残る）ので、
@@ -167,11 +198,19 @@ const labelLayer = (id: string, priority: boolean): LayerSpecification => ({
   },
 });
 
-const createStyle = (landUrl: string, markers: EventMarkerCollection): StyleSpecification => ({
+/** diffusion の経路の太さ。end の後は fade を掛けて細くする。 */
+const lineWidth: ExpressionSpecification = ["*", DIFFUSION.lineWidth, ["get", "fade"]];
+
+const createStyle = (
+  landUrl: string,
+  markers: EventMarkerCollection,
+  lines: DiffusionLineCollection,
+): StyleSpecification => ({
   version: 8,
   sources: {
     land: { type: "geojson", data: landUrl },
     [EVENTS_SOURCE_ID]: { type: "geojson", data: markers },
+    [LINES_SOURCE_ID]: { type: "geojson", data: lines },
   },
   layers: [
     {
@@ -191,13 +230,66 @@ const createStyle = (landUrl: string, markers: EventMarkerCollection): StyleSpec
       source: "land",
       paint: { "line-color": MAP_LINE.coastlineColor, "line-width": MAP_LINE.coastlineWidth },
     },
+    // diffusion の経路: 白い縁の上に分類色の線。どのマーカーよりも下に描く。
+    {
+      id: LINE_CASING_LAYER_ID,
+      type: "line",
+      source: LINES_SOURCE_ID,
+      filter: markerFilter([]),
+      layout: { "line-cap": "round", "line-join": "round" },
+      paint: {
+        "line-color": MARKER.strokeColor,
+        "line-width": ["+", lineWidth, 2 * DIFFUSION.lineCasingWidth],
+        "line-opacity": markerOpacity(null),
+      },
+    },
+    {
+      id: LINE_LAYER_ID,
+      type: "line",
+      source: LINES_SOURCE_ID,
+      filter: markerFilter([]),
+      layout: { "line-cap": "round", "line-join": "round" },
+      paint: { "line-color": markerColor, "line-width": lineWidth, "line-opacity": markerOpacity(null) },
+    },
+    // diffusion の起点の外側の輪（二重輪）。白い縁取り（下のレイヤー）の上に、白い円と分類色の輪を描き、
+    // その上に instant と同じ円（EVENTS_LAYER_ID）が乗る。輪の色が接するのは、内側も外側も白だけ。
+    {
+      id: ORIGIN_HALO_LAYER_ID,
+      type: "circle",
+      source: EVENTS_SOURCE_ID,
+      filter: markerFilter([], isOrigin),
+      layout: { "circle-sort-key": markerSortKey(null) },
+      paint: {
+        "circle-color": MARKER.strokeColor,
+        "circle-radius": ["+", originRingInnerRadius, DIFFUSION.ringWidth],
+        "circle-opacity": markerOpacity(null),
+        "circle-stroke-color": MARKER.strokeColor,
+        "circle-stroke-width": MARKER.strokeWidth,
+        "circle-stroke-opacity": markerOpacity(null),
+      },
+    },
+    {
+      id: ORIGIN_RING_LAYER_ID,
+      type: "circle",
+      source: EVENTS_SOURCE_ID,
+      filter: markerFilter([], isOrigin),
+      layout: { "circle-sort-key": markerSortKey(null) },
+      paint: {
+        "circle-color": MARKER.strokeColor,
+        "circle-radius": originRingInnerRadius,
+        "circle-opacity": markerOpacity(null),
+        "circle-stroke-color": markerColor,
+        "circle-stroke-width": DIFFUSION.ringWidth,
+        "circle-stroke-opacity": markerOpacity(null),
+      },
+    },
     // period: 中抜きの輪。白い縁取り（下のレイヤー）の上に、白い中心と分類色の輪を描く。
     // 外径は instant と同じ（半径 + 縁取り 2px）で、輪の色が接するのは白だけ。
     {
       id: PERIOD_HALO_LAYER_ID,
       type: "circle",
       source: EVENTS_SOURCE_ID,
-      filter: markerFilter([], kindIs("period")),
+      filter: markerFilter([], kindIn("period")),
       layout: { "circle-sort-key": markerSortKey(null) },
       paint: {
         "circle-color": MARKER.strokeColor,
@@ -212,7 +304,7 @@ const createStyle = (landUrl: string, markers: EventMarkerCollection): StyleSpec
       id: PERIOD_LAYER_ID,
       type: "circle",
       source: EVENTS_SOURCE_ID,
-      filter: markerFilter([], kindIs("period")),
+      filter: markerFilter([], kindIn("period")),
       layout: { "circle-sort-key": markerSortKey(null) },
       paint: {
         "circle-color": MARKER.strokeColor,
@@ -223,12 +315,12 @@ const createStyle = (landUrl: string, markers: EventMarkerCollection): StyleSpec
         "circle-stroke-opacity": markerOpacity(null),
       },
     },
-    // instant: 塗りつぶしの円。period より上に描く。
+    // instant と、diffusion の起点・到達点: 塗りつぶしの円。period より上に描く。
     {
       id: EVENTS_LAYER_ID,
       type: "circle",
       source: EVENTS_SOURCE_ID,
-      filter: markerFilter([], kindIs("instant")),
+      filter: markerFilter([], kindIn("instant", "diffusion")),
       layout: { "circle-sort-key": markerSortKey(null) },
       paint: {
         "circle-color": markerColor,
@@ -246,7 +338,7 @@ const createStyle = (landUrl: string, markers: EventMarkerCollection): StyleSpec
       source: EVENTS_SOURCE_ID,
       filter: selectedFilter([], []),
       paint: {
-        "circle-radius": ["+", markerRadius, MARKER.strokeWidth],
+        "circle-radius": markerOuterRadius,
         "circle-opacity": 0,
         "circle-stroke-color": SELECTION_RING.color,
         "circle-stroke-width": SELECTION_RING.width,
@@ -303,6 +395,8 @@ const itemsAt = (event: MapLayerMouseEvent): readonly PopupItem[] => {
 
 interface WorldMapProps {
   readonly markers: EventMarkerCollection;
+  /** diffusion の経路（現在年までに到達した stage への線） */
+  readonly lines: DiffusionLineCollection;
   readonly highlightedDomain: Domain | null;
   readonly hiddenDomains: readonly Domain[];
   /** 詳細パネルで選択中のイベント（地図上で輪を付ける） */
@@ -322,6 +416,7 @@ interface MapViewState {
 
 export function WorldMap({
   markers,
+  lines,
   highlightedDomain,
   hiddenDomains,
   selectedIds,
@@ -331,6 +426,7 @@ export function WorldMap({
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const markersRef = useRef(markers);
+  const linesRef = useRef(lines);
   const viewRef = useRef<MapViewState>({ highlightedDomain, hiddenDomains, selectedIds });
   const onSelectRef = useRef(onSelectEvents);
   const onClickEmptyRef = useRef(onClickEmpty);
@@ -344,7 +440,7 @@ export function WorldMap({
     setWorkerUrl(publicPath("/maplibre/maplibre-gl-worker.mjs"));
     const map = new MapLibreMap({
       container,
-      style: createStyle(publicPath("/geo/ne_110m_land.geojson"), markersRef.current),
+      style: createStyle(publicPath("/geo/ne_110m_land.geojson"), markersRef.current, linesRef.current),
       center: [0, 20],
       zoom: 0,
       renderWorldCopies: false,
@@ -369,6 +465,7 @@ export function WorldMap({
     // style 読み込み前に年や強調が変わっていた場合に備え、読み込み完了時に最新の状態を反映する。
     map.on("load", () => {
       map.getSource<GeoJSONSource>(EVENTS_SOURCE_ID)?.setData(markersRef.current);
+      map.getSource<GeoJSONSource>(LINES_SOURCE_ID)?.setData(linesRef.current);
       applyViewState(map, viewRef.current);
     });
 
@@ -420,6 +517,11 @@ export function WorldMap({
   }, [markers]);
 
   useEffect(() => {
+    linesRef.current = lines;
+    mapRef.current?.getSource<GeoJSONSource>(LINES_SOURCE_ID)?.setData(lines);
+  }, [lines]);
+
+  useEffect(() => {
     onSelectRef.current = onSelectEvents;
     onClickEmptyRef.current = onClickEmpty;
   }, [onSelectEvents, onClickEmpty]);
@@ -443,11 +545,15 @@ export function WorldMap({
 
 const applyViewState = (map: MapLibreMap, view: MapViewState): void => {
   const opacity = markerOpacity(view.highlightedDomain);
-  MARKER_LAYERS.forEach(({ id, kind }) => {
+  MARKER_LAYERS.forEach(({ id, only }) => {
     map.setPaintProperty(id, "circle-opacity", opacity);
     map.setPaintProperty(id, "circle-stroke-opacity", opacity);
     map.setLayoutProperty(id, "circle-sort-key", markerSortKey(view.highlightedDomain));
-    map.setFilter(id, markerFilter(view.hiddenDomains, kindIs(kind)));
+    map.setFilter(id, markerFilter(view.hiddenDomains, only));
+  });
+  [LINE_CASING_LAYER_ID, LINE_LAYER_ID].forEach((id) => {
+    map.setPaintProperty(id, "line-opacity", opacity);
+    map.setFilter(id, markerFilter(view.hiddenDomains));
   });
   map.setFilter(SELECTED_LAYER_ID, selectedFilter(view.hiddenDomains, view.selectedIds));
   map.setFilter(LABEL_LAYER_ID, labelFilter(view.hiddenDomains, false));
