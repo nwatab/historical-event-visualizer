@@ -28,16 +28,84 @@
 |---|---|---|
 | `instant` | 一時点の出来事（会戦、条約調印、発見・刊行など）。「〜年頃」でも1つの年で代表できるもの。 | `start` |
 | `period` | 始まりと終わりがあり、その間ずっと続く状態（戦争、王朝、流行期間など）。 | `start`, `end` |
-| `diffusion` | 時間とともに地理的に広がっていくもの（疫病の伝播、技術・宗教の伝播など）。 | `start`, `end`, `path`（`year` 付きの地点列） |
+| `diffusion` | 時間とともに地理的に広がっていくもの（疫病の伝播、技術・宗教の伝播など）。 | `start`, `end`, `places`（起点の 1 点）, `stages`（到達点の列） |
 
-表示するのは `instant` と `period`（R3 から）。`diffusion` は R6 で実装する。
+3 種類とも表示する（`instant` と `period` は R3 から、`diffusion` は R6a から。規則は下の「diffusion（広がる出来事）」）。
 
 - `instant` は現在年との差が ±20年（`EVENT_WINDOW_YEARS`）以内のとき表示し、差に応じて半径を縮める。
 - `period` は `start` 以上 `end` 以下の年に表示する（両端を含み、終了年の翌年で消える）。前後の窓による延長はしない。半径は縮めない（期間中は出来事が進行中で、現在年との差が 0 にあたるため）。
-- 本来は `diffusion` だが、R6 までの暫定で `period` として書いているイベント（**R6 で `diffusion` に変更する**）:
+- 本来は `diffusion` だが、手書きのサンプル（`src/data/events.sample.ts`）に暫定で `period` として書いているイベント。R6a は描画の実装だけで、データはまだ入れていない。
+  **R6b で `data/diffusion/` のデータを取り込むと、同じ id の diffusion 版に置き換わる**（そのときにこの項を消す）:
   - `Q821711` ユスティニアヌスのペスト（541〜549年）
   - `Q42005` ヨーロッパの黒死病流行（1347〜1351年）
 - 期間の年は出典の記事で確認してから書く。Wikidata に P580/P582（開始・終了）があれば、それとも照合する。
+
+## diffusion（広がる出来事）
+
+R6a で描画を実装した。規則は `src/lib/timeline.ts`（表示期間とマーカー）、`src/lib/diffusion.ts`（経路の線）、`src/lib/geo.ts`（大圏の補間）にある。
+
+### スキーマ
+
+`kind: "diffusion"` のイベントは次を持つ（`src/types/event.ts`）。
+
+- `start` / `end`: 伝播の最初と最後の年。
+- `places`: 起点の 1 点（他の種別の `places` と同じ形。primary ＝ ラベルの付く点はこれ）。
+- `stages`: 到達点の配列。時系列順で、`year` が同じものが複数あってよい。
+  - `year`: その地点に到達した年。
+  - `place`: `{ lon, lat, label, granularity? }`（`Place` と同じ）。
+  - `from?`: 直前の到達点の添字（`stages` の中の位置）。起点からなら `-1`。省略時は 1 つ前の stage（最初の stage なら起点）。
+    枝分かれする伝播（黒死病がシチリアからジェノヴァとマルセイユに分かれる、など）のためにある。
+  - `note?`: 出典や補足（生成データでは、到達点ごとの出典を `出典: …` の形で入れる）。
+- R5 までのスキーマにあった `path`（`year` 付きの地点列）は、枝分かれを表せないので `stages` に置き換えた（使っているデータは無かった）。
+
+### 地図の描き方
+
+- **表示期間**: `start` ≤ 現在年 ≤ `end` のあいだ 1 倍で表示する。`end` の後も `EVENT_WINDOW_YEARS`（20 年）だけ経路全体を残し、
+  instant と同じ規則（`end` との差）で縮める（`diffusionFade`）。`start` の前には出さない。
+  - 理由: 黒死病は 7 年で終わるので、period と同じ規則（end の翌年に消える）だと、スライダーで通り過ぎやすい。
+  - データのファイル分けは period と同じ（`[start, end]` と重なる区間に入れる）。end の後の 20 年は、アプリが常に現在年 ±20 年以上の区間を読むので、読み込まれている。
+- **起点**: instant と同じ塗りつぶしの円に、外側の輪をもう 1 本足した二重輪（`design.ts` の `DIFFUSION.ringWidth`）。輪の外側にも白い縁取りを付けるので、
+  分類色が接するのは白だけ。ラベル・選択中の輪・ラベル除けは、外側の輪まで含めた半径（`WorldMap.tsx` の `markerOuterRadius`）を使う。
+- **到達点**: `stage.year` ≤ 現在年 のものだけ描く。半径は `MARKER.minRadius` で固定。到達してからの年数で薄くも小さくもしない（色の識別性を守る方針のまま）。
+  現在年に到達した点（`stage.year` ＝ 現在年。マーカーの `role` が `"front"`）だけ、その年は instant と同じ大きさで描く（進行中の先端が分かるように）。
+- **経路**: `from` → stage を大圏の線で結ぶ（`geo.ts` の `greatCircle`。20 分割の球面線形補間。ライブラリは足していない）。到達した stage への線だけ描く。
+  色は分類色、太さは `DIFFUSION.lineWidth`（end の後は fade を掛けて細くする）。矢印は付けない（時系列は、再生と到達点の出現で分かる）。
+  - 線の両側に白い縁（`DIFFUSION.lineCasingWidth` = 1px）を付ける。マーカーの白い縁取りと同じ理由（分類色が陸・海の色に直接接すると、白に対する 3:1 の前提が崩れる）。
+  - 経度 180 度の経線をまたぐ線は、またぐ所で 2 本に分ける（`geo.ts` の `splitAtAntimeridian`。線の geometry は MultiLineString）。地図は世界を 1 枚だけ描くので、
+    分けた線は左右の端で切れる。当初は「対象データに無い」として考えない予定だったが、スペインかぜの下書き（ボストン → オークランド → アピア）が太平洋をまたいだので入れた。
+  - 大圏の線なので、遠い 2 点を結ぶと高緯度を通る（スペインかぜの下書きのブレスト → 日本は、北極海の沿岸を通る）。出典に無い中継地を省いた `from` は、線としても不自然になる。
+  - 線は別の GeoJSON ソース（`diffusion-lines`）。マーカーと同じ名前のプロパティを持たせ、`markerFilter`（分類の非表示・importance とズーム）をそのまま使う。
+- **ラベル**: 起点に出す。period と同じ規則で、importance 3 なら優先ラベル。
+- **クリック**: 起点・到達点のどれをクリックしても、そのイベントを選ぶ（到達点も同じ id のマーカー）。選択中の輪は、起点と到達点のすべてに付く。線はクリックの対象にしない。
+- **ズームの閾値**: `MIN_ZOOM_BY_IMPORTANCE` をそのまま使う（起点・到達点・線とも）。
+- **凡例**: 「一時点の出来事 ● 期間中の出来事 ○」の横に「広がる出来事 ◎」。**詳細パネル**: 期間の下に到達点の一覧（年・地名）。8 件（`DETAIL_PANEL.stagesCollapsedCount`）を超えたら残りを折りたたむ。
+- **年表**: period と同じ start〜end の帯。区別しない（end の後の 20 年は、地図だけの扱い）。
+- 実測（2026-09-21、ヘッドレス Chrome、1440×900、ソフトウェア描画。黒死病の下書き＝起点カッファ 1346 年、到達点 12、end 1353 年を `--with-drafts` で入れた状態）:
+  - 1345 年は何も出ない。1346 年は起点の二重輪だけ。1347 年は到達点 3（すべて front）と線 3。1348 年は到達点 8（うち front 5）と線 8 で、
+    メッシーナ経由でなくカッファからジェノヴァ、ジェノヴァ → マルセイユ → ボルドー／パリの枝分かれが両方描かれる。1353 年（end）は到達点 12・線 12。
+  - 1370 年は全経路が fade 0.575 で残り（線の太さ 1.15px）、1373 年は 0.5、1374 年に消える。
+  - 到達点（ベルゲン）のクリック、起点の外側の輪のクリックのどちらでも詳細パネルが開き、到達点 12 件のうち 8 件と「ほか 4 件を表示」が出る。選択中の輪は、その年に出ている起点と到達点のすべてに付く。
+  - 凡例で「人口・環境」を非表示にすると、起点・到達点・線がすべて消える。年表には start〜end の帯が出る。
+  - 1340 年から 20 年/秒で再生すると、1347 年に線 3、1349 年に 9、1351 年に 10、1353 年に 12 と伸び、1373 年まで残って 1375 年には消えている（100ms ごとの標本）。
+- `placeKind: "origin"` の 11 件（ジャズ、印象派、通貨など）は、R6 では触っていない（stage のデータが無いため、point と同じ表示のまま。将来の候補）。
+
+### データの置き場と作り方
+
+Wikidata には伝播の経路のデータが無いので、diffusion のデータは人が書く。
+
+- `data/diffusion/<slug>.json` に 1 イベント 1 ファイル（コミットする）。形は `scripts/wikidata/diffusion.mjs` の `DiffusionFile`。
+- **座標は書かない。** 起点と各 stage に Wikidata の QID と、表示する地名（`label`）を書く。座標は `place-overrides.json` と同じ経路
+  （`pnpm wikidata:fetch-app-extras` が QID → P625 を引いて `data/raw/app/override-places.json` に保存 → `build-app-data.mjs` が読む）。
+  場所の粒度も同じで、`pnpm wikidata:fetch-places` が取った P31 から決める。QID は API の出力でラベルを照合してから書く。
+- **年と経路は、出典に当たって書く。** 各 stage に `source`（Wikipedia の記事名と節名）と、`from` の根拠（`fromBasis`: 出典に明記 / 推測）を書く。
+  記憶だけで書かない。出典に当たれなかった stage には `needsCheck` に理由を書く。
+- `status` が `"draft"` のファイルは、人が確認する前の下書き。`pnpm wikidata:build-app-data` はデータに入れない
+  （`--with-drafts` を付けると入れる。動作確認用で、その出力はコミットしない）。確認が済んだら `"confirmed"` にする。
+- 人が確認するための表は `pnpm wikidata:diffusion-draft` が `scripts/wikidata/diffusion.draft.md` に作る（QID から取得したラベルと座標を並べて出す）。
+- 生成時に、同じ id の項目（手書きのサンプルの暫定 period や、Wikidata 由来の instant）は diffusion 版で置き換える。
+- 場所の粒度を P31 から決めると困る場所は、その場所に `granularity` と理由（`granularityNote`）を書いて人が決める。都市の項目が過去の国家のクラスも併せ持つと
+  `country` になり、zoom 4 以上で消えるため（ストラスブール Q6602 は P31 に「帝国自由都市」がある）。
+- 表の誤り（年が start〜end の外、時系列順でない、`from` が自分より後ろを指す、座標が取れない、場所が大陸・海洋）は、生成を止める。
 
 ## 年の扱い
 
@@ -74,7 +142,7 @@
 | 取得 | `pnpm wikidata:fetch-places` | 場所の項目（P276 / P189 などの先）の P31。場所の粒度の判定に使う（Wikidata の API、wbgetentities） | `data/raw/app/` |
 | 取得 | `pnpm wikidata:fetch-app-extras` | 母集団の項目の Wikipedia 記事名（出典 URL 用）、場所のラベル、`place-overrides.json` の根拠の項目の座標 | `data/raw/app/` |
 | 分析 | `pnpm wikidata:report` | `analyze.mjs` で開始年・場所・地域・分類・importance を導出し、分布を `scripts/wikidata/REPORT.md` に出す。年か場所が取れなかったリスト項目は `data/raw/lists/missing.json` | `REPORT.md` |
-| 生成 | `pnpm wikidata:build-app-data` | 母集団を `HistEvent` に変換し、手書きのサンプル（`src/data/events.sample.ts`）と統合して、区間ごとの JSON と `manifest.json` に分けて出す | `public/data/events/` |
+| 生成 | `pnpm wikidata:build-app-data` | 母集団を `HistEvent` に変換し、手書きのサンプル（`src/data/events.sample.ts`）と、広がる出来事（`data/diffusion/*.json`。上の「diffusion」）を統合して、区間ごとの JSON と `manifest.json` に分けて出す | `public/data/events/` |
 
 - 生データには導出値を持たせない。開始年・分類・importance などの規則は `analyze.mjs` / `classify.mjs` / `importance.mjs` に集め、レポートと生成が同じ関数を使う。
 - 人が編集する表は `roots.mjs`（取得の入口のクラス）、`p31-domain-map.mjs`（P31 → 7分類）、`title-predicates.mjs`（P31 → タイトルに足す述語）、`place-granularity.mjs`（場所の P31 → 粒度）、`lists.mjs`（Vital articles のページと分類、作品類の P31）、`place-overrides.json`（人が決めた地点・起点）。QID を足すときは、ラベルを API の出力で照合する（記憶で書いた QID は R4a で 55 件中 3 件が別物だった）。
@@ -99,7 +167,7 @@
      - Wikidata の場所が大陸・海洋だけの項目や、残った場所が不適切な項目（第一次世界大戦は P276 が大陸・海洋と「中華人民共和国」だけだった）は、`place-overrides.json` で人が代表的な地点を決める。`places` の先頭が primary（ラベルの付く点）で、Wikidata 由来の places は全部置き換わる。代表点の選び方を `note` に書く（第一次世界大戦は西部戦線のヴェルダン、ナポレオン戦争は起点の国の首都のパリ、など。2026-09-21 に 14 件）。
      - 場所が大陸・海洋だけで `none` のまま残っている項目は、`pnpm wikidata:build-app-data` が `scripts/wikidata/coarse-only.md` に sitelinks 順で出す（次の overrides の候補。2026-09-21 で 44 件）。
    - **作品類**（`lists.mjs` の `WORK_CLASSES`: 映画・テレビ番組・漫画・文学作品・楽曲・定期刊行物など）は、データに含めない。「どこで起きたか」が無いため。座標を持つ作品（建築物や、制作地・出版地が分かるもの）は残す。
-   - **人が地点・起点を決めた項目**は `scripts/wikidata/place-overrides.json` に書き、`point`（特定の地点で起きた）または `origin`（広がる概念の起点。R6 で diffusion に変換する対象）にする。通貨は「導入年に発行を担った機関の所在地」を起点にする。
+   - **人が地点・起点を決めた項目**は `scripts/wikidata/place-overrides.json` に書き、`point`（特定の地点で起きた）または `origin`（広がる概念の起点。将来 diffusion に変換する候補。R6 では触っていない）にする。通貨は「導入年に発行を担った機関の所在地」を起点にする。
      - 座標はこのファイルに書かない。根拠にする Wikidata の項目の QID（と経路: その項目の P625、または P159 本部所在地の先の P625）を書き、座標は取得して反映する。**記憶や推測で座標を書かない。** QID は API の出力でラベルを照合してから書く。
      - 機関が導入年より後に移転している場合は、移転前の所在地を使う。P159 に始点・終点の修飾子があれば、導入年に該当するものを選ぶ（ユーロ → 2014 年までの所在地）。該当する所在地が Wikidata に無ければ、その旨を `note` に書いて、所在していた都市の項目を使う（スイス・フラン → ベルン）。
      - `start` / `end` / `kind` を Wikidata の値から変えるときも、このファイルに理由つきで書く（印象派の start、文化大革命と世界恐慌の period 化、人民幣の start、セルジューク朝の period 化、メキシコ独立革命の start）。
@@ -131,10 +199,12 @@ pnpm wikidata:fetch-places      # 約5分。場所の項目の P31（wbgetentiti
 pnpm wikidata:fetch-app-extras  # 20〜40分（Wikidata 側の混雑による）
 pnpm wikidata:report            # REPORT.md を作り直して、分布に大きな変化が無いか見る
 pnpm wikidata:build-app-data    # public/data/events/ を作り直す。件数とファイルの大きさが出る
+pnpm wikidata:diffusion-draft   # data/diffusion/ を変えたとき。人が確認する表 diffusion.draft.md を作り直す（取得済みの座標を読むだけ）
 node scripts/wikidata/count-markers.mjs 1500 1800 1950   # 世界全体の表示でのマーカー数（500 を超えたら MIN_ZOOM_BY_IMPORTANCE を見直す）
 ```
 
 写像表や規則だけを変えたときは、取得をやり直さずに `report` 以降だけを実行すればよい。
+`data/diffusion/` に場所（QID）を足したときは、`fetch-places` と `fetch-app-extras` を実行する（どちらも取得済みの分は問い合わせないので、足した QID のぶんだけ取りに行く）。
 
 ## デザイン
 
@@ -184,7 +254,7 @@ node scripts/wikidata/count-markers.mjs 1500 1800 1950   # 世界全体の表示
 - マーカーの横にイベント名のラベルを出す（MapLibre の symbol レイヤ、`text-allow-overlap: false`）。閾値は `LABEL_MIN_ZOOM_BY_IMPORTANCE`（3 → 常時、2 → zoom 3 以上、1 → zoom 5 以上）で、マーカーより 1 段遅らせる。重なるラベルは MapLibre が間引き、importance の高いもの、同じなら現在年に近いものを残す（`symbol-sort-key`）。places が複数あるイベントは、最初の1点にだけラベルを出す。ホバーの吹き出しは併用する。
   - スタイルに `glyphs` の URL を置かない。MapLibre 6 は、`glyphs` が無ければ全グリフを端末のフォントで描くので、フォントファイルも外部 CDN も要らない（「運用費ゼロ」の方針のまま）。見た目の値は `design.ts` の `MAP_LABEL`（11px、白いハロー 2px）。
   - MapLibre の衝突判定は symbol どうしでしか働かず、circle レイヤのマーカーは避けてくれない。ラベルが他のマーカーを横切らないように、各マーカーと同じ位置に、マーカーの直径と同じ大きさの透明な文字（`events-label-blocker` レイヤ。`text-opacity: 0`、`text-allow-overlap: true`、`text-ignore-placement: false`）を置いて、マーカーの領域を占有させている。ラベルのレイヤより後ろ（＝上）に置くのは、MapLibre が上のレイヤの symbol から先に配置するため。
-  - **優先ラベル**（R4f）: importance 3 かつ `period` のイベント名は、別の symbol レイヤ（`events-label-priority`）に出し、`events-label-blocker` より後ろ（＝上）に置く。先に配置されるので、マーカーの領域に関係なく出る。通常のラベル（`events-label`）からはこの条件を除いてあり、通常のラベルは優先ラベルも避けて置かれる。見た目と `symbol-sort-key` の式は同じ。優先ラベルどうしが重なれば、MapLibre が間引く。
+  - **優先ラベル**（R4f）: importance 3 かつ `period`（R6a から `diffusion` も）のイベント名は、別の symbol レイヤ（`events-label-priority`）に出し、`events-label-blocker` より後ろ（＝上）に置く。先に配置されるので、マーカーの領域に関係なく出る。通常のラベル（`events-label`）からはこの条件を除いてあり、通常のラベルは優先ラベルも避けて置かれる。見た目と `symbol-sort-key` の式は同じ。優先ラベルどうしが重なれば、MapLibre が間引く。
     - 理由: 世界大戦のような長く続く最重要の出来事は、primary の周りがその戦争の会戦のマーカーで埋まっていて、マーカーを避ける通常のラベルだとどのズームでも出なかった（R4e の時点で、1916 年の第一次世界大戦のラベルは、ヴェルダン中心の zoom 2.5〜6 のどれでも出ず、1967 年の第三次中東戦争も同じだった。2026-09-21、ヘッドレス Chrome での実測）。分けた後は、どちらも世界全体の表示で出る（同日の実測）。
     - 代償として、優先ラベルは他のマーカーの上を横切ることがある（1916 年のヨーロッパ）。
   - 世界全体の表示でのラベル数（2026-09-21、ヘッドレス Chrome での実測。横長 1440×900、zoom 1.3、importance 3 のみ。通常のラベルと優先ラベルの合計）: 1500年 8、1800年 19、1950年 26（マーカーは 13 / 38 / 110。国の代表点のマーカーを含む）。優先ラベルを分ける前（R4e）は 8 / 20 / 24、R4d では 9 / 23 / 28、マーカーを避ける前（R4c）は 11 / 27 / 49（R4d・R4c の値は、この文書の以前の版からの転記）。

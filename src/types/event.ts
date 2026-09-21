@@ -16,7 +16,7 @@ export type Domain =
  * 時間的な広がりの種別。
  * - instant:   一時点の出来事（start のみ）
  * - period:    期間を持つ出来事（start〜end）
- * - diffusion: 時間とともに地理的に広がる出来事（start〜end と path）
+ * - diffusion: 時間とともに地理的に広がる出来事（start〜end、起点の places、到達点の stages）
  */
 export type TemporalKind = "instant" | "period" | "diffusion";
 
@@ -48,16 +48,24 @@ export interface Place {
   readonly granularity?: PlaceGranularity;
 }
 
-export interface PathPoint {
-  readonly lon: number;
-  readonly lat: number;
+/**
+ * diffusion の到達点。時系列順に並べる（year が同じものが複数あってよい）。
+ * 経路は from → この到達点 を結ぶ線で表す。枝分かれする伝播（シチリアからジェノヴァとマルセイユへ、など）のために from を持つ。
+ */
+export interface DiffusionStage {
+  /** その地点に到達した年 */
   readonly year: Year;
+  readonly place: Place;
+  /** 直前の到達点の添字（stages の中の位置）。起点からなら -1。省略時は 1 つ前の stage（最初の stage なら起点） */
+  readonly from?: number;
+  /** 出典や補足 */
+  readonly note?: string;
 }
 
 /**
  * 場所の性質。省略時は "point"。
  * - point:  特定の地点で起きた。通常のマーカー
- * - origin: 広がりを持つ概念の起点。通常のマーカーだが、R6 で diffusion に変換する対象
+ * - origin: 広がりを持つ概念の起点。通常のマーカー。将来 diffusion に変換する候補（到達点のデータが無いので、R6 では point と同じ表示のまま）
  * - none:   場所の概念が無い（または、まだ地点を決められていない）。places は空で、地図には出ない。R5 で年表に出す
  */
 export type PlaceKind = "point" | "origin" | "none";
@@ -75,12 +83,12 @@ export interface HistEvent {
   readonly start: Year;
   /** period / diffusion 用 */
   readonly end?: Year;
-  /** 同時発見等で複数可。placeKind が "none" の項目では空 */
+  /** 同時発見等で複数可。placeKind が "none" の項目では空。diffusion では起点の 1 点 */
   readonly places: readonly Place[];
   /** 省略時は "point" */
   readonly placeKind?: PlaceKind;
-  /** diffusion 用 */
-  readonly path?: readonly PathPoint[];
+  /** diffusion 用。到達点（時系列順） */
+  readonly stages?: readonly DiffusionStage[];
   /** 3 が最重要 */
   readonly importance: 1 | 2 | 3;
   /** 出典 URL */

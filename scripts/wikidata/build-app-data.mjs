@@ -2,6 +2,8 @@
 //
 //   pnpm wikidata:build-app-data
 //
+//   pnpm wikidata:build-app-data --with-drafts   … data/diffusion/ の下書き（status: "draft"）も入れる。動作確認用で、出力はコミットしない
+//
 // ネットワークには出ない（要るものは fetch.mjs / fetch-lists.mjs / fetch-app-extras.mjs が data/raw/ に保存済み）。
 // 出力した JSON はコミットする（取得に1時間かかるので、CI では生成しない）。
 //
@@ -19,6 +21,7 @@ import {
   PLACE_CLASS_LABELS_PATH,
   PLACE_LABELS_PATH,
 } from "./config.mjs";
+import { loadDiffusionFiles, toDiffusionEvent } from "./diffusion.mjs";
 import { COUNTRY_LEVEL_PLACE_PROPS } from "./lists.mjs";
 import { loadAnalysis, readJsonOr } from "./load-analysis.mjs";
 import { loadSampleEvents } from "./load-ts.mjs";
@@ -236,12 +239,27 @@ if (unusedOverrides.length > 0) {
   console.warn(`place-overrides にあるがデータに入らなかった項目: ${unusedOverrides.map((o) => `${o.qid} ${o.title}`).join("、")}`);
 }
 
-// 手書きのサンプルとの統合: QID が同じ項目は手書きを優先し（座標と説明が正確）、手書きにしか無い項目（slug の id）はそのまま足す
+// 広がる出来事（data/diffusion/*.json。人が書いた起点と到達点）。人が確認する前の下書き（status: "draft"）は、--with-drafts を付けたときだけ入れる
+const withDrafts = process.argv.includes("--with-drafts");
+const diffusionFiles = await loadDiffusionFiles();
+const skippedDrafts = diffusionFiles.filter(({ data }) => data.status !== "confirmed" && !withDrafts);
+const diffusion = diffusionFiles
+  .filter(({ data }) => data.status === "confirmed" || withDrafts)
+  .map(({ data }) => toDiffusionEvent(data, resolved, (qid) => granularityOf(placeClasses[qid]?.p31 ?? [])));
+if (skippedDrafts.length > 0) console.warn(`data/diffusion の下書き（status が "confirmed" でない）は入れない: ${skippedDrafts.map((f) => f.file).join("、")}`);
+if (withDrafts) console.warn("--with-drafts: data/diffusion の下書きも入れている。この出力はコミットしない");
+const diffusionIds = new Set(diffusion.map((e) => e.id));
+
+// 手書きのサンプルとの統合: QID が同じ項目は手書きを優先し（座標と説明が正確）、手書きにしか無い項目（slug の id）はそのまま足す。
+// diffusion は、同じ id の項目（手書きのサンプルの暫定 period や、Wikidata 由来の instant）を置き換える
 const sampleIds = new Set(sample.map((e) => e.id));
 const duplicates = generated.filter((e) => sampleIds.has(/** @type {string} */ (e.id)));
-const events = [...sample, ...generated.filter((e) => !sampleIds.has(/** @type {string} */ (e.id)))].sort(
-  (a, b) => a.start - b.start || b.importance - a.importance || String(a.id).localeCompare(String(b.id)),
-);
+const replacedByDiffusion = [...sample, ...generated].filter((e) => diffusionIds.has(/** @type {string} */ (e.id)));
+const events = [
+  ...diffusion,
+  ...sample.filter((e) => !diffusionIds.has(e.id)),
+  ...generated.filter((e) => !sampleIds.has(/** @type {string} */ (e.id)) && !diffusionIds.has(/** @type {string} */ (e.id))),
+].sort((a, b) => a.start - b.start || b.importance - a.importance || String(a.id).localeCompare(String(b.id)));
 
 // 場所の粒度（R4e）の影響。R4d までの規則（場所はすべて使う。none は P495 / P17 だけの項目）と比べる。
 // 人が場所を決めた項目（place-overrides）は、粒度に関係なくその場所を使うので数えない。
@@ -298,6 +316,7 @@ const manifest = {
     },
     handwritten: { file: "src/data/events.sample.ts", count: sample.length },
     placeOverrides: { file: "scripts/wikidata/place-overrides.json", applied: placeOverrides.overrides.length - unusedOverrides.length },
+    diffusion: { dir: "data/diffusion", count: diffusion.length, ...(withDrafts ? { withDrafts: true } : {}) },
   },
   // period は重なる区間すべてに入るので、files の count の合計は total より大きい
   total: events.length,
@@ -321,6 +340,9 @@ console.log(
 );
 console.log(`母集団 ${population.length} 件 → ラベルなしで除外 ${noLabel} 件 → Wikidata 由来 ${generated.length} 件`);
 console.log(`手書きサンプル ${sample.length} 件（うち Wikidata 由来と QID が重複 ${duplicates.length} 件、手書きを優先）→ 合計 ${events.length} 件`);
+console.log(
+  `広がる出来事（data/diffusion）${diffusion.length} 件（同じ id の項目を置き換え: ${replacedByDiffusion.map((e) => `${e.id} ${e.title.ja}[${e.kind}]`).join("、") || "なし"}）`,
+);
 console.log("分類別:", JSON.stringify(manifest.byDomain));
 console.log("importance 別:", JSON.stringify(manifest.byImportance), " placeKind 別:", JSON.stringify(manifest.byPlaceKind));
 const placeName = (/** @type {import("./analyze.mjs").GradedPlace} */ p) =>

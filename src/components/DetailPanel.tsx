@@ -1,11 +1,12 @@
 "use client";
 
-import { FONT_WEIGHT, GRAY, SPACE, surfaceStyle, swatchStyle, textStyle } from "@/lib/design";
+import { useState } from "react";
+import { DETAIL_PANEL, FONT_WEIGHT, GRAY, SPACE, surfaceStyle, swatchStyle, textStyle } from "@/lib/design";
 import { DOMAIN_LABELS } from "@/lib/domain";
 import { neverOnMap } from "@/lib/mapFilters";
 import type { Selection } from "@/lib/appState";
 import { formatYear, formatYearRange } from "@/lib/year";
-import type { HistEvent } from "@/types/event";
+import type { DiffusionStage, HistEvent } from "@/types/event";
 
 interface DetailPanelProps {
   readonly selection: Selection;
@@ -60,6 +61,42 @@ const DomainLabel = ({ event }: { readonly event: HistEvent }) => (
   </p>
 );
 
+/**
+ * diffusion の到達点の一覧（年・地名。時系列順）。DETAIL_PANEL.stagesCollapsedCount 件を超えたら、残りは折りたたむ。
+ * 開閉の状態は、イベントが変わったら戻す（呼び出し側で key にイベントの id を渡す）。
+ */
+const StageList = ({ stages }: { readonly stages: readonly DiffusionStage[] }) => {
+  const [expanded, setExpanded] = useState(false);
+  const limit = DETAIL_PANEL.stagesCollapsedCount;
+  const shown = expanded ? stages : stages.slice(0, limit);
+  return (
+    <section className="flex flex-col" style={{ gap: SPACE[4] }}>
+      <h3 style={textStyle.caption}>到達点（{stages.length}件）</h3>
+      <ol className="flex flex-col" style={{ gap: SPACE[4] }}>
+        {shown.map((stage, index) => (
+          <li key={index} className="flex" style={{ gap: SPACE[8], ...textStyle.body }}>
+            <span className="shrink-0" style={{ fontVariantNumeric: "tabular-nums" }}>
+              {formatYear(stage.year)}
+            </span>
+            <span>{stage.place.label ?? "（地名なし）"}</span>
+          </li>
+        ))}
+      </ol>
+      {stages.length > limit && (
+        <button
+          type="button"
+          className="text-left"
+          style={{ ...textStyle.caption, ...linkStyle }}
+          aria-expanded={expanded}
+          onClick={() => setExpanded((v) => !v)}
+        >
+          {expanded ? "折りたたむ" : `ほか ${stages.length - limit} 件を表示`}
+        </button>
+      )}
+    </section>
+  );
+};
+
 const EventDetail = ({ event }: { readonly event: HistEvent }) => {
   const source = event.source ? sourceInfo(event.source) : null;
   return (
@@ -69,6 +106,9 @@ const EventDetail = ({ event }: { readonly event: HistEvent }) => {
       <p style={{ ...textStyle.body, fontVariantNumeric: "tabular-nums" }}>{eventYears(event)}</p>
       {/* 年表から選べるが、地図には出ない項目（場所が無い、または国の代表点だけで拡大前に消える） */}
       {neverOnMap(event) && <p style={textStyle.caption}>地図上の位置は不明</p>}
+      {event.kind === "diffusion" && event.stages && event.stages.length > 0 && (
+        <StageList key={event.id} stages={event.stages} />
+      )}
       {event.description && <p style={textStyle.body}>{event.description.ja}</p>}
       {source && event.source && (
         <p style={textStyle.caption}>
