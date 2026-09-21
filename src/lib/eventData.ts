@@ -35,6 +35,16 @@ export const filesForYear = (
 ): readonly EventFile[] => files.filter((f) => f.from <= year + margin && f.to > year - margin);
 
 /**
+ * 再生中に先読みするファイル。窓の先 [year, year + margin + ahead] と重なる区間（表示に要るファイルと重なってよい）。
+ */
+export const filesAhead = (
+  files: readonly EventFile[],
+  year: Year,
+  margin: number,
+  ahead: number,
+): readonly EventFile[] => files.filter((f) => f.from <= year + margin + ahead && f.to > year);
+
+/**
  * 複数のファイルのイベントを1つにまとめ、id の重複を除く。
  * period は重なる区間すべてのファイルに同じ内容で入っているので、どれを残しても同じ。
  */

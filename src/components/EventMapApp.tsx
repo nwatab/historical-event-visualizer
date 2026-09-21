@@ -6,12 +6,14 @@ import { SCREEN_INSET, SLIDER_PANEL_MAX_WIDTH, SPACE } from "@/lib/design";
 import {
   EVENT_WINDOW_YEARS,
   INITIAL_YEAR,
+  PLAYBACK_PREFETCH_SECONDS,
   TIMELINE_HALF_SPAN,
   YEAR_MAX,
   YEAR_MIN,
   eventMarkers,
 } from "@/lib/timeline";
 import { useEvents } from "@/lib/useEvents";
+import { usePlayback } from "@/lib/usePlayback";
 import type { Domain } from "@/types/event";
 import { DetailPanel } from "./DetailPanel";
 import { Legend } from "./Legend";
@@ -19,23 +21,42 @@ import { Timeline } from "./Timeline";
 import { WorldMapClient } from "./WorldMapClient";
 import { YearSlider } from "./YearSlider";
 
-const reducer = appReducer({ min: YEAR_MIN, max: YEAR_MAX, halfSpan: TIMELINE_HALF_SPAN });
+const reducer = appReducer({
+  min: YEAR_MIN,
+  max: YEAR_MAX,
+  halfSpan: TIMELINE_HALF_SPAN,
+});
 
 const isTextInput = (target: EventTarget | null): boolean =>
   target instanceof HTMLElement &&
   (target.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName));
 
 /**
+ * スペースキーを、フォーカス中の要素に任せるべきか。ボタンは Space で押されるので任せる（凡例の切り替えなど）。
+ * 年スライダー（input[type=range]）は Space を使わないので、フォーカスがあっても再生／停止に使う。
+ */
+const ownsSpaceKey = (target: EventTarget | null): boolean =>
+  target instanceof HTMLElement &&
+  (target.tagName === "BUTTON" ||
+    target.tagName === "A" ||
+    (isTextInput(target) && !(target instanceof HTMLInputElement && target.type === "range")));
+
+/** キー入力の意味。年の移動と詳細パネルは状態遷移（AppAction）、再生／停止は再生のフックに渡す。 */
+type KeyCommand = { readonly action: AppAction } | { readonly togglePlayback: true };
+
+/**
  * キー入力を状態遷移に変換する。
  * - Esc: 詳細パネルが開いていれば閉じる（年は動かさない）
  * - ← / →: 年を1年（Shift 併用で10年）動かす。入力要素にフォーカスがあるときはそちらに任せる
+ * - Space: 再生／停止
  */
-const actionFromKey = (event: KeyboardEvent, state: AppState): AppAction | null => {
-  if (event.key === "Escape") return state.selection === null ? null : { type: "closeSelection" };
+const commandFromKey = (event: KeyboardEvent, state: AppState): KeyCommand | null => {
+  if (event.key === "Escape") return state.selection === null ? null : { action: { type: "closeSelection" } };
+  if (event.key === " ") return ownsSpaceKey(event.target) ? null : { togglePlayback: true };
   if (isTextInput(event.target)) return null;
   const unit = event.shiftKey ? 10 : 1;
-  if (event.key === "ArrowLeft") return { type: "stepYear", delta: -unit };
-  if (event.key === "ArrowRight") return { type: "stepYear", delta: unit };
+  if (event.key === "ArrowLeft") return { action: { type: "stepYear", delta: -unit } };
+  if (event.key === "ArrowRight") return { action: { type: "stepYear", delta: unit } };
   return null;
 };
 
@@ -46,8 +67,16 @@ export function EventMapApp() {
     initialAppState,
   );
   const [hoveredDomain, setHoveredDomain] = useState<Domain | null>(null);
-  // イベントは public/data/events/ から、現在年の前後（地図の窓と年表の窓の広いほう）の区間だけを読む。読み込み中は直前のものが返る
-  const { events, eventsById } = useEvents(state.year, Math.max(EVENT_WINDOW_YEARS, state.timelineHalfSpan));
+  // 再生。年を進めるのは年スライダーと同じ setYear
+  const onPlaybackYear = useCallback((year: number) => dispatch({ type: "setYear", year }), []);
+  const playback = usePlayback(state.year, YEAR_MAX, onPlaybackYear);
+  // イベントは public/data/events/ から、現在年の前後（地図の窓と年表の窓の広いほう）の区間だけを読む。読み込み中は直前のものが返る。
+  // 再生中は、窓の先の区間も先読みする
+  const { events, eventsById } = useEvents(
+    state.year,
+    Math.max(EVENT_WINDOW_YEARS, state.timelineHalfSpan),
+    playback.playing ? playback.speed * PLAYBACK_PREFETCH_SECONDS : 0,
+  );
   const markers = useMemo(() => eventMarkers(events, state.year), [events, state.year]);
 
   // キーハンドラは一度だけ登録し、最新の状態は ref から読む
@@ -56,25 +85,36 @@ export function EventMapApp() {
     stateRef.current = state;
   }, [state]);
 
+  const { toggle: togglePlayback, stop: stopPlayback } = playback;
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
-      const action = actionFromKey(event, stateRef.current);
-      if (action === null) return;
+      const command = commandFromKey(event, stateRef.current);
+      if (command === null) return;
       event.preventDefault();
-      dispatch(action);
+      if ("togglePlayback" in command) {
+        togglePlayback();
+        return;
+      }
+      // 人が年を動かしたら、再生を止める
+      if (command.action.type === "stepYear") stopPlayback();
+      dispatch(command.action);
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, []);
+  }, [togglePlayback, stopPlayback]);
 
-  const onSelectEvents = useCallback(
-    (eventIds: readonly string[]) => dispatch({ type: "selectEvents", eventIds }),
-    [],
-  );
+  const onSelectEvents = useCallback((eventIds: readonly string[]) => dispatch({ type: "selectEvents", eventIds }), []);
   // 地図の何もない所をクリックしたら詳細パネルを閉じる。凡例やスライダーは地図の上に重なった別の要素なので、
   // そこでのクリックは地図に届かず、パネルは閉じない
   const onClickEmpty = useCallback(() => dispatch({ type: "closeSelection" }), []);
-  const onSetYear = useCallback((year: number) => dispatch({ type: "setYear", year }), []);
+  // 年スライダーの操作と年表のドラッグ。人が年を動かしたら、再生を止める
+  const onSetYear = useCallback(
+    (year: number) => {
+      stopPlayback();
+      dispatch({ type: "setYear", year });
+    },
+    [stopPlayback],
+  );
   const onSetHalfSpan = useCallback((halfSpan: number) => dispatch({ type: "setTimelineHalfSpan", halfSpan }), []);
 
   const selectedIds = useMemo(
@@ -107,7 +147,7 @@ export function EventMapApp() {
         style={{ padding: SCREEN_INSET, gap: SCREEN_INSET }}
       >
         <div
-          className="flex min-h-0 flex-1 flex-col items-start sm:flex-row sm:justify-between"
+          className="flex min-h-0 flex-1 flex-col items-start wide:flex-row wide:justify-between"
           style={{ gap: SCREEN_INSET }}
         >
           <div className="pointer-events-auto shrink-0">
@@ -120,7 +160,7 @@ export function EventMapApp() {
             />
           </div>
           {state.selection !== null && (
-            <div className="pointer-events-auto flex min-h-0 w-full max-h-[var(--hv-sheet-max-height)] sm:max-h-full sm:w-[var(--hv-panel-width)]">
+            <div className="pointer-events-auto flex min-h-0 w-full max-h-[var(--hv-sheet-max-height)] wide:max-h-full wide:w-[var(--hv-panel-width)]">
               <DetailPanel
                 selection={state.selection}
                 eventsById={eventsById}
@@ -144,17 +184,16 @@ export function EventMapApp() {
             hiddenDomains={state.hiddenDomains}
             highlightedDomain={hoveredDomain}
             selectedIds={selectedIds}
+            playing={playback.playing}
+            speed={playback.speed}
+            onTogglePlayback={playback.toggle}
+            onCycleSpeed={playback.cycleSpeed}
             onSetYear={onSetYear}
             onSetHalfSpan={onSetHalfSpan}
             onSelectEvents={onSelectEvents}
             onClickEmpty={onClickEmpty}
           />
-          <YearSlider
-            year={state.year}
-            min={YEAR_MIN}
-            max={YEAR_MAX}
-            onChange={onSetYear}
-          />
+          <YearSlider year={state.year} min={YEAR_MIN} max={YEAR_MAX} onChange={onSetYear} />
         </div>
       </div>
     </div>

@@ -281,7 +281,11 @@ export const timelineLabels = (
 /** 目盛りの間隔の候補（年）。 */
 export const TIMELINE_AXIS_STEPS: readonly number[] = [10, 50, 100, 500];
 
-/** 隣り合うラベルの間隔が minSpacing (px) 以上になる、最小の間隔。どれも詰まるなら最大のもの。 */
+/**
+ * 隣り合うラベルの間隔が minSpacing (px) 以上になる、最小の間隔。どれも詰まるなら最大のもの。
+ * ただし、その間隔だと窓の中に目盛りが1本も入らないとき（狭い画面で窓が 500 年に満たないとき）は、
+ * 目盛りが入るところまで間隔を細かくする（ラベルが多少詰まっても、年が1つも読めないよりよい）。
+ */
 export const timelineAxisStep = (
   window: TimelineWindow,
   width: number,
@@ -289,7 +293,12 @@ export const timelineAxisStep = (
   steps: readonly number[] = TIMELINE_AXIS_STEPS,
 ): number => {
   const pxPerYear = width / windowYears(window);
-  return steps.find((step) => step * pxPerYear >= minSpacing) ?? steps[steps.length - 1];
+  const preferred = steps.find((step) => step * pxPerYear >= minSpacing) ?? steps[steps.length - 1];
+  const usable = [...steps]
+    .filter((step) => step <= preferred)
+    .sort((a, b) => b - a)
+    .find((step) => timelineAxisTicks(window, step).length > 0);
+  return usable ?? preferred;
 };
 
 /**

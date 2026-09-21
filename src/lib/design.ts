@@ -263,6 +263,14 @@ export const TIMELINE = {
   tooltipMaxItems: 8,
 } as const;
 
+/** 再生ボタン（年表の左）。アイコンは絵文字ではなく SVG で描く。 */
+export const PLAYBACK = {
+  buttonSize: SPACE[32],
+  iconSize: SPACE[12],
+  buttonColor: GRAY.line,
+  iconColor: GRAY.strong,
+} as const;
+
 /** 年表示の最小幅（「紀元前3001年」が収まり、桁数の変化で揺れない幅） */
 export const YEAR_LABEL_MIN_WIDTH = 144;
 
