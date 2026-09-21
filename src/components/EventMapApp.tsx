@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
+import { bordersAvailable } from "@/lib/borderData";
 import { appReducer, initialAppState, type AppAction, type AppState } from "@/lib/appState";
 import { SCREEN_INSET, SLIDER_PANEL_MAX_WIDTH, SPACE } from "@/lib/design";
 import { diffusionLines } from "@/lib/diffusion";
@@ -16,6 +17,7 @@ import {
   eventMarkers,
   promotedThresholds,
 } from "@/lib/timeline";
+import { useBorders } from "@/lib/useBorders";
 import { useEvents } from "@/lib/useEvents";
 import { usePlayback } from "@/lib/usePlayback";
 import type { Domain } from "@/types/event";
@@ -81,6 +83,8 @@ export function EventMapApp() {
     Math.max(EVENT_WINDOW_YEARS, state.timelineHalfSpan),
     playback.playing ? playback.speed * PLAYBACK_PREFETCH_SECONDS : 0,
   );
+  // 国境（1500 年以降）。現在年の世紀のファイルだけを読み、再生中は先の世紀も先読みする。非表示のときは読まない
+  const borders = useBorders(state.year, state.bordersVisible, playback.playing ? playback.speed * PLAYBACK_PREFETCH_SECONDS : 0);
   const markers = useMemo(() => eventMarkers(events, state.year), [events, state.year]);
   const lines = useMemo(() => diffusionLines(events, state.year), [events, state.year]);
   // 密度による調整: 現在年のマーカーが少ない年は、importance 2（さらに 1）を 3 と同じ扱いにする。GeoJSON は作り直さず、filter 式の閾値だけを変える
@@ -141,6 +145,8 @@ export function EventMapApp() {
       <WorldMapClient
         markers={markers}
         lines={lines}
+        borders={borders}
+        year={state.year}
         highlightedDomain={hoveredDomain}
         hiddenDomains={state.hiddenDomains}
         densityLevel={density}
@@ -168,6 +174,9 @@ export function EventMapApp() {
               onHover={setHoveredDomain}
               onToggle={(domain) => dispatch({ type: "toggleDomain", domain })}
               onShowAll={() => dispatch({ type: "showAllDomains" })}
+              bordersVisible={state.bordersVisible}
+              bordersAvailable={bordersAvailable(state.year)}
+              onToggleBorders={() => dispatch({ type: "toggleBorders" })}
             />
           </div>
           {state.selection !== null && (

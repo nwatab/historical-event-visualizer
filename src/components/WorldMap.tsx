@@ -16,6 +16,7 @@ import {
 import "maplibre-gl/dist/maplibre-gl.css";
 import { publicPath } from "@/lib/config";
 import {
+  BORDER_HIT_TOLERANCE,
   DIFFUSION,
   DOMAIN_COLORS,
   GRAY,
@@ -29,7 +30,8 @@ import {
 } from "@/lib/design";
 import { DOMAINS } from "@/lib/domain";
 import { markerFilter } from "@/lib/mapFilters";
-import { popupContent, type PopupItem } from "@/lib/popupContent";
+import { borderPopupContent, popupContent, type PopupItem } from "@/lib/popupContent";
+import { borderNames, type BorderCollection, type BorderProperties } from "@/lib/borderData";
 import type { DiffusionLineCollection } from "@/lib/diffusion";
 import {
   LABEL_MIN_ZOOM_BY_IMPORTANCE,
@@ -39,10 +41,12 @@ import {
   type EventMarkerCollection,
   type MarkerKind,
 } from "@/lib/timeline";
-import type { Domain } from "@/types/event";
+import type { Domain, Year } from "@/types/event";
 
 const EVENTS_SOURCE_ID = "events";
 const LINES_SOURCE_ID = "diffusion-lines";
+const BORDERS_SOURCE_ID = "borders";
+const BORDERS_LAYER_ID = "borders-line";
 const EVENTS_LAYER_ID = "events-circle";
 const LINE_CASING_LAYER_ID = "diffusion-line-casing";
 const LINE_LAYER_ID = "diffusion-line";
@@ -216,6 +220,16 @@ const labelLayer = (id: string, priority: boolean): LayerSpecification => ({
   },
 });
 
+/**
+ * その年に存在する国境の線だけを描く filter（start ≤ 現在年 < end。end が無ければ、いまも続いている）。
+ * 年ごとの切り替えはこの filter だけで行い、GeoJSON（1 世紀ぶん）は世紀が替わるときだけ差し替える。
+ */
+const borderFilter = (year: Year): ExpressionSpecification => [
+  "all",
+  ["<=", ["get", "start"], year],
+  ["any", ["!", ["has", "end"]], [">", ["get", "end"], year]],
+];
+
 /** diffusion の経路の太さ。end の後は fade を掛けて細くする。 */
 const lineWidth: ExpressionSpecification = ["*", DIFFUSION.lineWidth, ["get", "fade"]];
 
@@ -223,12 +237,15 @@ const createStyle = (
   landUrl: string,
   markers: EventMarkerCollection,
   lines: DiffusionLineCollection,
+  borders: BorderCollection,
+  year: Year,
 ): StyleSpecification => ({
   version: 8,
   sources: {
     land: { type: "geojson", data: landUrl },
     [EVENTS_SOURCE_ID]: { type: "geojson", data: markers },
     [LINES_SOURCE_ID]: { type: "geojson", data: lines },
+    [BORDERS_SOURCE_ID]: { type: "geojson", data: borders },
   },
   layers: [
     {
@@ -247,6 +264,15 @@ const createStyle = (
       type: "line",
       source: "land",
       paint: { "line-color": MAP_LINE.coastlineColor, "line-width": MAP_LINE.coastlineWidth },
+    },
+    // 国境（1500 年以降）: 陸地と海岸線の上、経路の線とマーカーの下。海岸線と同じグレーで、少しだけ太い
+    {
+      id: BORDERS_LAYER_ID,
+      type: "line",
+      source: BORDERS_SOURCE_ID,
+      filter: borderFilter(year),
+      layout: { "line-cap": "round", "line-join": "round" },
+      paint: { "line-color": MAP_LINE.borderColor, "line-width": MAP_LINE.borderWidth },
     },
     // diffusion の経路: 白い縁の上に分類色の線。どのマーカーよりも下に描く。
     {
@@ -415,6 +441,9 @@ interface WorldMapProps {
   readonly markers: EventMarkerCollection;
   /** diffusion の経路（現在年までに到達した stage への線） */
   readonly lines: DiffusionLineCollection;
+  /** 現在年の世紀の国境の線（非表示のとき、1500 年より前は空）。年ごとの切り替えは filter で行う */
+  readonly borders: BorderCollection;
+  readonly year: Year;
   readonly highlightedDomain: Domain | null;
   readonly hiddenDomains: readonly Domain[];
   /** 密度による importance の繰り上げの段階（現在年のマーカー数から決まる。timeline.ts の densityLevel） */
@@ -433,11 +462,14 @@ interface MapViewState {
   readonly hiddenDomains: readonly Domain[];
   readonly densityLevel: DensityLevel;
   readonly selectedIds: readonly string[];
+  readonly year: Year;
 }
 
 export function WorldMap({
   markers,
   lines,
+  borders,
+  year,
   highlightedDomain,
   hiddenDomains,
   densityLevel,
@@ -449,7 +481,8 @@ export function WorldMap({
   const mapRef = useRef<MapLibreMap | null>(null);
   const markersRef = useRef(markers);
   const linesRef = useRef(lines);
-  const viewRef = useRef<MapViewState>({ highlightedDomain, hiddenDomains, densityLevel, selectedIds });
+  const bordersRef = useRef(borders);
+  const viewRef = useRef<MapViewState>({ highlightedDomain, hiddenDomains, densityLevel, selectedIds, year });
   const onSelectRef = useRef(onSelectEvents);
   const onClickEmptyRef = useRef(onClickEmpty);
   const hoverPopupRef = useRef<Popup | null>(null);
@@ -462,7 +495,13 @@ export function WorldMap({
     setWorkerUrl(publicPath("/maplibre/maplibre-gl-worker.mjs"));
     const map = new MapLibreMap({
       container,
-      style: createStyle(publicPath("/geo/ne_110m_land.geojson"), markersRef.current, linesRef.current),
+      style: createStyle(
+        publicPath("/geo/ne_110m_land.geojson"),
+        markersRef.current,
+        linesRef.current,
+        bordersRef.current,
+        viewRef.current.year,
+      ),
       center: [0, 20],
       zoom: 0,
       renderWorldCopies: false,
@@ -488,6 +527,7 @@ export function WorldMap({
     map.on("load", () => {
       map.getSource<GeoJSONSource>(EVENTS_SOURCE_ID)?.setData(markersRef.current);
       map.getSource<GeoJSONSource>(LINES_SOURCE_ID)?.setData(linesRef.current);
+      map.getSource<GeoJSONSource>(BORDERS_SOURCE_ID)?.setData(bordersRef.current);
       applyViewState(map, viewRef.current);
     });
 
@@ -503,6 +543,27 @@ export function WorldMap({
     map.on("mouseleave", INTERACTIVE_LAYER_IDS, () => {
       map.getCanvas().style.cursor = "";
       hoverPopup.remove();
+    });
+    // 国境の上では、その線を国境に持つ国の名前を吹き出しに出す（クリックは何もしない）。線が細いので、カーソルの周りを少し広く探す。
+    // マーカーの上ではマーカーの吹き出しを優先する（上のハンドラが出す）
+    let borderPopupShown = false;
+    map.on("mousemove", (e) => {
+      const t = BORDER_HIT_TOLERANCE;
+      const box: [[number, number], [number, number]] = [
+        [e.point.x - t, e.point.y - t],
+        [e.point.x + t, e.point.y + t],
+      ];
+      const onMarker = map.queryRenderedFeatures(e.point, { layers: INTERACTIVE_LAYER_IDS }).length > 0;
+      const names = onMarker
+        ? []
+        : borderNames(map.queryRenderedFeatures(box, { layers: [BORDERS_LAYER_ID] }).map((f) => f.properties as BorderProperties));
+      if (names.length > 0) {
+        hoverPopup.setLngLat(e.lngLat).setDOMContent(borderPopupContent(names)).addTo(map);
+        borderPopupShown = true;
+      } else if (borderPopupShown) {
+        if (!onMarker) hoverPopup.remove();
+        borderPopupShown = false;
+      }
     });
     // クリック（タップ）で詳細パネルを開く。小さいマーカーも選べるよう、判定に余裕を持たせる。
     // 何もない所のクリックは親に知らせる（詳細パネルを閉じる）。ドラッグでの移動は click にならない。
@@ -539,6 +600,11 @@ export function WorldMap({
   }, [markers]);
 
   useEffect(() => {
+    bordersRef.current = borders;
+    mapRef.current?.getSource<GeoJSONSource>(BORDERS_SOURCE_ID)?.setData(borders);
+  }, [borders]);
+
+  useEffect(() => {
     linesRef.current = lines;
     mapRef.current?.getSource<GeoJSONSource>(LINES_SOURCE_ID)?.setData(lines);
   }, [lines]);
@@ -549,11 +615,11 @@ export function WorldMap({
   }, [onSelectEvents, onClickEmpty]);
 
   useEffect(() => {
-    const view = { highlightedDomain, hiddenDomains, densityLevel, selectedIds };
+    const view = { highlightedDomain, hiddenDomains, densityLevel, selectedIds, year };
     viewRef.current = view;
     const map = mapRef.current;
     if (map?.getLayer(EVENTS_LAYER_ID)) applyViewState(map, view);
-  }, [highlightedDomain, hiddenDomains, densityLevel, selectedIds]);
+  }, [highlightedDomain, hiddenDomains, densityLevel, selectedIds, year]);
 
   // 縦長画面では世界の外側（上下）も見えるため、コンテナ自体も海の色で塗る。
   return (
@@ -566,6 +632,7 @@ export function WorldMap({
 }
 
 const applyViewState = (map: MapLibreMap, view: MapViewState): void => {
+  map.setFilter(BORDERS_LAYER_ID, borderFilter(view.year));
   const opacity = markerOpacity(view.highlightedDomain);
   MARKER_LAYERS.forEach(({ id, only }) => {
     map.setPaintProperty(id, "circle-opacity", opacity);

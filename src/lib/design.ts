@@ -145,11 +145,20 @@ export const MAP_LABEL = {
 /** マーカーのクリック判定の余裕 (px)。タッチでも小さいマーカーを選べるように。 */
 export const MARKER_HIT_TOLERANCE = SPACE[4];
 
-/** 地図の線 */
+/**
+ * 地図の線。
+ * 国境（1500 年以降。OpenHistoricalMap）は、海岸線と同じ GRAY.weak で、少しだけ太くする（0.75px）。海岸線より少し目立つ程度で、マーカーや経路の線より前に出ない。
+ * グレースケールのうち GRAY.line（#d9d9d9）は、陸の色（#e8e0c8）との差がほとんど無く、線が見えないので使わない。
+ */
 export const MAP_LINE = {
   coastlineColor: GRAY.weak,
   coastlineWidth: 0.5,
+  borderColor: GRAY.weak,
+  borderWidth: 0.75,
 } as const;
+
+/** 国境のホバーの判定の余裕 (px)。線が細いので、カーソルの周りをこの幅で探す */
+export const BORDER_HIT_TOLERANCE = SPACE[4];
 
 // ── 共有スタイル ───────────────────────────────────────────
 
@@ -207,6 +216,14 @@ export const kindSwatchDotStyle: CSSProperties = {
   borderRadius: RADIUS.small,
   backgroundColor: GRAY.weak,
 };
+
+/** 国境の見本（凡例用）。地図の国境と同じ色の横線。非表示・無効のときは GRAY.line。幅は色見本と同じ 8px、太さは見えるように 2px */
+export const borderSwatchStyle = (active: boolean): CSSProperties => ({
+  width: SPACE[8],
+  height: 0,
+  borderTop: `2px solid ${active ? MAP_LINE.borderColor : GRAY.line}`,
+  flexShrink: 0,
+});
 
 /** 分類の色見本（マーカーと同じ円）。直径 8px・角丸 4px。 */
 export const swatchStyle = (domain: Domain): CSSProperties => ({
