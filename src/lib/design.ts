@@ -269,6 +269,8 @@ export const PLAYBACK = {
   iconSize: SPACE[12],
   buttonColor: GRAY.line,
   iconColor: GRAY.strong,
+  /** 押せないとき（現在年が最後の年）の不透明度。色は足さず、薄くして示す */
+  disabledOpacity: 0.3,
 } as const;
 
 /** 年表示の最小幅（「紀元前3001年」が収まり、桁数の変化で揺れない幅） */

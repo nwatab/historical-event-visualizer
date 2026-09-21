@@ -174,7 +174,9 @@ export const nextPlaybackSpeed = (speed: PlaybackSpeed): PlaybackSpeed =>
  * （描画が重くてフレームが落ちても、速度が変わらないように）。
  */
 export const playbackYear = (startYear: Year, elapsedMs: number, speed: number): Year =>
-  startYear + Math.floor((elapsedMs / 1000) * speed);
+  // requestAnimationFrame の時刻はフレームの開始時刻で、再生を始めた時刻より前のことがある。負の経過時間をそのまま使うと、
+  // 再生の最初のフレームで 1 年戻る（R5b で、1950 → 1949 → … と動いていた。R5c の計測で見つけた）
+  startYear + Math.floor((Math.max(0, elapsedMs) / 1000) * speed);
 
 /**
  * 再生中に先読みする範囲（秒）。窓の先、この秒数で進むぶんの年までと重なる区間のファイルを、先に取りに行く。

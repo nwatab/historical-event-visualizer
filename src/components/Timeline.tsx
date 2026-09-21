@@ -117,7 +117,11 @@ function PlaybackControls({
   speed,
   onTogglePlayback,
   onCycleSpeed,
-}: Pick<TimelineProps, "playing" | "speed" | "onTogglePlayback" | "onCycleSpeed">) {
+  atEnd,
+}: Pick<TimelineProps, "playing" | "speed" | "onTogglePlayback" | "onCycleSpeed"> & {
+  /** 現在年が年スライダーの最後の年で、これ以上進めない */
+  readonly atEnd: boolean;
+}) {
   const size = PLAYBACK.iconSize;
   return (
     <div className="flex shrink-0 flex-col items-center" style={{ gap: SPACE[4] }}>
@@ -129,7 +133,11 @@ function PlaybackControls({
           height: PLAYBACK.buttonSize,
           borderRadius: RADIUS.small,
           backgroundColor: PLAYBACK.buttonColor,
+          // 進める年が無いときは押せない
+          opacity: atEnd ? PLAYBACK.disabledOpacity : 1,
+          cursor: atEnd ? "default" : "pointer",
         }}
+        disabled={atEnd}
         aria-label={playing ? "停止（スペースキー）" : "再生（スペースキー）"}
         aria-pressed={playing}
         data-playback={playing ? "playing" : "stopped"}
@@ -209,6 +217,14 @@ export function Timeline({
   const painted = useMemo(() => [...items].sort(byTimelinePaintOrder), [items]);
   // 項目が多すぎて点が並びきらないレーンは、ヒストグラムにする
   const modes = useMemo(() => laneModes(items, geometry), [items, geometry]);
+  // ヒストグラムのレーンの、年ごとの件数。ホバーで再描画されるたびに数え直さないよう、項目と窓が変わったときだけ作る
+  const histograms = useMemo(
+    () =>
+      new Map(
+        lanes.filter((domain) => modes[domain] === "histogram").map((domain) => [domain, laneHistogram(items, domain, view)]),
+      ),
+    [items, view, lanes, modes],
+  );
   const labels = useMemo(
     () =>
       width === 0
@@ -363,6 +379,7 @@ export function Timeline({
         speed={speed}
         onTogglePlayback={onTogglePlayback}
         onCycleSpeed={onCycleSpeed}
+        atEnd={year >= max}
       />
       <div className="min-w-0 flex-1">
         <button
@@ -462,7 +479,7 @@ export function Timeline({
                     <title>{DOMAIN_LABELS[domain]}</title>
                     {histogram && (
                       <LaneHistogram
-                        bins={laneHistogram(items, domain, view)}
+                        bins={histograms.get(domain) ?? []}
                         view={view}
                         width={width}
                         bottom={(index + 1) * TIMELINE.laneHeight}
