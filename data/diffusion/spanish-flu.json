@@ -1,0 +1,185 @@
+{
+  "status": "draft",
+  "id": "Q178275",
+  "title": {
+    "ja": "スペインかぜ",
+    "en": "1918–1920 flu pandemic"
+  },
+  "description": {
+    "ja": "1918年から1920年にかけて世界中で流行したインフルエンザ。最初の記録はアメリカ合衆国の陸軍基地で、兵員の輸送とともにヨーロッパへ、さらに船で各大陸へ広がった。"
+  },
+  "domain": "population",
+  "tags": [
+    "population",
+    "conflict"
+  ],
+  "importance": 3,
+  "note": "既存のデータに Q178275 は無い（新しい項目。2026-09-21 に public/data/events/ を検索）。起源は出典でも特定できないとされ、争いがある（エタプル／オールダーショット 1916–17、オーストリア 1917、中国北部 1917年11月などの説）。ここでは、出典が広がりの始点として書いている最初の記録地（キャンプ・ファンストン、1918年3月4日）を起点にした。英語版の冒頭は「1918年3月にハスケル郡」、同じ記事の年表は「早ければ1918年1月にハスケル郡」で、記事の中で食い違う（別の候補: Q374663 ハスケル郡）。期間は en / ja とも 1918〜1920年、Wikidata は P580 1918-01・P582 1920-12。このアプリの時間の分解能は 1 年なので、10 の stage が 1918 年に同時に出る（月は month に書いた）。importance は要確認。",
+  "start": 1918,
+  "end": 1920,
+  "source": "https://ja.wikipedia.org/wiki/スペインかぜ",
+  "origin": {
+    "qid": "Q1029832",
+    "label": "キャンプ・ファンストン",
+    "labelEn": "Camp Funston",
+    "source": "en: Spanish flu § First wave of early 1918; ja: スペインかぜ § 第1波",
+    "summary": "キャンプ・ファンストンの陸軍の調理兵アルバート・ギッチェルの症例（1918年3月4日）が、最初の記録とされる",
+    "needsCheck": "起源には争いがある（note を参照）。別の候補はハスケル郡（Q374663。郡なので粒度は region）"
+  },
+  "stages": [
+    {
+      "year": 1918,
+      "month": "1918-04",
+      "qid": "Q12193",
+      "label": "ブレスト",
+      "labelEn": "Brest",
+      "from": -1,
+      "source": "en: Spanish flu § First wave of early 1918（ブレストの名は § Deadly second wave of late 1918）",
+      "summary": "1918年4月までに、中西部・東海岸・フランスの港で流行になった",
+      "fromBasis": "出典に明記",
+      "fromNote": "キャンプ・ファンストンから他の陸軍基地とヨーロッパへ広がった、と明記。第2波の節に、ブレストにはアメリカ軍かフランスの新兵とともに着いたらしい、とある",
+      "needsCheck": "4月の文は「フランスの港」で、ブレストを名指ししていない。ブレストの名は第2波（8月）の文にだけ出る"
+    },
+    {
+      "year": 1918,
+      "month": "1918-05",
+      "qid": "Q2807",
+      "label": "マドリード",
+      "labelEn": "Madrid",
+      "from": 0,
+      "source": "en: Spanish flu § First wave of early 1918; ja: スペインかぜ § 第1波",
+      "summary": "首都マドリードでは1918年5月頃から第1波の新聞報道が始まった (ja)",
+      "fromBasis": "推測（年代と地理から）",
+      "fromNote": "出典の順序は、フランスの港 → 西部戦線（4月中旬）→「フランスの残り、イギリス、イタリア、スペイン」。ブレスト→マドリードの直接の経路とは書かれていない",
+      "needsCheck": "5月は「報道が始まった」月（ja）と死者数の期間（en: 1918年5〜6月）。到達の月そのものではない"
+    },
+    {
+      "year": 1918,
+      "month": "1918-06",
+      "qid": "Q1156",
+      "label": "ムンバイ",
+      "labelEn": "Mumbai",
+      "from": 0,
+      "source": "en: 1918 flu pandemic in India § Initial outbreak at Bombay",
+      "summary": "港に配置されていた1人を含む警察官7人が、インフルエンザで入院した",
+      "fromBasis": "推測（年代と地理から）",
+      "fromNote": "出典は「ヨーロッパから戻る兵員」の輸送船（5月29日入港、6月10日に最初の報告例）とするだけで、出港地は無い。ヨーロッパの代表として stage 0 につないだ",
+      "needsCheck": "en: Spanish flu 本体は「5月に北アフリカ、インド、日本に達した」で、月が1か月ずれる。船が起点というのも推定の書き方"
+    },
+    {
+      "year": 1918,
+      "month": "1918-08",
+      "qid": "Q3780",
+      "label": "フリータウン",
+      "labelEn": "Freetown",
+      "from": 0,
+      "source": "en: Spanish flu § Deadly second wave of late 1918",
+      "summary": "第2波は、おそらくブレストからの船でボストンとフリータウンへ広がった",
+      "fromBasis": "出典に明記",
+      "fromNote": "ただし「おそらく」付き。ja は3港で「ほぼ同時に発生」とだけ書き、方向は書いていない"
+    },
+    {
+      "year": 1918,
+      "month": "1918-08",
+      "qid": "Q100",
+      "label": "ボストン",
+      "labelEn": "Boston",
+      "from": 0,
+      "source": "en: Spanish flu § Deadly second wave of late 1918",
+      "summary": "第2波は、おそらくブレストからの船でボストンとフリータウンへ広がった",
+      "fromBasis": "出典に明記",
+      "fromNote": "「おそらく」付き。同じ記事の § China にある Hannoun 説は逆向き（ボストン近郊で変異 → ブレスト）",
+      "needsCheck": "方向について、出典の中に対立する説がある"
+    },
+    {
+      "year": 1918,
+      "month": "1918-09",
+      "qid": "Q48344",
+      "label": "レシフェ",
+      "labelEn": "Recife",
+      "from": 0,
+      "source": "pt: Demerara (navio) 冒頭; pt: Gripe espanhola § No Brasil; pt: 1918 no Brasil",
+      "summary": "デメララ号が1918年9月9日にレシフェに入港し、ウイルスを持ち込んだ",
+      "fromBasis": "推測（年代と地理から）",
+      "fromNote": "出典では、船はリヴァプール発（8月15日）、リスボン経由。どちらも stage に無いので、ヨーロッパの代表として stage 0 につないだ。pt は、リスボンで乗ったのか英国を出た時点で感染していたのかは不明、とも書く",
+      "needsCheck": "出典がポルトガル語版のみ。en: Spanish flu は「船でブラジルとカリブ海に達した」だけで、月も港も無い。from はブレストではなく、リヴァプール／リスボン"
+    },
+    {
+      "year": 1918,
+      "month": "1918-09",
+      "qid": "Q258",
+      "label": "南アフリカ",
+      "labelEn": "South Africa",
+      "from": 0,
+      "source": "en: Spanish flu § Deadly second wave of late 1918",
+      "summary": "南アフリカには9月、フランスから労働部隊の隊員を連れ帰る船で入った",
+      "fromBasis": "出典に明記",
+      "fromNote": "「フランスから」とは書くが、ブレストとは書いていない",
+      "needsCheck": "出典に都市名が無いので国の項目（粒度 country。拡大すると地図から消える）。ケープタウン（Q5465、P625 あり）が候補だが、取得した本文に根拠が無い"
+    },
+    {
+      "year": 1918,
+      "month": "1918-10",
+      "qid": "Q37100",
+      "label": "オークランド",
+      "labelEn": "Auckland",
+      "from": 4,
+      "source": "en: 1918 in New Zealand（10月の項）; en: RMS Niagara § Spanish flu",
+      "summary": "10月初め、オークランドでスペインかぜの最初の症例が記録された",
+      "fromBasis": "推測（年代と地理から）",
+      "fromNote": "ナイアガラ号はバンクーバー発オークランド行き（ホノルル・スバ経由、10月12日入港）。北米の第2波の代表として stage 4（ボストン）につないだ",
+      "needsCheck": "ナイアガラ号が原因かどうかは、出典の中で争いがある。バンクーバーは stage に無い"
+    },
+    {
+      "year": 1918,
+      "month": "1918-10",
+      "qid": "Q17",
+      "label": "日本",
+      "labelEn": "Japan",
+      "from": 0,
+      "source": "en: Spanish flu § Deadly second wave of late 1918; ja: スペインかぜ § 日本",
+      "summary": "1918年8月に日本上陸、10月に大流行が始まった (ja)",
+      "fromBasis": "推測（年代と地理から）",
+      "fromNote": "en は、第2波がヨーロッパからロシア、シベリア鉄道を経て10月に中国と日本へ、とする。ロシアが stage に無いので、ヨーロッパ（0）につないだ",
+      "needsCheck": "出典に都市名が無いので国の項目（粒度 country）。第1波の到達は en が5月、ja は4月に台湾で力士が死亡・8月に「日本上陸」とあり、月が複数ある"
+    },
+    {
+      "year": 1918,
+      "month": "1918-11",
+      "qid": "Q36260",
+      "label": "アピア",
+      "labelEn": "Apia",
+      "from": 7,
+      "source": "en: SS Talune 冒頭・§ Influenza in the Pacific（en: Territory of Western Samoa、en: Spanish flu § Devastated communities も同旨）",
+      "summary": "1918年11月7日、タルーン号が西サモアのアピアに着いた",
+      "fromBasis": "出典に明記",
+      "fromNote": "ニュージーランドからサモアへ持ち込んだ、と明記。オークランド発、スバ経由"
+    },
+    {
+      "year": 1919,
+      "month": "1919-01",
+      "qid": "Q3141",
+      "label": "メルボルン",
+      "labelEn": "Melbourne",
+      "from": 7,
+      "source": "en: Spanish flu § Third wave of 1919; ja: スペインかぜ § 第3波",
+      "summary": "インフルエンザは1919年1月に初めてオーストラリアに入った",
+      "fromBasis": "推測（年代と地理から）",
+      "fromNote": "出典は、どこから入ったかを書いていない。最寄りの既感染地としてニュージーランド（7）につないだだけ",
+      "needsCheck": "from の根拠が無い。同じ記事の § First wave に「1918年7月にオーストラリアに達した後」とあり、記事の中で食い違う"
+    },
+    {
+      "year": 1919,
+      "month": "1919-04",
+      "qid": "Q1019",
+      "label": "マダガスカル",
+      "labelEn": "Madagascar",
+      "from": 6,
+      "source": "en: Spanish flu § Third wave of 1919",
+      "summary": "マダガスカルでは1919年4月に最初の症例が出た",
+      "fromBasis": "推測（年代と地理から）",
+      "fromNote": "出典に経路の記述は無い。地理的に近い南アフリカ（6）につないだだけ",
+      "needsCheck": "from の根拠が無い。出典に都市名が無いので国の項目（粒度 country）"
+    }
+  ]
+}

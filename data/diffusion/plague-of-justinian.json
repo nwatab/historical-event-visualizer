@@ -1,0 +1,134 @@
+{
+  "status": "draft",
+  "id": "Q821711",
+  "title": {
+    "ja": "ユスティニアヌスのペスト",
+    "en": "Plague of Justinian"
+  },
+  "description": {
+    "ja": "541年にエジプトのペルシウムで記録され、542年に首都コンスタンティノープルで猛威を振るい、地中海全域に広がったペスト。"
+  },
+  "domain": "population",
+  "tags": [
+    "population"
+  ],
+  "importance": 2,
+  "note": "手書きのサンプルの Q821711（541〜549年の暫定 period）を置き換える。日本語版 Wikipedia に単独の記事は無い（Q821711 の sitelink に jawiki が無い。調査時の wbgetentities の出力、2026-09-21）。英語版の記事には到達点ごとの年がほとんど無く、年の多くはフランス語版・ドイツ語版の記事から取った。Wikidata の Q821711 には P580 / P582 が無く、541〜549 年は英語版の冒頭の記述。フランス語版・ドイツ語版は第1波を 541〜544 年としている。ペルシウムはプロコピオスが最初に流行を記録した場所で、病気そのものの起源ではない（クシュ／ヌビア、ヒムヤル、中央アジアなどの説がある）。",
+  "start": 541,
+  "end": 549,
+  "source": "https://en.wikipedia.org/wiki/Plague_of_Justinian",
+  "origin": {
+    "qid": "Q1145715",
+    "label": "ペルシウム",
+    "labelEn": "Pelusium",
+    "source": "en: Plague of Justinian § History; en: First plague pandemic § Plague in Africa and South Arabia",
+    "summary": "プロコピオスは541年、エジプトのスエズ近くの港ペルシウムから最初に流行を報告した (en-plague-of-justinian.txt:8; en-first-plague-pandemic.txt:12; de-justinian.txt:18; fr-justinien.txt:76 は541年7月)"
+  },
+  "stages": [
+    {
+      "year": 541,
+      "qid": "Q47492",
+      "label": "ガザ",
+      "labelEn": "Gaza City",
+      "from": -1,
+      "source": "de: Justinianische Pest § Die Ausbreitung der ersten Welle; fr: Peste de Justinien § Deux premières vagues",
+      "summary": "プロコピオスによれば、まず東のガザと西のアレクサンドリアへ広がった (de-justinian.txt:20)。ガザは541年8月 (fr-justinien.txt:76)",
+      "fromBasis": "出典に明記",
+      "fromNote": "ペルシウムから東へガザ、と明記 (de)"
+    },
+    {
+      "year": 541,
+      "qid": "Q87",
+      "label": "アレクサンドリア",
+      "labelEn": "Alexandria",
+      "from": -1,
+      "source": "en: First plague pandemic § Plague in Africa and South Arabia; fr: Peste de Justinien § Deux premières vagues",
+      "summary": "プロコピオスの証言では、ペルシウムで始まり、その後アレクサンドリアへ広がった (en-first-plague-pandemic.txt:12)。541年9月 (fr-justinien.txt:76)",
+      "fromBasis": "出典に明記",
+      "fromNote": "ペルシウム→アレクサンドリアと明記"
+    },
+    {
+      "year": 542,
+      "qid": "Q16869",
+      "label": "コンスタンティノープル",
+      "labelEn": "Constantinople",
+      "from": 1,
+      "source": "en: Plague of Justinian § History; de: § Die Ausbreitung…; fr: § Deux premières vagues",
+      "summary": "エジプトからの穀物船に乗った感染ネズミが運んだと同時代史料は考えた (en-plague-of-justinian.txt:9)。542年春 (de:21)、3–8月 (fr:76)",
+      "fromBasis": "出典に明記",
+      "fromNote": "『エジプトからの穀物船』は明記。出港地をアレクサンドリアとするのは推測"
+    },
+    {
+      "year": 542,
+      "qid": "Q200441",
+      "label": "アンティオキア",
+      "labelEn": "Antioch",
+      "from": 0,
+      "source": "de: Justinianische Pest § Die Ausbreitung…; fr: § Deux premières vagues / § Géographie",
+      "summary": "542年、コンスタンティノープルと同じ年のうちにアンティオキア、イリュリア、チュニジア、スペインへ (de-justinian.txt:21)。パレスチナは542年初頭 (fr:76)",
+      "fromBasis": "推測（年代と地理から）",
+      "fromNote": "『パレスチナ経由の陸路の拡散』(fr-justinien.txt:41) と地理から、ガザ発とした",
+      "needsCheck": "fr:77 は、542年秋に首都とアンティオキアを結ぶ幹線道路沿いに小アジアへ到達と書く。from=2(コンスタンティノープル)の解釈も可能"
+    },
+    {
+      "year": 543,
+      "qid": "Q6343",
+      "label": "カルタゴ",
+      "labelEn": "Carthage",
+      "from": 2,
+      "source": "fr: Peste de Justinien § Deux premières vagues; de: § Die Ausbreitung…",
+      "summary": "543年初めにチュニジアに到達、沿岸部が先に感染 (fr-justinien.txt:77)",
+      "fromBasis": "推測（年代と地理から）",
+      "fromNote": "海上交易(港から港)による拡散という一般的な記述のみで、経路の明記は無い",
+      "needsCheck": "出典は『チュニジア』とだけ書き、カルタゴの名は無い(都市の選択は調査時の推測)。年も不一致: de:21 は 542年、fr:77 は 543年初め。from はアレクサンドリア(1)の可能性もある"
+    },
+    {
+      "year": 543,
+      "qid": "Q260437",
+      "label": "アトロパテネ",
+      "labelEn": "Atropatene",
+      "from": 3,
+      "source": "de: Justinianische Pest § Die Ausbreitung…",
+      "summary": "543年にアトロパテネに達し、ペルシア軍を襲った。ホスロー1世も543年に罹患 (de-justinian.txt:21)",
+      "fromBasis": "推測（年代と地理から）",
+      "fromNote": "シリアから東へ、という地理的な推測のみ",
+      "needsCheck": "QID は紀元前323年〜紀元226年の古代王国の項目で、時代が合わず、都市でもない（P625 はある）。より適切な項目を人が選ぶ必要がある（候補 Q274536 は未検証）。この stage を外す選択もある"
+    },
+    {
+      "year": 543,
+      "qid": "Q48292",
+      "label": "アルル",
+      "labelEn": "Arles",
+      "from": 4,
+      "source": "de: Justinianische Pest § Quellenlage; en: First plague pandemic § Plagues in Francia; fr: § Chroniqueurs",
+      "summary": "トゥールのグレゴリウスによれば、543年にローヌ渓谷で流行し、アルル周辺がほぼ無人になった (de-justinian.txt:10)",
+      "fromBasis": "推測（年代と地理から）",
+      "fromNote": "地中海の港伝い、ローヌ川軸という一般的な記述 (fr-justinien.txt:102) のみ。どの港から来たかは出典に無い",
+      "needsCheck": "年が不一致: de は 543年、fr:16 は 549年、en:19 は 540年代後半。de:21 の『543年にガリア』と整合するのは 543年"
+    },
+    {
+      "year": 544,
+      "qid": "Q220",
+      "label": "ローマ",
+      "labelEn": "Rome",
+      "from": 2,
+      "source": "fr: Peste de Justinien § Deux premières vagues; de: § Die Ausbreitung…",
+      "summary": "イタリアは543年、コンスタンティノープルからの軍の移動により感染。ローマは544年に達した可能性 (fr-justinien.txt:77; de:21 もイタリア543年)",
+      "fromBasis": "出典に明記",
+      "fromNote": "『コンスタンティノープルからの軍の移動』は明記(イタリアについて)",
+      "needsCheck": "ローマの544年は fr に『peut-être(おそらく)』とある。確実なのは『イタリア 543年』で、都市は特定されていない"
+    },
+    {
+      "year": 544,
+      "qid": "Q22890",
+      "label": "アイルランド島",
+      "labelEn": "Ireland",
+      "from": 6,
+      "source": "fr: Peste de Justinien § Europe méridionale et du nord; de: § Quellenlage",
+      "summary": "544年または545年にアイルランドからブリテン諸島に到達 (fr-justinien.txt:192)。ガリアからコーンウォールとアイルランドに達した可能性 (de-justinian.txt:10)",
+      "fromBasis": "出典に明記",
+      "fromNote": "de は『möglicherweise(可能性)』付きでガリア発と書く",
+      "needsCheck": "年は『544 または 545』。ja: ペストの歴史 (:26) は『ブリテン島周辺には547年』。粒度が島全体で都市ではない。fr:104 には、ブリテン諸島の流行はペストではないとするビラベンの見解もある"
+    }
+  ]
+}

@@ -1,0 +1,172 @@
+{
+  "status": "draft",
+  "id": "Q42005",
+  "title": {
+    "ja": "黒死病",
+    "en": "Black Death"
+  },
+  "description": {
+    "ja": "1346年にクリミアのカッファで記録され、1347年にコンスタンティノープルとシチリアへ、1348年にイタリア・フランス・イングランドへ、1353年にモスクワへ達したペストの大流行。"
+  },
+  "domain": "population",
+  "tags": [
+    "population",
+    "economy"
+  ],
+  "importance": 3,
+  "note": "手書きのサンプルの Q42005（ヨーロッパの黒死病流行、1347〜1351年の暫定 period）を置き換える。期間は、en / ja の Wikipedia の冒頭の 1346〜1353 年。Wikidata の Q42005 は P580 = 1346、P582 = 1352（調査時の wbgetentities の出力。2026-09-21）で、終了年が 1 年食い違う。description は到達点の表からの要約で、表の確認後に直す。",
+  "start": 1346,
+  "end": 1353,
+  "source": "https://ja.wikipedia.org/wiki/黒死病",
+  "origin": {
+    "qid": "Q158491",
+    "label": "カッファ（現フェオドシヤ）",
+    "labelEn": "Feodosiia",
+    "source": "en: Black Death § Origin / § Transmission – Europe; ja: 黒死病 § ヨーロッパでの感染爆発",
+    "needsCheck": "カッファは伝播がヨーロッパ・地中海世界に入った地点で、病気そのものの起源ではない（起源は中央アジア説など、出典の中でも争いがある）。QID は現在の都市フェオドシヤ（カッファの跡地）。wbsearchentities で「Caffa」は該当なし",
+    "summary": "ヨーロッパへの最初の侵入は、キプチャク汗国軍によるクリミアのジェノヴァ交易港カッファの包囲戦(1345–46)からとされ、ジェノヴァ商人経由で1347年に持ち込まれた (en-black-death.txt:21,77; ja-kokushibyo.txt:55)"
+  },
+  "stages": [
+    {
+      "year": 1347,
+      "qid": "Q16869",
+      "label": "コンスタンティノープル",
+      "labelEn": "Constantinople",
+      "from": -1,
+      "source": "en: Black Death § Transmission – Europe; ja: 黒死病 § ヨーロッパでの感染爆発",
+      "fromBasis": "出典に明記",
+      "fromNote": "カッファ→コンスタンティノープルと明記",
+      "summary": "ジェノヴァ商人がカッファから黒海を渡って逃れ、1347年夏にコンスタンティノープルに到来 (en-black-death.txt:77; ja-kokushibyo.txt:55)"
+    },
+    {
+      "year": 1347,
+      "qid": "Q13666",
+      "label": "メッシーナ",
+      "labelEn": "Messina",
+      "from": -1,
+      "source": "en: Black Death in Italy § lead / § Southern Italy; en: Black Death migration § European outbreak",
+      "fromBasis": "出典に明記",
+      "fromNote": "クリミア/カッファ発と明記。ただし出典間に不一致あり(要確認の列)",
+      "needsCheck": "ja: ペストの歴史 § ヨーロッパへの上陸 (ja-pest-history.txt:51) は「コンスタンティノープルから出港した12隻」とし、en: Black Death § Origin (:21) も『コンスタンティノープル経由』と書く。from=0 とする解釈も可能",
+      "summary": "1347年10月、カッファ(クリミア)から来たジェノヴァ船12隻がシチリアのメッシーナに入港 (en-bd-italy.txt:1,21; en-black-death-migration.txt:36)"
+    },
+    {
+      "year": 1347,
+      "qid": "Q87",
+      "label": "アレクサンドリア",
+      "labelEn": "Alexandria",
+      "from": 0,
+      "source": "en: Black Death § West Asia and North Africa; ja: 黒死病 § 西アジアおよび北アフリカの感染爆発",
+      "fromBasis": "出典に明記",
+      "fromNote": "コンスタンティノープル発の船と明記",
+      "summary": "1347年秋までに、コンスタンティノープルから奴隷を運ぶ商船1隻により海路で伝染 (en-black-death.txt:86; ja-kokushibyo.txt:64)"
+    },
+    {
+      "year": 1348,
+      "qid": "Q1449",
+      "label": "ジェノヴァ",
+      "labelEn": "Genoa",
+      "from": -1,
+      "source": "en: Black Death § Transmission – Europe; ja: 黒死病 § ヨーロッパでの感染爆発",
+      "fromBasis": "出典に明記",
+      "fromNote": "カッファ発のガレー船と明記",
+      "needsCheck": "en: Black Death migration § European outbreak (:37) は『そこ(メッシーナ)からジェノヴァ・ヴェネツィアへ、1347–48年の変わり目までに』とし、from=1 の解釈もある",
+      "summary": "カッファからのガレー船が1348年1月にジェノヴァとヴェネツィアに到着 (en-black-death.txt:79; ja-kokushibyo.txt:57)"
+    },
+    {
+      "year": 1348,
+      "qid": "Q23482",
+      "label": "マルセイユ",
+      "labelEn": "Marseille",
+      "from": 3,
+      "source": "en: Black Death § Transmission – Europe; en: Black Death in France § Southern France",
+      "fromBasis": "出典に明記",
+      "fromNote": "ジェノヴァを追われた船と明記 (en-bd-france.txt:24)",
+      "needsCheck": "到着年が不一致: en Black Death と ja 黒死病 は 1348年1月末、en Black Death in France は lead で 1347年11月、§ Southern France で 1347年12月。1347年だとジェノヴァ(1348年1月)より前になり from と矛盾する",
+      "summary": "1月末頃、イタリアから追放されたガレー船がマルセイユに到着。ハイリゲンによれば母港ジェノヴァを追われたジェノヴァ船 (en-black-death.txt:79; en-bd-france.txt:24)"
+    },
+    {
+      "year": 1348,
+      "qid": "Q1479",
+      "label": "ボルドー",
+      "labelEn": "Bordeaux",
+      "from": 4,
+      "source": "en: Black Death in France § Southern France",
+      "fromBasis": "推測（年代と地理から）",
+      "fromNote": "マルセイユの船が南仏沿岸を西(トゥールーズ方面)へ進んだ記述 (:24) と年代順から",
+      "summary": "ボルドーでは1348年6月に確認(3月には既に存在した可能性)。カルカソンヌ1月、トゥールーズ4月 (en-bd-france.txt:26)"
+    },
+    {
+      "year": 1348,
+      "qid": "Q90",
+      "label": "パリ",
+      "labelEn": "Paris",
+      "from": 4,
+      "source": "en: Black Death in England § The Black Death; en: Black Death in France § Northern France",
+      "fromBasis": "推測（年代と地理から）",
+      "fromNote": "『マルセイユから南仏、続いて北仏へ』(en-bd-france.txt:1) という国単位の記述に基づく。パリへの直接の経路は出典に無い",
+      "needsCheck": "6月の記録はパリ市内ではなく近郊ロワシー。パリ市内の大量死の記述は1348年11–12月",
+      "summary": "1348年6月までに北はパリまで到達 (en-bd-england.txt:22)。ジャン・ド・ヴネットによれば6月にゴネス近郊ロワシーに初到来 (en-bd-france.txt:34)"
+    },
+    {
+      "year": 1348,
+      "qid": "Q661619",
+      "label": "ウェイマス",
+      "labelEn": "Weymouth",
+      "from": 5,
+      "source": "en: Black Death in England § lead / § Progress of the plague",
+      "fromBasis": "出典に明記",
+      "fromNote": "出典は『ガスコーニュから』と明記。ボルドーをガスコーニュの代表とするのは推測",
+      "needsCheck": "出典はガスコーニュの出港地を明記していない。別の上陸地(ブリストル、サウサンプトン)を挙げる史料もあると同記事にある。より正確な地点は Q748863 メルカム・レジス(P625 あり)",
+      "summary": "1348年6月24日の少し前、ガスコーニュからの船でメルカム(ウェイマス)に到来 (en-bd-england.txt:3,27)"
+    },
+    {
+      "year": 1349,
+      "qid": "Q26793",
+      "label": "ベルゲン",
+      "labelEn": "Bergen",
+      "from": 7,
+      "source": "en: Black Death in Norway § Western Norway; en: Black Death § Transmission – Europe; ja: 黒死病 § ヨーロッパでの感染爆発",
+      "fromBasis": "出典に明記",
+      "fromNote": "『イングランドから』は明記。ウェイマスに割り当てたのは便宜",
+      "needsCheck": "イングランドの出港地は出典に無い。同記事 § Eastern Norway (:37) は、オスロが1349年5–6月でベルゲンより先だったとする",
+      "summary": "1349年夏の終わり(おそらく8月)、イングランドからの船でベルゲンに到達 (en-bd-norway.txt:28; en-black-death.txt:80; ja-kokushibyo.txt:58)"
+    },
+    {
+      "year": 1350,
+      "qid": "Q2843",
+      "label": "リューベック",
+      "labelEn": "Lübeck",
+      "from": 8,
+      "source": "en: Black Death in the Holy Roman Empire § Northern Germany",
+      "fromBasis": "推測（年代と地理から）",
+      "fromNote": "HRE 記事 (:18) は北ドイツへは『デンマークから』とし、デンマークの伝承はイングランド発のノルウェー船 (en-bd-denmark.txt:16)",
+      "needsCheck": "出典間で矛盾: en-bd-hre.txt:18 は『デンマーク→北ドイツ』、en-bd-denmark.txt:12 は『ドイツ→デンマーク』。from は弱い推測。パリ(北仏→ライン)からとする案もある",
+      "summary": "1350年初夏に北ドイツ(マクデブルク、ハルバーシュタット、リューベック、ハンブルク)に到達、海路とみられる (en-bd-hre.txt:38)"
+    },
+    {
+      "year": 1352,
+      "qid": "Q2214",
+      "label": "プスコフ",
+      "labelEn": "Pskov",
+      "from": 9,
+      "source": "en: Black Death in Russia § lead / § Plague migration; en: Black Death in the Holy Roman Empire § Northern Germany",
+      "fromBasis": "出典に明記",
+      "fromNote": "『ドイツ→プロイセン→バルト→ルーシ』は明記。リューベックをドイツ側の代表とするのは推測",
+      "needsCheck": "中間のプロイセン・バルトの都市は出典に都市名が無く、stage にしていない",
+      "summary": "ロシアで最初に記録された流行は1352年春のプスコフ。バルト地方(現ラトビア付近)から (en-bd-russia.txt:3,13)。ドイツ→プロイセン→バルト(1351)→ルーシ (en-bd-hre.txt:39; en-bd-sweden.txt:37)"
+    },
+    {
+      "year": 1353,
+      "qid": "Q649",
+      "label": "モスクワ",
+      "labelEn": "Moscow",
+      "from": 10,
+      "source": "en: Black Death in Russia § Plague migration; en: Black Death § Transmission – Europe",
+      "fromBasis": "出典に明記",
+      "fromNote": "プスコフ→ノヴゴロド→(南下)→モスクワ。ノヴゴロド(Q2235、1352年)を挟むとより正確",
+      "needsCheck": "ja: 黒死病 (:58) と en: Black Death migration (:40) は『1351年にロシア北西部/北東部』としており、1352–53年と食い違う。ja の記事にモスクワへの言及は無い",
+      "summary": "プスコフから同年ノヴゴロドへ、そこから南下して1353年にモスクワに到達 (en-bd-russia.txt:14; en-black-death.txt:80)"
+    }
+  ]
+}

@@ -1,0 +1,173 @@
+{
+  "status": "draft",
+  "id": "printing-press-spread",
+  "title": {
+    "ja": "活版印刷の伝播",
+    "en": "Spread of the printing press in Europe"
+  },
+  "description": {
+    "ja": "1450年頃にマインツで実用化された活版印刷が、15世紀の終わりまでにヨーロッパ各地の都市へ広がった。"
+  },
+  "domain": "technology",
+  "tags": [
+    "technology",
+    "culture"
+  ],
+  "importance": 3,
+  "note": "新しい項目（id は slug）。「Global spread of the printing press」の Wikidata の項目 Q656515 は、P31 が印刷機（Q144334）で P580 / P582 も無く、出来事の項目として使えない（調査時の wbgetentities の出力、2026-09-21）。手書きのサンプルの gutenberg-printing-press（1450年、マインツ、instant）はそのまま残る。都市ごとの年は、英語版の記事の表（出典は Meyers Konversations-Lexikon 第4版、1888–1890）によるもので、同じ記事の本文と表が食い違う箇所がある（ケルン、ロンドン／ウェストミンスター）。start 1450・end 1500 は依頼の指定（1500 年はインキュナブラの区切り）。日本語版に伝播そのものの記事は無く、ja: 印刷機 § 印刷本の大量生産と普及 は起点のマインツと約270都市への普及だけを裏付ける。importance は gutenberg-printing-press と同じ 3 にした（要確認）。",
+  "start": 1450,
+  "end": 1500,
+  "source": "https://en.wikipedia.org/wiki/Global_spread_of_the_printing_press",
+  "origin": {
+    "qid": "Q1720",
+    "label": "マインツ",
+    "labelEn": "Mainz",
+    "source": "ja: 印刷機 § 印刷本の大量生産と普及; en: Global spread of the printing press § Germany",
+    "summary": "マインツの単一の印刷所を起点に、15世紀の終わりまでに約270都市に普及した (ja: 印刷機)"
+  },
+  "stages": [
+    {
+      "year": 1460,
+      "qid": "Q6602",
+      "label": "ストラスブール",
+      "labelEn": "Strasbourg",
+      "from": -1,
+      "source": "en: Global spread of the printing press § Dates by location（表: 1460 Strassburg, Johannes Mentelin）; en: Johannes Mentelin § Career",
+      "summary": "メンテリンの最古の印刷物はラテン語聖書で、第1巻に1460年の日付がある",
+      "fromBasis": "出典に明記",
+      "fromNote": "en: Johannes Mentelin § Career は、技術をマインツで直接か仲介者を通じて得た「可能性が高い」とする（記事自体が推定の書き方）",
+      "needsCheck": "同じ記事は、印刷を始めたのはおそらく1458年頃、署名のある最初の本は1465年とする。1460 は表の年",
+      "granularity": "fine",
+      "granularityNote": "Wikidata の Q6602 は P31 に「帝国自由都市」「神聖ローマ帝国の領邦」を併せ持ち、規則（いちばん粗いものを採る）だと country になって、zoom 4 以上で地図から消える。ここでは都市として扱う。"
+    },
+    {
+      "year": 1465,
+      "qid": "Q365",
+      "label": "ケルン",
+      "labelEn": "Cologne",
+      "from": -1,
+      "source": "en: Global spread of the printing press § Dates by location（表: c. 1465 Cologne, Ulrich Zell）; en: Ulrich Zell § Biography",
+      "summary": "ツェルは早ければ1463年にケルンで印刷していたとみられるが、日付のある最初の本は1466年",
+      "fromBasis": "出典に明記",
+      "fromNote": "en: Ulrich Zell § Biography: マインツのフストとシェッファーの工房で印刷を学び、ケルンへ移った",
+      "needsCheck": "年が不一致: 表は c. 1465、同じ記事の § Europe は 1466、Zell の記事は 1463（推定）または 1466（日付のある最初の本）"
+    },
+    {
+      "year": 1465,
+      "qid": "Q243467",
+      "label": "スビアーコ",
+      "labelEn": "Subiaco",
+      "from": -1,
+      "source": "en: Global spread of the printing press § Italy（表: 1465 Subiaco, Pannartz / Sweynheym）; en: Subiaco Press 冒頭",
+      "summary": "スヴァインハイムはグーテンベルクの下で働いていたとされる",
+      "fromBasis": "出典に明記",
+      "fromNote": "en: Arnold Pannartz and Konrad Sweynheim § Backgrounds: スヴァインハイムはマインツ近郊エルトフィレの出身。グーテンベルクの下で働いた（1461–1464）というのは研究者（Zedler）の見解で、記録された事実ではない",
+      "needsCheck": "en: Subiaco Press は、設立を1464年、現存する最初の本を1465年9月とする。表は1465"
+    },
+    {
+      "year": 1467,
+      "qid": "Q220",
+      "label": "ローマ",
+      "labelEn": "Rome",
+      "from": 2,
+      "source": "en: Global spread of the printing press § Italy（表: 1467 Rome）; en: Subiaco Press 冒頭",
+      "summary": "1467年、パンナルツとスヴァインハイムはスビアーコを離れてローマに移った",
+      "fromBasis": "出典に明記",
+      "fromNote": "同じ印刷者がスビアーコからローマへ移った"
+    },
+    {
+      "year": 1469,
+      "qid": "Q641",
+      "label": "ヴェネツィア",
+      "labelEn": "Venice",
+      "from": -1,
+      "source": "en: Global spread of the printing press § Italy（表: 1469 Venice, Johann von Speyer）; en: Johann and Wendelin of Speyer 冒頭",
+      "summary": "1462年以降にマインツからイタリアへ来た最初期の印刷者に数えられる",
+      "fromBasis": "出典に明記",
+      "fromNote": "ヨハンは1460–61年にマインツにいた記録があり、1468年にヴェネツィアに定住。最初の本は1469年"
+    },
+    {
+      "year": 1470,
+      "qid": "Q90",
+      "label": "パリ",
+      "labelEn": "Paris",
+      "from": 0,
+      "source": "en: Global spread of the printing press § France（表: 1470 Paris, Gering / Crantz / Friburger）; en: Johann Heynlin § Heynlin's printing press",
+      "summary": "ハインリンがスイスの職人を呼び、ソルボンヌの建物に印刷機を据えさせた",
+      "fromBasis": "推測（年代と地理から）",
+      "fromNote": "Heynlin の記事は、フリブルガーはコルマール出身、クランツはミュンスターかストラスブール出身「かもしれない」、ゲーリングはベロミュンスター出身とする。上ライン地方を指すが、どこで印刷を学んだかは取得した本文に無い",
+      "needsCheck": "from は弱い。バーゼル（表では c. 1468、Q78）も同じくらいあり得るが、stage にしていない。-1 にする案もある"
+    },
+    {
+      "year": 1473,
+      "qid": "Q31487",
+      "label": "クラクフ",
+      "labelEn": "Kraków",
+      "from": -1,
+      "source": "en: Global spread of the printing press § Poland（表: 1473 Kraków, Kasper Straube）; en: Kasper Straube",
+      "summary": "1473年の Calendarium cracoviense が、ポーランドで印刷された最初のものとされる",
+      "fromBasis": "推測（年代と地理から）",
+      "fromNote": "シュトラウベは「バイエルン出身のドイツ人印刷者」とあるだけで、どこで学んだかは取得した本文に無い",
+      "needsCheck": "経路は不明。-1 は「ドイツ人の印刷者」という意味でしかなく、マインツとのつながりは出典に無い"
+    },
+    {
+      "year": 1473,
+      "qid": "Q8818",
+      "label": "バレンシア",
+      "labelEn": "Valencia",
+      "from": -1,
+      "source": "en: Books in Spain; en: Global spread of the printing press § Spain（表: c. 1472–1473 Valencia, Lambert Palmart）",
+      "summary": "スペインの最初の印刷所は1473年にバレンシアに置かれた",
+      "fromBasis": "推測（年代と地理から）",
+      "fromNote": "en: Books in Spain は、ラーフェンスブルクのドイツ人の商会との関係を書くが、出身の都市は書いていない",
+      "needsCheck": "表では、セゴビア 1471–1472（Johannes Parix）のほうがバレンシア c. 1472–1473 より早い。en の Johannes Parix・Lambert Palmart の記事は本文が取れなかった。セゴビアは Q15684（P625 あり）"
+    },
+    {
+      "year": 1473,
+      "qid": "Q12994",
+      "label": "ブルッヘ",
+      "labelEn": "Bruges",
+      "from": 1,
+      "source": "en: William Caxton 冒頭・伝記; en: Global spread of the printing press § Belgium（表: c. 1473–1474 Bruges, Colard Mansion）",
+      "summary": "カクストンはケルンで印刷業を見て、ブルッヘで印刷所を始めた",
+      "fromBasis": "出典に明記",
+      "fromNote": "カクストンがケルンからブルッヘへ移った",
+      "needsCheck": "年が不一致: Caxton の記事は最初の本を1473年、表は c. 1473–1474、en: Colard Mansion は協業を1474–1476年とする。表でベルギー最初はアールスト 1473（Dirk Martens）"
+    },
+    {
+      "year": 1474,
+      "qid": "Q2843",
+      "label": "リューベック",
+      "labelEn": "Lübeck",
+      "from": -1,
+      "source": "en: Global spread of the printing press § Germany…（表: c. 1474 Lübeck）",
+      "summary": "表の行に印刷者の名は無い（備考欄は、1488年のスカンディナヴィア・フィンランド向けの最初の本について）",
+      "fromBasis": "推測（年代と地理から）",
+      "fromNote": "表に印刷者名が無く、en: Lucas Brandis は本文が取れなかった",
+      "needsCheck": "年は c. 1474 で、経路の出典が無い。スカンディナヴィアへの中継点として入れた stage"
+    },
+    {
+      "year": 1476,
+      "qid": "Q189960",
+      "label": "ウェストミンスター",
+      "labelEn": "Westminster",
+      "from": 8,
+      "source": "en: Global spread of the printing press § England（表: 1476 Westminster, William Caxton）; en: William Caxton",
+      "summary": "1476年、ウェストミンスターに国内最初の印刷所を置いた",
+      "fromBasis": "出典に明記",
+      "fromNote": "ブルッヘで得た技術をイングランドに持ち帰った",
+      "needsCheck": "Global spread の § Europe の本文は「London 1477」、表は Westminster 1476 と London 1480"
+    },
+    {
+      "year": 1483,
+      "qid": "Q1754",
+      "label": "ストックホルム",
+      "labelEn": "Stockholm",
+      "from": 9,
+      "source": "en: Global spread of the printing press § Sweden（表: 1483 Stockholm, Johann Snell）; en: Johann Snell",
+      "summary": "スネルは1480年にリューベックで独立した印刷者・製本者だった",
+      "fromBasis": "出典に明記",
+      "fromNote": "スネルはリューベックから1482年にオーデンセ（デンマーク最初の本。Q25331）へ、1483年にストックホルムへ行き、その後リューベックに戻った"
+    }
+  ]
+}
