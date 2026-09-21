@@ -426,6 +426,10 @@ pnpm ohm:build   # 約 10 秒。受け入れると決めていない license が
 - 依存を足す・変えるときは pnpm install を回して lockfile を一緒にコミットする。CI は --frozen-lockfile で止まる。
   - 経緯: R3b-3 で `pnpm add -D mapshaper` の後に、package.json の版の指定だけを手で `^0.7.62` → `0.7.62` に直し、install を回し直さなかった。
     lockfile に古い指定が残り、main のデプロイが失敗した（2026-09-21）。package.json を手で直したときも同じ。
+- PR を積むとき（別の PR のブランチを base にするとき）は、下の PR がマージされたら base を main に付け替えてからマージする。base のブランチを削除していないと
+  自動では付け替わらず、そのままマージすると main に入らない（#22 で起きた）。
+  - 経緯: #22（国境の表示）は、#21（取得と生成）のブランチ `claude/r3b3-ohm-borders` を base にして出した。#21 のマージ後もそのブランチが残っていたので、#22 の base は付け替わらず、
+    #22 はそのブランチにマージされた。表示のコードを main に入れるために、そのブランチを main にマージする #24 が要った（2026-09-21。PR の一覧と `git log origin/main` で確認）。
 
 ## basePath
 
