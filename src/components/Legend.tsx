@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { GRAY, SPACE, kindSwatchDotStyle, kindSwatchStyle, surfaceStyle, swatchStyle, textStyle } from "@/lib/design";
+import { GRAY, SPACE, borderSwatchStyle, kindSwatchDotStyle, kindSwatchStyle, surfaceStyle, swatchStyle, textStyle } from "@/lib/design";
 import { DOMAINS, DOMAIN_LABELS } from "@/lib/domain";
 import type { Domain } from "@/types/event";
 
@@ -13,6 +13,11 @@ interface LegendProps {
   readonly onHover: (domain: Domain | null) => void;
   readonly onToggle: (domain: Domain) => void;
   readonly onShowAll: () => void;
+  /** 国境を描くか（既定はオン） */
+  readonly bordersVisible: boolean;
+  /** 現在年に国境のデータがあるか（1500 年以降）。無い年は、切り替えを無効にして注記だけ出す */
+  readonly bordersAvailable: boolean;
+  readonly onToggleBorders: () => void;
 }
 
 /** 時間種別の見本と名前（形で区別する） */
@@ -34,7 +39,16 @@ const legendSwatch = (domain: Domain, visible: boolean) => ({
  * - ホバー・フォーカスで、その分類のマーカーを強調する（表示中の分類のみ）
  * 狭い画面では折りたたみ、色見本の列だけを表示する。
  */
-export function Legend({ hiddenDomains, highlighted, onHover, onToggle, onShowAll }: LegendProps) {
+export function Legend({
+  hiddenDomains,
+  highlighted,
+  onHover,
+  onToggle,
+  onShowAll,
+  bordersVisible,
+  bordersAvailable,
+  onToggleBorders,
+}: LegendProps) {
   const [expanded, setExpanded] = useState(false);
   const isVisible = (domain: Domain) => !hiddenDomains.includes(domain);
   const allHidden = DOMAINS.every((domain) => !isVisible(domain));
@@ -139,6 +153,26 @@ export function Legend({ hiddenDomains, highlighted, onHover, onToggle, onShowAl
             </span>
           ))}
         </p>
+        {/* 国境（1500 年以降）の表示の切り替え。見本は地図の国境と同じ色・太さの線 */}
+        <button
+          type="button"
+          className="flex w-full items-center text-left"
+          style={{
+            gap: SPACE[8],
+            marginTop: SPACE[8],
+            paddingBlock: SPACE[4],
+            ...textStyle.body,
+            color: bordersAvailable && bordersVisible ? GRAY.text : GRAY.weak,
+            textDecoration: bordersAvailable && !bordersVisible ? "line-through" : "none",
+          }}
+          aria-pressed={bordersVisible}
+          disabled={!bordersAvailable}
+          onClick={onToggleBorders}
+        >
+          <span style={borderSwatchStyle(bordersAvailable && bordersVisible)} aria-hidden />
+          <span>国境</span>
+        </button>
+        <p style={textStyle.caption}>1500年以降のみ・出典: OpenHistoricalMap（CC0 / CC BY）</p>
       </div>
     </nav>
   );

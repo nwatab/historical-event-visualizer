@@ -84,3 +84,20 @@ export const popupContent = (
   }
   return root;
 };
+
+/** 国境の上の吹き出し。「国境」の見出しと、その線を国境に持つ国の名前（1 行ずつ）。 */
+export const borderPopupContent = (names: readonly string[]): HTMLElement => {
+  const root = document.createElement("div");
+  Object.assign(root.style, { display: "flex", flexDirection: "column", gap: px(SPACE[4]) });
+  const heading = document.createElement("div");
+  Object.assign(heading.style, { fontSize: px(textStyle.caption.fontSize), color: textStyle.caption.color });
+  heading.textContent = "国境";
+  root.append(heading);
+  names.forEach((name) => {
+    const el = document.createElement("div");
+    Object.assign(el.style, { fontSize: px(textStyle.body.fontSize), color: textStyle.body.color });
+    el.textContent = name;
+    root.append(el);
+  });
+  return root;
+};
