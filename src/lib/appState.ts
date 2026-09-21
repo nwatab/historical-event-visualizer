@@ -11,6 +11,8 @@ export interface AppState {
   readonly timelineHalfSpan: number;
   /** 非表示にしている分類 */
   readonly hiddenDomains: readonly Domain[];
+  /** 国境（1500 年以降）を描くか。既定はオン */
+  readonly bordersVisible: boolean;
   /** 詳細パネルの状態。null なら閉じている。 */
   readonly selection: Selection | null;
 }
@@ -30,6 +32,7 @@ export type AppAction =
   | { readonly type: "setTimelineHalfSpan"; readonly halfSpan: number }
   | { readonly type: "toggleDomain"; readonly domain: Domain }
   | { readonly type: "showAllDomains" }
+  | { readonly type: "toggleBorders" }
   | { readonly type: "selectEvents"; readonly eventIds: readonly string[] }
   | { readonly type: "openEvent"; readonly eventId: string }
   | { readonly type: "backToList" }
@@ -46,6 +49,7 @@ export const initialAppState = ({ year, timelineHalfSpan }: Pick<AppState, "year
   year,
   timelineHalfSpan,
   hiddenDomains: [],
+  bordersVisible: true,
   selection: null,
 });
 
@@ -78,6 +82,8 @@ export const appReducer =
         };
       case "showAllDomains":
         return { ...state, hiddenDomains: [] };
+      case "toggleBorders":
+        return { ...state, bordersVisible: !state.bordersVisible };
       case "selectEvents":
         return { ...state, selection: selectionFor(action.eventIds) };
       case "openEvent":
