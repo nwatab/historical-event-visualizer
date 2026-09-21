@@ -50,6 +50,16 @@ export const usePlayback = (year: Year, max: Year, onSetYear: (year: Year) => vo
     return () => cancelAnimationFrame(frame);
   }, [playing, speed, max, onSetYear]);
 
+  // タブを離れたら止める。隠れている間は requestAnimationFrame が止まり、戻ったときに、離れていた時間のぶんだけ年が飛ぶため
+  useEffect(() => {
+    if (!playing) return;
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "hidden") setPlaying(false);
+    };
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", onVisibilityChange);
+  }, [playing]);
+
   const toggle = useCallback(() => setPlaying((v) => !v && yearRef.current < max), [max]);
   const stop = useCallback(() => setPlaying(false), []);
   const cycleSpeed = useCallback(() => setSpeed(nextPlaybackSpeed), []);

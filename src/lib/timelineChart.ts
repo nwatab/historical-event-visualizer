@@ -191,7 +191,12 @@ export interface HistogramBin {
   readonly count: number;
 }
 
-/** 窓の中の整数年ごとの件数。instant は start の年に、period は start〜end の各年に 1 を加える。 */
+/**
+ * 窓の中の整数年ごとの件数。instant は start の年に、period は start〜end の各年に 1 を加える。
+ * 差分配列で数える: 項目ごとに「start の年で +1、end の翌年で −1」を置き、先頭から累積する。O(項目数 ＋ 年数)。
+ * 年ごとに全項目を調べる方法（O(項目数 × 年数)）だと、±500 年・数百件のレーンで、再生中の毎フレームの計算が重い。
+ * 差分の配列は、この関数の中だけで書き換える（引数や外の状態は書き換えない）。
+ */
 export const laneHistogram = (
   items: readonly TimelineItem[],
   domain: Domain,
@@ -199,11 +204,20 @@ export const laneHistogram = (
 ): readonly HistogramBin[] => {
   const first = Math.ceil(window.center - window.halfSpan);
   const last = Math.floor(window.center + window.halfSpan);
-  const lane = items.filter((item) => item.domain === domain && item.end >= first && item.start <= last);
-  return Array.from({ length: Math.max(0, last - first + 1) }, (_, i) => first + i).map((year) => ({
-    year,
-    count: lane.filter((item) => existsInYear(item, year)).length,
-  }));
+  const length = Math.max(0, last - first + 1);
+  // 末尾の 1 要素は、窓の最後の年まで続く項目の −1 の置き場（累積には使わない）
+  const deltas = new Int32Array(length + 1);
+  items.forEach((item) => {
+    if (item.domain !== domain || item.end < first || item.start > last) return;
+    deltas[Math.max(item.start, first) - first] += 1;
+    deltas[Math.min(item.end, last) - first + 1] -= 1;
+  });
+  // 累積和。配列を写しながら畳むと O(年数²) になるので、この関数の中だけの変数に足していく
+  let running = 0;
+  return Array.from(deltas.subarray(0, length), (delta, i) => {
+    running += delta;
+    return { year: first + i, count: running };
+  });
 };
 
 /** x 座標 → いちばん近い整数年（ヒストグラムの棒は、その年を中心に 1 年ぶんの幅を持つ）。 */
