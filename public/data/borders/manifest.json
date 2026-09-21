@@ -1,0 +1,126 @@
+{
+ "generatedAt": "2026-09-21T07:49:52.626Z",
+ "source": {
+  "name": "OpenHistoricalMap",
+  "url": "https://www.openhistoricalmap.org/",
+  "license": "CC0 / CC BY",
+  "attribution": "© OpenHistoricalMap contributors（CC0 / CC BY 4.0）。一部の国境線は HDX（CC BY-IGO）および National Library of Scotland（CC BY）に由来",
+  "query": "relation[\"boundary\"=\"administrative\"][\"admin_level\"=\"2\"]",
+  "tagsFetchedAt": "2026-09-21T07:23:21.730Z",
+  "osmBase": "2026-09-21T07:21:59Z",
+  "geometryFetchedFrom": "2026-09-21T07:23:29.353Z",
+  "geometryFetchedTo": "2026-09-21T07:39:24.513Z"
+ },
+ "yearMin": 1500,
+ "yearMax": 2025,
+ "simplifyToleranceDeg": 0.1,
+ "coordPrecisionDeg": 0.01,
+ "relations": {
+  "selected": 3265,
+  "excluded": 2,
+  "withLines": 2919,
+  "withoutLines": 344
+ },
+ "features": 8689,
+ "ways": {
+  "used": 32663,
+  "kept": 26659,
+  "dropped": {
+   "maritime": 5834,
+   "coastline": 170
+  }
+ },
+ "waysByLicense": {
+  "CC0": 25889,
+  "CC BY 4.0": 644,
+  "CC BY-IGO": 105,
+  "CC BY": 21
+ },
+ "waysByLicenseTag": {
+  "(タグ無し)": 22921,
+  "CC0": 70,
+  "CC0-1.0": 2767,
+  "CC-BY-4.0": 479,
+  "CC-BY 4.0": 115,
+  "CCO 4.0": 105,
+  "CC0 / public domain": 131,
+  "CC BY 4.0": 42,
+  "Creative Commons Attribution 4.0 International license": 8,
+  "CC-BY (NLS): Reproduced with the permission of the National Library of Scotland": 21
+ },
+ "excluded": [
+  {
+   "id": 2847907,
+   "name": "Sindh Sultanate",
+   "dates": "-0500〜1843",
+   "reason": "start_date が異常（スルターン朝が紀元前 501 年から続いていることになっている）。1500〜1843 年の国境に入ってしまう",
+   "inPeriod": true
+  },
+  {
+   "id": 2888181,
+   "name": "Catawba",
+   "dates": "-3999〜1763",
+   "reason": "start_date が異常（紀元前 4000 年から）。北米の先住民の領域で、国境（admin_level=2）として 1500〜1763 年に入ってしまう",
+   "inPeriod": true
+  },
+  {
+   "id": 2875841,
+   "name": "Kingdom of Leinster",
+   "dates": "-0600〜0800",
+   "reason": "start_date が異常（紀元前 601 年から）。1500 年より前に終わるので、いまの対象期間（1500 年〜）には元から入らない。期間を広げたときのために記録しておく",
+   "inPeriod": false
+  },
+  {
+   "id": 2874062,
+   "name": "Uaxactún",
+   "dates": "-0600〜0378",
+   "reason": "調査でどのスナップショットにも入っていた 1 件。1500 年より前に終わるので、いまの対象期間には元から入らない。期間を広げたときのために記録しておく",
+   "inPeriod": false
+  }
+ ],
+ "totalBytes": 8345318,
+ "files": [
+  {
+   "file": "1500.json",
+   "from": 1500,
+   "to": 1600,
+   "count": 911,
+   "bytes": 584719
+  },
+  {
+   "file": "1600.json",
+   "from": 1600,
+   "to": 1700,
+   "count": 1244,
+   "bytes": 958186
+  },
+  {
+   "file": "1700.json",
+   "from": 1700,
+   "to": 1800,
+   "count": 1957,
+   "bytes": 1551692
+  },
+  {
+   "file": "1800.json",
+   "from": 1800,
+   "to": 1900,
+   "count": 3108,
+   "bytes": 2421475
+  },
+  {
+   "file": "1900.json",
+   "from": 1900,
+   "to": 2000,
+   "count": 3127,
+   "bytes": 2391239
+  },
+  {
+   "file": "2000.json",
+   "from": 2000,
+   "to": 2100,
+   "count": 632,
+   "bytes": 438007
+  }
+ ]
+}

@@ -73,6 +73,7 @@ MapLibre GL JS v6 は、ワーカーを別ファイル（`maplibre-gl-worker.mjs
 
 - **[Wikidata](https://www.wikidata.org/)** — 項目の QID、ラベル、年、座標、分類（P31）、sitelinks 数。ライセンス: [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/)（[Wikidata:Licensing](https://www.wikidata.org/wiki/Wikidata:Licensing)）。[Wikidata Query Service](https://query.wikidata.org/) の SPARQL エンドポイントから取得。
 - **[英語版 Wikipedia の Vital articles（Level 5）](https://en.wikipedia.org/wiki/Wikipedia:Vital_articles/Level_5)** — 科学・技術・経済・文化の項目の選抜と、その分類（リストの節）に使用。ライセンス: [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)。使ったページは `scripts/wikidata/lists.mjs`、取得した版は manifest.json にあります。
+- **[OpenHistoricalMap](https://www.openhistoricalmap.org/)** — 1500 年以降の国境の線（`public/data/borders/`）。© OpenHistoricalMap contributors（[CC0](https://creativecommons.org/publicdomain/zero/1.0/) / [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)。[Copyright and Acknowledgements](https://www.openhistoricalmap.org/copyright)）。一部の国境線は [HDX](https://data.humdata.org/)（CC BY-IGO）および National Library of Scotland（CC BY）に由来します。海岸線と海上の線は使っていません（海岸線は下の Natural Earth）。取得と生成は `scripts/ohm/`、取得日と license 別の線の本数は `public/data/borders/manifest.json`、license の判断の根拠は `scripts/ohm/licenses.mjs` にあります。
 - 各イベントの `source` は、日本語版 Wikipedia の記事（無ければ英語版、それも無ければ Wikidata の項目）への URL です。記事の本文は取得・転載していません。詳細パネルでは、Wikipedia へのリンクに CC BY-SA 4.0 の表記を添えています。
 - **手書きのサンプル — `src/data/events.sample.ts`**（35件）。各イベントの `source` に参照した Wikipedia の URL を付けています（年や期間はその記事で確認しています）。`id` は Wikidata の QID です（該当する項目が無いものは slug）。生成時に統合し、QID が同じ項目は手書きを優先します。
 

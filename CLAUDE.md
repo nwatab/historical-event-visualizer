@@ -221,6 +221,67 @@ node scripts/wikidata/count-markers.mjs 1500 1800 1950   # 世界全体の表示
 写像表や規則だけを変えたときは、取得をやり直さずに `report` 以降だけを実行すればよい。
 `data/diffusion/` に場所（QID）を足したときは、`fetch-places` と `fetch-app-extras` を実行する（どちらも取得済みの分は問い合わせないので、足した QID のぶんだけ取りに行く）。
 
+## 国境（R3b-3）
+
+時代別の国境を、OpenHistoricalMap（OHM）から取って、地図に線で描く。スクリプトは `scripts/ohm/`。候補の比較と、OHM の穴の調査は `scripts/research/borders.md`。
+
+### 方針と理由
+
+- **1500 年以降だけ。** それより前の OHM は穴が大きすぎる（紀元前 500 年にアケメネス朝が無く、800 年に唐が無い。800 年は 42 件のうち 24 件がヨーロッパ）。
+  穴のある国境は「そこに国が無かった」という誤情報になるので、出さない。1500 年以降も、ポーランド・リトアニア（1500 年）などの穴は残っている。
+- **線だけ。面で塗らない。** 面にするには relation ごとに輪を閉じる必要があり、海岸線（下の理由で落としている）が要る。線なら、隣り合う国が共有する国境を 1 回持てば済み、
+  階層の違う relation（インカ帝国と 4 つのスウユ）が重なっても、塗りが濃くなるような破綻が無い。地図が主役、という方針にも合う。
+- **海岸線と海上の線は落とす。** `natural=coastline` の way は OSM 由来（CC BY-SA 2.0。OHM の copyright ページの謝辞）で、継承の条件をリポジトリに持ち込まないため。
+  `maritime=yes` / `boundary_type=maritime` は領海の線で、陸の国境ではない。海岸線は Natural Earth で描いてある。このため、島国（国境が海岸線と海上の線だけの国）には線が無い。
+- **ライセンス: CC0 と CC BY は受け入れ、SA（継承）と NC（非商用）は拒否する**（2026-09-21、人の判断。`scripts/ohm/licenses.mjs`）。
+  - OHM のデータは既定で CC0 だが、個々の地物の `license` タグで CC BY などになっていることがある。admin_level=2 の relation は CC0 だけだったが、way には CC BY 4.0 がある。
+  - CC BY の条件は表示だけで、利用者に何も課さない。CShapes 2.0 を避けた理由は NC と SA のほうで、BY ではない。
+  - 一部の way だけを落とすと線が途切れ、途切れた国境は「そこに境界が無い」という誤情報になる。だから、license を理由に way を落とすことはしない。
+  - 受け入れると決めていない値（SA / NC / 読めない値）が、relation か、残す way に 1 つでもあれば、`pnpm ohm:build` は止まって報告する。表記ゆれは `normalizeLicense` が吸収し、
+    それで済まない値は、人が確認して `REVIEWED_LICENSE_VALUES` に根拠つきで書く。
+  - 人が確認して受け入れた値（2026-09-21）: `CCO 4.0`（105 本。書き間違いとみられ、出典の HDX のデータセットは CC BY-IGO だった）と、
+    `CC-BY (NLS): …`（21 本。スコットランド国立図書館の地図が出典で、値が CC BY と言っている）。根拠は `licenses.mjs` に書いてある。
+  - 表示: 凡例の注記は短く「出典: OpenHistoricalMap（CC0 / CC BY）」。README の出典には内訳を書く（「© OpenHistoricalMap contributors（CC0 / CC BY 4.0）。
+    一部の国境線は HDX（CC BY-IGO）および National Library of Scotland（CC BY）に由来」）。manifest の `waysByLicense` に、license 別（正規化後）の way の本数を出す。
+- **除外の表（`exclusions.mjs`）に入れるのは、日付が異常な relation だけ**（紀元前 501 年から続くスルターン朝、など）。名目上だけ続いた国や、階層の違うものは、OHM が描いているとおりに出す。
+  Kingdom of Leinster の 2875840（800〜1603 年）は、レンスター王国が名目上 1603 年まで続いたという事実に合っているので、除かない。
+
+### 年
+
+OHM の `start_date` / `end_date` は ISO 8601 の文字列で、**すでに天文年**（紀元前 1 年が `0000`、紀元前 2 年が `-0001`。OSM Wiki「OpenHistoricalMap/Tags/Key/start_date」を 2026-09-21 に取得して確認）。
+年の部分をそのまま整数にし、`bce()` は通さない（`scripts/ohm/dates.mjs`）。Overpass の式で日付を比べると文字列の比較になるので、タグを全件取ってから手元で選ぶ。
+
+### 生成データの形
+
+- `public/data/borders/<世紀>.json`: その世紀（`1500.json` は 1500〜1599 年）に 1 年でも表示される線の GeoJSON。世紀をまたぐ線は、重なる区間すべてのファイルに入る（イベントと同じ）。
+- 各 feature は MultiLineString と `{ name, nameJa?, start, end? }`。表示の条件は `start` ≤ 現在年 < `end`（`end` が無ければ、いまも続いている）。
+  - **feature の単位は relation ではなく、「その線を国境に持つ国の名前の組が変わらない期間」**（`borders.mjs` の `waySpans`）。`name` は、その線を国境に持つ国の名前を ` / ` でつないだもの
+    （隣り合う 2 国の国境なら「Austria-Hungary / German Reich」）。`nameJa` は、`name:ja` のある国が 1 つでもあれば付け、無い国は英語名のまま入れる。
+  - 理由: OHM は国境が変わるたびに別の relation を作る（アメリカ合衆国が 52 件）。relation ごとに線を出すと、同じ way が版の数だけ重複し、許容 0.1° でも合計 17.5 MB になった
+    （2026-09-21 の実測。最初の設計は relation ごとの feature だった）。way の単位で 1 回だけ持つと、半分になる。同じ国の版どうしは名前が同じなので、版が替わっても期間は切れない。
+    代わりに、relation の id は出力に残らない。
+- 簡略化は mapshaper（devDependency）。way は端点を共有しているので、端点を動かさない mapshaper の簡略化で、国境のつながりが保たれる。許容は 0.05°（合計が 8 MB を超えたら 0.1°）、座標は小数 2 桁。
+- `manifest.json`: 生成日、OHM の取得日、許容、relation と way の数、落とした way の理由別の数、license 別の way の本数、除外した relation、ファイルごとの件数と大きさ。
+
+### 実測（2026-09-21 の `pnpm ohm:build` の出力。OHM のデータは 2026-09-21 取得）
+
+- 対象の relation 3,265 件（admin_level=2 の全 4,041 件のうち、1500〜2025 年に存在するもの）。除外 2 件（Sindh Sultanate、Catawba。表の残り 2 件は 1500 年より前に終わる）。
+  線が残った relation 2,919 件、1 本も残らなかった 344 件（ギルバート諸島、バハマ、ジャマイカ、グレートブリテン王国など、国境が海岸線と海上の線だけの島）。
+- way: 使われている 32,663 本 → 海上 5,834 本と海岸線 170 本を落として、26,659 本。
+- license（残した way、正規化後）: CC0 25,889 本（うちタグ無し 22,921 本）、CC BY 4.0 644 本、CC BY-IGO 105 本、CC BY 21 本。relation は CC0 だけ（タグ無し 3,174、CC0-1.0 61、CC0 28）。
+- 大きさ: 許容 0.05° で合計 9.26 MB → 8 MB を超えたので 0.1° にして 8.35 MB、feature 8,689 件。
+  1500.json 571 KB（911 件）/ 1600.json 936 KB（1,244）/ 1700.json 1,515 KB（1,957）/ 1800.json 2,365 KB（3,108）/ 1900.json 2,335 KB（3,127）/ 2000.json 428 KB（632）。アプリが一度に読むのは 1 世紀ぶん。
+  - 許容を倍にしても 1 割しか減らない。大きさを決めているのは点の数ではなく、短い way の多さ（ドイツ国とオーストリア＝ハンガリーの国境が 752 本）。way をつないで 1 本にすれば減るはずだが、やっていない。
+
+### 再生成の手順
+
+```bash
+pnpm ohm:fetch   # 約 45 分（131 チャンク。直列、5 秒間隔）。取得済みのチャンクは再利用する。取り直すなら data/raw/ohm/ を消す（約 500 MB、コミットしない）
+pnpm ohm:build   # 約 10 秒。受け入れると決めていない license があれば止まる
+```
+
+`pnpm ohm:build --allow-unreviewed-licenses` は、止めずに作って報告を見るための確認用で、その出力はコミットしない。
+
 ## デザイン
 
 主役は地図。UI は地図より前に出ない。値はすべて `src/lib/design.ts` に定数として置き、コンポーネントや CSS に直接書かない（CSS からは `cssVariables` 経由の `var(--hv-…)` で参照する）。

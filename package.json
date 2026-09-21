@@ -15,7 +15,9 @@
     "wikidata:report": "node scripts/wikidata/report.mjs",
     "wikidata:build-app-data": "node scripts/wikidata/build-app-data.mjs",
     "wikidata:place-overrides-draft": "node scripts/wikidata/build-place-overrides-draft.mjs",
-    "wikidata:diffusion-draft": "node scripts/wikidata/build-diffusion-draft.mjs"
+    "wikidata:diffusion-draft": "node scripts/wikidata/build-diffusion-draft.mjs",
+    "ohm:fetch": "node scripts/ohm/fetch-borders.mjs",
+    "ohm:build": "node scripts/ohm/build-borders.mjs"
   },
   "dependencies": {
     "maplibre-gl": "6.10.0",
@@ -31,6 +33,7 @@
     "@types/react-dom": "19.3.0",
     "eslint": "9.39.5",
     "eslint-config-next": "16.3.5",
+    "mapshaper": "0.7.62",
     "postcss": "8.5.28",
     "tailwindcss": "4.3.3",
     "typescript": "6.0.3"
