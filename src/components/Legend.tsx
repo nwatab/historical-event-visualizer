@@ -53,7 +53,7 @@ export function Legend({ hiddenDomains, highlighted, onHover, onToggle, onShowAl
     <nav aria-label="分類の凡例とフィルタ" style={surfaceStyle}>
       <button
         type="button"
-        className="flex items-center sm:hidden"
+        className="flex items-center roomy:hidden"
         style={{ gap: SPACE[8], ...textStyle.caption }}
         aria-expanded={expanded}
         aria-controls="legend-items"
@@ -76,10 +76,10 @@ export function Legend({ hiddenDomains, highlighted, onHover, onToggle, onShowAl
       {allHidden && showAllButton}
       <div
         id="legend-items"
-        className={expanded ? "block" : "hidden sm:block"}
+        className={expanded ? "block" : "hidden roomy:block"}
         style={{ marginTop: expanded ? SPACE[8] : 0 }}
       >
-        <p className="hidden sm:block" style={{ ...textStyle.caption, marginBottom: SPACE[4] }}>
+        <p className="hidden roomy:block" style={{ ...textStyle.caption, marginBottom: SPACE[4] }}>
           分類（クリックで表示／非表示）
         </p>
         <ul className="flex flex-col">

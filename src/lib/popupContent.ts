@@ -16,11 +16,25 @@ const px = (value: number): string => `${value}px`;
 
 /**
  * 吹き出しの中身。分類は色に頼らずテキストでも示す。
- * moreCount を渡すと、末尾に「ほか N 件」を足す（出す件数を絞ったとき）。
+ * moreCount を渡すと、末尾に「ほか N 件」を足す（出す件数を絞ったとき）。heading は先頭の見出し（年表のヒストグラムの「1950年: 120件」）。
  */
-export const popupContent = (items: readonly PopupItem[], moreCount: number = 0): HTMLElement => {
+export const popupContent = (
+  items: readonly PopupItem[],
+  moreCount: number = 0,
+  heading: string | null = null,
+): HTMLElement => {
   const root = document.createElement("div");
   Object.assign(root.style, { display: "flex", flexDirection: "column", gap: px(SPACE[8]) });
+  if (heading !== null) {
+    const headingEl = document.createElement("div");
+    Object.assign(headingEl.style, {
+      fontSize: px(textStyle.caption.fontSize),
+      color: textStyle.caption.color,
+      fontVariantNumeric: "tabular-nums",
+    });
+    headingEl.textContent = heading;
+    root.append(headingEl);
+  }
   items.forEach(({ title, domain }) => {
     const label = document.createElement("div");
     Object.assign(label.style, {

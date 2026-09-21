@@ -5,6 +5,7 @@ import { publicPath } from "./config";
 import {
   MANIFEST_PATH,
   eventFilePath,
+  filesAhead,
   filesForYear,
   mergeEventFiles,
   type EventManifest,
@@ -30,8 +31,10 @@ const fetchJson = async <T,>(path: `/${string}`): Promise<T> => {
  * 現在年の前後 margin 年（地図の窓と年表の窓の広いほう）と重なる区間のファイルだけを読み、読んだものはキャッシュする
  * （ページを開いている間だけ。localStorage は使わない）。年表の窓が ±500 年のとき、最大 11 ファイル。
  * 読み込み中は既存のイベントをそのまま返し、必要なファイルが揃ってから差し替える（マーカーが一瞬消えるのを避ける）。
+ * prefetchAhead（年）が正なら、窓の先のその年数ぶんと重なるファイルも先に取りに行く（再生中。窓の端が次の区間に入る前に
+ * 読み始めるため）。先読みのファイルは表示の条件には入れないので、間に合わなくても表示は待たされない。
  */
-export const useEvents = (year: Year, margin: number): LoadedEvents => {
+export const useEvents = (year: Year, margin: number, prefetchAhead: number = 0): LoadedEvents => {
   const [manifest, setManifest] = useState<EventManifest | null>(null);
   // file 名 → イベント。読み込みの開始は requested で管理し、同じファイルを二度取りに行かない
   const [cache, setCache] = useState<ReadonlyMap<string, readonly HistEvent[]>>(new Map());
@@ -56,8 +59,13 @@ export const useEvents = (year: Year, margin: number): LoadedEvents => {
     [manifest, year, margin],
   );
 
+  const prefetch = useMemo(
+    () => (manifest === null || prefetchAhead <= 0 ? [] : filesAhead(manifest.files, year, margin, prefetchAhead)),
+    [manifest, year, margin, prefetchAhead],
+  );
+
   useEffect(() => {
-    needed
+    [...needed, ...prefetch]
       .filter((f) => !requested.current.has(f.file))
       .forEach((f) => {
         requested.current.add(f.file);
@@ -68,7 +76,7 @@ export const useEvents = (year: Year, margin: number): LoadedEvents => {
             console.error(`${f.file} を読めませんでした`, e);
           });
       });
-  }, [needed]);
+  }, [needed, prefetch]);
 
   // 年を動かしても、必要なファイルの組が変わらなければ作り直さない
   const neededKey = needed.map((f) => f.file).join("|");

@@ -150,6 +150,66 @@ export const itemsAtX = (
     })
     .sort(byTimelinePriority(window.center));
 
+// ── レーンの描き方（点と帯 / ヒストグラム） ──────────────────
+
+/**
+ * レーンの描き方。項目が多すぎて点が並びきらないレーンは、点と帯の代わりに 1 年刻みのヒストグラムにする。
+ * - items:     点（instant）と帯（period）
+ * - histogram: その年に存在する項目の数の棒
+ */
+export type LaneMode = "items" | "histogram";
+
+/** レーンに点を重ねずに並べられる数（レーンの幅 ÷ 点の直径）。窓内の項目数がこれを超えたらヒストグラムにする。 */
+export const laneCapacity = (geometry: TimelineGeometry): number =>
+  Math.floor(geometry.width / (2 * geometry.pointRadius));
+
+export const laneModes = (
+  items: readonly TimelineItem[],
+  geometry: TimelineGeometry,
+): Readonly<Record<Domain, LaneMode>> => {
+  const capacity = laneCapacity(geometry);
+  const count = (domain: Domain): number => items.filter((item) => item.domain === domain).length;
+  return Object.fromEntries(
+    DOMAINS.map((domain) => [domain, count(domain) > capacity ? "histogram" : "items"]),
+  ) as Record<Domain, LaneMode>;
+};
+
+/** その年に存在する項目か。instant は start の年、period は start〜end の各年。 */
+export const existsInYear = (item: TimelineItem, year: Year): boolean => item.start <= year && year <= item.end;
+
+/** その年に存在する、そのレーンの項目。優先順（importance、現在年への近さ）で返す。 */
+export const itemsInYear = (
+  items: readonly TimelineItem[],
+  domain: Domain,
+  year: Year,
+  center: Year,
+): readonly TimelineItem[] =>
+  items.filter((item) => item.domain === domain && existsInYear(item, year)).sort(byTimelinePriority(center));
+
+export interface HistogramBin {
+  readonly year: Year;
+  readonly count: number;
+}
+
+/** 窓の中の整数年ごとの件数。instant は start の年に、period は start〜end の各年に 1 を加える。 */
+export const laneHistogram = (
+  items: readonly TimelineItem[],
+  domain: Domain,
+  window: TimelineWindow,
+): readonly HistogramBin[] => {
+  const first = Math.ceil(window.center - window.halfSpan);
+  const last = Math.floor(window.center + window.halfSpan);
+  const lane = items.filter((item) => item.domain === domain && item.end >= first && item.start <= last);
+  return Array.from({ length: Math.max(0, last - first + 1) }, (_, i) => first + i).map((year) => ({
+    year,
+    count: lane.filter((item) => existsInYear(item, year)).length,
+  }));
+};
+
+/** x 座標 → いちばん近い整数年（ヒストグラムの棒は、その年を中心に 1 年ぶんの幅を持つ）。 */
+export const yearAtX = (x: number, window: TimelineWindow, width: number): Year =>
+  Math.round(window.center - window.halfSpan + (width === 0 ? 0 : (x / width) * windowYears(window)));
+
 // ── ラベル ────────────────────────────────────────────────
 
 /**
@@ -166,36 +226,54 @@ export interface TimelineLabel {
   /** ラベルの左端 */
   readonly x: number;
   readonly width: number;
+  /** ラベルが指している位置（項目の右端、帯の左端、ヒストグラムのレーンでは開始年）。 */
+  readonly anchor: number;
 }
 
 /**
  * ラベルを置く。レーンごとに、優先順（importance の高いもの、同じなら現在年に近いもの）で見ていき、
- * 既に置いたラベルと重なるもの、他の項目の点（instant）や短い帯に重なるもの、年表の右端からはみ出すものは出さない。
- * - 点を避けるのは、白いハローを付けない（背景が白の前提）ので、点の上に乗った文字が読めなくなるため。
- *   長い period の帯は薄い塗りなので、その上には置いてよい。
- * - ラベルは項目の右隣に置く（period は帯の左端から）。
+ * 既に置いたラベルと重なるもの、年表の右端からはみ出すものは出さない。
+ * - 点と帯のレーン: 他の項目の点（instant）や短い帯に重なるものも出さない。白いハローを付けない（背景が白の前提）ので、
+ *   点の上に乗った文字が読めなくなるため。長い period の帯は薄い塗りなので、その上には置いてよい。
+ *   ラベルは項目の右隣に置く（period は帯の左端から）。
+ * - ヒストグラムのレーン: importance 3 の項目だけにラベルを出す。ラベルどうしだけを避け、ヒストグラムは避けない
+ *   （薄い塗りなので、その上でも読める）。点が無いので、ラベルは開始年の位置から置く。
  */
 export const timelineLabels = (
   items: readonly TimelineItem[],
   window: TimelineWindow,
   geometry: TimelineGeometry,
   label: { readonly fontSize: number; readonly gap: number },
+  modes: Readonly<Record<Domain, LaneMode>> = laneModes(items, geometry),
 ): readonly TimelineLabel[] =>
   timelineLanes([]).flatMap((domain) => {
+    const histogram = modes[domain] === "histogram";
     const lane = items.filter((item) => item.domain === domain);
-    // 避ける対象: 点と、点と同じくらい短い帯（輪郭の縦線が文字を横切る）
-    const points = lane
-      .map((item) => ({ id: item.id, kind: item.kind, extent: itemExtent(item, window, geometry) }))
-      .filter((p) => p.kind === "instant" || p.extent[1] - p.extent[0] <= 4 * geometry.pointRadius);
-    return [...lane].sort(byTimelinePriority(window.center)).reduce<readonly TimelineLabel[]>((placed, item) => {
-      const [x0, x1] = itemExtent(item, window, geometry);
-      const x = (item.kind === "instant" ? x1 : x0) + label.gap;
-      const width = estimateTextWidth(item.title, label.fontSize);
-      const fits = x >= 0 && x + width <= geometry.width;
-      const hitsLabel = placed.some((p) => x < p.x + p.width + label.gap && p.x < x + width + label.gap);
-      const hitsPoint = points.some((p) => p.id !== item.id && x < p.extent[1] && p.extent[0] < x + width);
-      return fits && !hitsLabel && !hitsPoint ? [...placed, { id: item.id, domain, text: item.title, x, width }] : placed;
-    }, []);
+    // 避ける対象: 点と、点と同じくらい短い帯（輪郭の縦線が文字を横切る）。ヒストグラムのレーンには点が無い
+    const points = histogram
+      ? []
+      : lane
+          .map((item) => ({ id: item.id, kind: item.kind, extent: itemExtent(item, window, geometry) }))
+          .filter((p) => p.kind === "instant" || p.extent[1] - p.extent[0] <= 4 * geometry.pointRadius);
+    return lane
+      .filter((item) => !histogram || item.importance === 3)
+      .sort(byTimelinePriority(window.center))
+      .reduce<readonly TimelineLabel[]>((placed, item) => {
+        const [x0, x1] = itemExtent(item, window, geometry);
+        const anchor = histogram
+          ? Math.max(0, timelineX(item.start, window, geometry.width))
+          : item.kind === "instant"
+            ? x1
+            : x0;
+        const x = anchor + label.gap;
+        const width = estimateTextWidth(item.title, label.fontSize);
+        const fits = x >= 0 && x + width <= geometry.width;
+        const hitsLabel = placed.some((p) => x < p.x + p.width + label.gap && p.x < x + width + label.gap);
+        const hitsPoint = points.some((p) => p.id !== item.id && x < p.extent[1] && p.extent[0] < x + width);
+        return fits && !hitsLabel && !hitsPoint
+          ? [...placed, { id: item.id, domain, text: item.title, x, width, anchor }]
+          : placed;
+      }, []);
   });
 
 // ── 時間軸 ────────────────────────────────────────────────
@@ -203,7 +281,11 @@ export const timelineLabels = (
 /** 目盛りの間隔の候補（年）。 */
 export const TIMELINE_AXIS_STEPS: readonly number[] = [10, 50, 100, 500];
 
-/** 隣り合うラベルの間隔が minSpacing (px) 以上になる、最小の間隔。どれも詰まるなら最大のもの。 */
+/**
+ * 隣り合うラベルの間隔が minSpacing (px) 以上になる、最小の間隔。どれも詰まるなら最大のもの。
+ * ただし、その間隔だと窓の中に目盛りが1本も入らないとき（狭い画面で窓が 500 年に満たないとき）は、
+ * 目盛りが入るところまで間隔を細かくする（ラベルが多少詰まっても、年が1つも読めないよりよい）。
+ */
 export const timelineAxisStep = (
   window: TimelineWindow,
   width: number,
@@ -211,7 +293,12 @@ export const timelineAxisStep = (
   steps: readonly number[] = TIMELINE_AXIS_STEPS,
 ): number => {
   const pxPerYear = width / windowYears(window);
-  return steps.find((step) => step * pxPerYear >= minSpacing) ?? steps[steps.length - 1];
+  const preferred = steps.find((step) => step * pxPerYear >= minSpacing) ?? steps[steps.length - 1];
+  const usable = [...steps]
+    .filter((step) => step <= preferred)
+    .sort((a, b) => b - a)
+    .find((step) => timelineAxisTicks(window, step).length > 0);
+  return usable ?? preferred;
 };
 
 /**

@@ -1,5 +1,27 @@
 @import "tailwindcss";
 
+/*
+ * wide: デスクトップの配置（詳細パネルを右、年スライダーを1行）にする条件。
+ * 幅が 640px 以上、または横向き（幅 > 高さ）。横向きのスマホは、幅が足りなくてもデスクトップの配置にする。
+ * コンポーネントでは sm: ではなく wide: を使う。
+ */
+@custom-variant wide {
+  @media (min-width: 640px), (orientation: landscape) {
+    @slot;
+  }
+}
+
+/*
+ * roomy: 凡例と年表を、開いたままにしてよい条件。wide に加えて、高さが 500px 以上。
+ * 横向きのスマホ（高さ 390px 前後）では、開いた凡例（約 260px）と年表（約 200px）と年スライダーが縦に収まらず、
+ * 重なってしまう（844×390 で確認）。そこで、配置はデスクトップのまま、凡例と年表だけ縦向きのスマホと同じく畳んでおく。
+ */
+@custom-variant roomy {
+  @media (min-width: 640px) and (min-height: 500px), (orientation: landscape) and (min-height: 500px) {
+    @slot;
+  }
+}
+
 /* 値はすべて src/lib/design.ts の cssVariables から来る。ここに直接数値・色を書かない。 */
 
 html {

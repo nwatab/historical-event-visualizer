@@ -85,12 +85,12 @@ export function YearSlider({ year, min, max, onChange }: YearSliderProps) {
       style={{ ...surfaceStyle, columnGap: SPACE[16], rowGap: SPACE[4] }}
     >
       <output
-        className="order-first w-full text-center sm:order-last sm:w-auto sm:text-right"
+        className="order-first w-full text-center wide:order-last wide:w-auto wide:text-right"
         style={{ ...textStyle.year, minWidth: YEAR_LABEL_MIN_WIDTH }}
       >
         {label}
       </output>
-      <span className="hidden shrink-0 self-start sm:inline" style={textStyle.caption}>
+      <span className="hidden shrink-0 self-start wide:inline" style={textStyle.caption}>
         {formatYear(min)}
       </span>
       <div className="min-w-0 flex-1">
@@ -110,7 +110,7 @@ export function YearSlider({ year, min, max, onChange }: YearSliderProps) {
         </div>
         {width > 0 && <AxisLabels scale={scale} />}
       </div>
-      <span className="hidden shrink-0 self-start sm:inline" style={textStyle.caption}>
+      <span className="hidden shrink-0 self-start wide:inline" style={textStyle.caption}>
         {formatYear(max)}
       </span>
     </div>

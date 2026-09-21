@@ -157,3 +157,27 @@ export const TIMELINE_IMPORTANCE_BY_WINDOW: readonly {
 
 /** ホイールの回転量 (deltaY) あたりの、窓の幅の変化率（指数）。100 で約 1.22 倍。 */
 export const TIMELINE_WHEEL_SENSITIVITY = 0.002;
+
+// ── 再生 ──────────────────────────────────────────────────
+
+/** 再生の速度（年/秒）。ボタンで順に切り替える。 */
+export const PLAYBACK_SPEEDS = [5, 20, 100] as const;
+export type PlaybackSpeed = (typeof PLAYBACK_SPEEDS)[number];
+export const PLAYBACK_INITIAL_SPEED: PlaybackSpeed = 20;
+
+/** 次の速度（最後の次は最初に戻る）。 */
+export const nextPlaybackSpeed = (speed: PlaybackSpeed): PlaybackSpeed =>
+  PLAYBACK_SPEEDS[(PLAYBACK_SPEEDS.indexOf(speed) + 1) % PLAYBACK_SPEEDS.length];
+
+/**
+ * 再生を始めた時点の年と経過時間から、現在年を求める。フレームごとに 1 年ずつ足すのではなく、経過時間から決める
+ * （描画が重くてフレームが落ちても、速度が変わらないように）。
+ */
+export const playbackYear = (startYear: Year, elapsedMs: number, speed: number): Year =>
+  startYear + Math.floor((elapsedMs / 1000) * speed);
+
+/**
+ * 再生中に先読みする範囲（秒）。窓の先、この秒数で進むぶんの年までと重なる区間のファイルを、先に取りに行く。
+ * 100 年/秒なら 300 年先まで（近現代の 1 ファイルは 1〜2MB で、読み込みと解析に 1 秒前後かかるため）。
+ */
+export const PLAYBACK_PREFETCH_SECONDS = 3;
