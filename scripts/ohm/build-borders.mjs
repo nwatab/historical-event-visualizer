@@ -1,6 +1,7 @@
 // data/raw/ohm/ の取得結果から、時代別の国境の線（GeoJSON）を作って public/data/borders/ に出力する。
 //
 //   pnpm ohm:build
+//   pnpm ohm:build --allow-unreviewed-licenses   … 受け入れると決めていない license があっても止めずに作る。報告を見るための確認用で、その出力はコミットしない
 //
 // ネットワークには出ない。出力した JSON はコミットする（取得に 1 時間近くかかるので、CI では生成しない）。
 // 年は OHM の日付の年の部分で、すでに天文年（dates.mjs）。
@@ -17,9 +18,10 @@ import {
   SIZE_BUDGET_BYTES,
   TAGS_PATH,
 } from "./config.mjs";
-import { borderProperties, centuryBins, dropReason, isCc0, visibleIn } from "./borders.mjs";
+import { borderProperties, centuryBins, dropReason, visibleIn, waySpans } from "./borders.mjs";
 import { inBorderPeriod } from "./dates.mjs";
 import { EXCLUDED_RELATIONS } from "./exclusions.mjs";
+import { acceptedLicense } from "./licenses.mjs";
 
 /** @typedef {import("./borders.mjs").RawRelation} RawRelation */
 /** @typedef {import("./borders.mjs").RawWay} RawWay */
@@ -77,15 +79,6 @@ if (missing.length > 0) throw new Error(`取得していない relation が ${mi
 
 const excludedIds = new Set(EXCLUDED_RELATIONS.map((e) => e.id));
 const relations = [...relationById.values()].filter((r) => !excludedIds.has(r.id));
-// license が CC0 以外の relation があれば、生成を止めて報告する（way の license は、下でその way だけを落とす）
-const nonCc0 = relations.filter((r) => !isCc0(r.tags.license));
-if (nonCc0.length > 0) {
-  throw new Error(
-    `license が CC0 でない relation が ${nonCc0.length} 件あります。exclusions.mjs で除くか、扱いを決めてください:\n` +
-      nonCc0.map((r) => `  ${r.id} ${r.tags["name:en"] ?? r.tags.name} license=${r.tags.license}`).join("\n"),
-  );
-}
-
 const usedWayIds = [...new Set(relations.flatMap((r) => r.members.map((m) => m.ref)))];
 const usedWays = usedWayIds.flatMap((id) => wayById.get(id) ?? []);
 const dropped = usedWays.flatMap((w) => {
@@ -95,22 +88,64 @@ const dropped = usedWays.flatMap((w) => {
 const droppedIds = new Set(dropped.map((d) => d.way.id));
 const keptWays = usedWays.filter((w) => !droppedIds.has(w.id) && w.coords.length >= 2);
 
+// license: CC0 と CC BY は受け入れ、それ以外（SA / NC / 読めない値）が relation か、残す way に 1 つでもあれば、生成を止めて報告する（licenses.mjs）
+const allowUnreviewed = process.argv.includes("--allow-unreviewed-licenses");
+const unaccepted = [
+  ...relations.filter((r) => acceptedLicense(r.tags.license) === null).map((r) => ({ kind: "relation", id: r.id, license: r.tags.license })),
+  ...keptWays.filter((w) => acceptedLicense(w.tags.license) === null).map((w) => ({ kind: "way", id: w.id, license: w.tags.license })),
+];
+if (unaccepted.length > 0) {
+  const report =
+    `受け入れると決めていない license が ${unaccepted.length} 件あります（licenses.mjs の REVIEWED_LICENSE_VALUES で決めるか、exclusions.mjs で relation を除いてください）:\n` +
+    [...Map.groupBy(unaccepted, (u) => `${u.kind} license=${u.license}`).entries()]
+      .map(([key, group]) => {
+        const ids = new Set(group.map((g) => g.id));
+        const names = group[0].kind === "way" ? [...new Set(relations.filter((r) => r.members.some((m) => ids.has(m.ref))).map((r) => r.tags["name:en"] ?? r.tags.name))] : [];
+        return `  ${key}: ${group.length} 件（例: ${group.slice(0, 3).map((g) => g.id).join(", ")}）${names.length > 0 ? ` 使っている relation: ${names.slice(0, 8).join("、")}${names.length > 8 ? ` ほか ${names.length - 8}` : ""}` : ""}`;
+      })
+      .join("\n");
+  if (!allowUnreviewed) throw new Error(report);
+  console.warn(`${report}\n--allow-unreviewed-licenses: 止めずに続ける。この出力はコミットしない`);
+}
+
 // ── 簡略化と出力 ──────────────────────────────────────────
 
 const bins = centuryBins(BORDER_YEAR_MIN, BORDER_YEAR_MAX);
 
+// 線は way の単位で持つ（relation ごとに出すと、同じ way が版の数だけ重複する。borders.mjs の waySpans）。
+// 期間と名前の組が同じ way は、1 つの feature（MultiLineString）にまとめる
+const keptIds = new Set(keptWays.map((w) => w.id));
+const relationInputs = relations.flatMap((relation) => {
+  const properties = borderProperties(relation);
+  return properties === null ? [] : [{ properties, wayIds: [...new Set(relation.members.map((m) => m.ref))].filter((id) => keptIds.has(id)) }];
+});
+const spans = waySpans(relationInputs, BORDER_YEAR_MIN, BORDER_YEAR_MAX);
+
 /** @param {number} toleranceDeg */
 const build = async (toleranceDeg) => {
   const simplified = await simplifyWays(keptWays, toleranceDeg);
-  const features = relations.flatMap((relation) => {
-    const properties = borderProperties(relation);
-    if (properties === null) return [];
-    const lines = [...new Set(relation.members.map((m) => m.ref))].flatMap((ref) => simplified.get(ref) ?? []);
-    return lines.length === 0 ? [] : [{ type: "Feature", properties, geometry: { type: "MultiLineString", coordinates: lines } }];
+  const pieces = [...spans.entries()].flatMap(([wayId, list]) => {
+    const lines = simplified.get(wayId) ?? [];
+    return lines.length === 0 ? [] : list.map((span) => ({ ...span, lines }));
+  });
+  const features = [...Map.groupBy(pieces, (p) => `${p.start}|${p.end}|${p.names.map((n) => n.name).join("|")}`).values()].map((group) => {
+    const { start, end, names } = group[0];
+    return {
+      type: "Feature",
+      properties: {
+        // その線を国境に持つ国（隣り合う 2 国なら 2 つ）。英語名と、日本語名（name:ja が無い国は英語名のまま）
+        name: names.map((n) => n.name).join(" / "),
+        ...(names.some((n) => n.nameJa) ? { nameJa: names.map((n) => n.nameJa ?? n.name).join(" / ") } : {}),
+        start,
+        // BORDER_YEAR_MAX まで続く線には end を書かない
+        ...(end > BORDER_YEAR_MAX ? {} : { end }),
+      },
+      geometry: { type: "MultiLineString", coordinates: group.flatMap((p) => p.lines) },
+    };
   });
   const files = bins
     .map((bin) => {
-      const mine = features.filter((f) => visibleIn(f.properties, bin)).sort((a, b) => a.properties.start - b.properties.start || a.properties.relationId - b.properties.relationId);
+      const mine = features.filter((f) => visibleIn(f.properties, bin)).sort((a, b) => a.properties.start - b.properties.start || a.properties.name.localeCompare(b.properties.name));
       return { bin, file: `${bin.from}.json`, count: mine.length, json: JSON.stringify({ type: "FeatureCollection", features: mine }) };
     })
     .filter((f) => f.count > 0);
@@ -127,13 +162,14 @@ await Promise.all((await readdir(BORDERS_DIR)).filter((f) => f.endsWith(".json")
 await Promise.all(result.files.map((f) => writeFile(join(BORDERS_DIR, f.file), f.json)));
 
 const fetchedAts = chunks.map((c) => c.fetchedAt).sort();
-const withoutLines = relations.filter((r) => !result.features.some((f) => f.properties.relationId === r.id));
+const withoutLines = relationInputs.filter((r) => r.wayIds.length === 0);
 const manifest = {
   generatedAt: new Date().toISOString(),
   source: {
     name: "OpenHistoricalMap",
     url: "https://www.openhistoricalmap.org/",
-    license: "CC0",
+    license: "CC0 / CC BY 4.0",
+    attribution: "© OpenHistoricalMap contributors（CC0 / CC BY 4.0）",
     query: 'relation["boundary"="administrative"]["admin_level"="2"]',
     tagsFetchedAt: tagsFile.fetchedAt,
     osmBase: tagsFile.osmBase,
@@ -144,10 +180,13 @@ const manifest = {
   yearMax: BORDER_YEAR_MAX,
   simplifyToleranceDeg: result.toleranceDeg,
   coordPrecisionDeg: COORD_PRECISION_DEG,
-  relations: { selected: relationById.size, excluded: relationById.size - relations.length, withLines: result.features.length, withoutLines: withoutLines.length },
+  relations: { selected: relationById.size, excluded: relationById.size - relations.length, withLines: relationInputs.length - withoutLines.length, withoutLines: withoutLines.length },
+  features: result.features.length,
   ways: { used: usedWays.length, kept: keptWays.length, dropped: countBy(dropped, (d) => d.reason) },
-  // license で落とした way の、license の値ごとの数
-  droppedLicenses: countBy(dropped.filter((d) => d.reason === "license"), (d) => d.way.tags.license),
+  // 残した way の、license 別の本数（正規化した名前。タグ無しは OHM の既定の CC0）と、タグの値そのままの内訳
+  waysByLicense: countBy(keptWays, (w) => acceptedLicense(w.tags.license) ?? `未判断: ${w.tags.license}`),
+  waysByLicenseTag: countBy(keptWays, (w) => w.tags.license ?? "(タグ無し)"),
+  ...(allowUnreviewed && unaccepted.length > 0 ? { unreviewedLicenses: true } : {}),
   excluded: EXCLUDED_RELATIONS.map((e) => ({ ...e, inPeriod: relationById.has(e.id) })),
   totalBytes: result.bytes,
   files: result.files.map((f) => ({ file: f.file, from: f.bin.from, to: f.bin.to, count: f.count, bytes: Buffer.byteLength(f.json) })),
@@ -155,8 +194,9 @@ const manifest = {
 await writeFile(join(BORDERS_DIR, "manifest.json"), JSON.stringify(manifest, null, 1));
 
 console.log(`relation: 取得 ${relationById.size} 件、除外 ${manifest.relations.excluded} 件、線が残った ${manifest.relations.withLines} 件、線が 1 本も残らなかった ${withoutLines.length} 件`);
-console.log(`way: 使われている ${usedWays.length} 本 → 残した ${keptWays.length} 本。落とした理由:`, JSON.stringify(manifest.ways.dropped), " license の内訳:", JSON.stringify(manifest.droppedLicenses));
-console.log(`license が CC0 でない relation: ${nonCc0.length} 件`);
+console.log(`way: 使われている ${usedWays.length} 本 → 残した ${keptWays.length} 本。落とした理由:`, JSON.stringify(manifest.ways.dropped));
+console.log("残した way の license:", JSON.stringify(manifest.waysByLicense), " タグの値:", JSON.stringify(manifest.waysByLicenseTag));
+console.log("relation の license:", JSON.stringify(countBy(relations, (r) => r.tags.license ?? "(タグ無し)")));
 console.log(manifest.files.map((f) => `  ${f.file.padStart(10)}  ${String(f.count).padStart(5)} 件  ${(f.bytes / 1024).toFixed(0).padStart(6)} KB`).join("\n"));
 console.log(`合計 ${(result.bytes / 1e6).toFixed(2)} MB（許容 ${result.toleranceDeg}°）→ ${BORDERS_DIR}`);
-if (withoutLines.length > 0) console.log("線が残らなかった relation（上位）:", withoutLines.slice(0, 15).map((r) => `${r.tags["name:en"] ?? r.tags.name}(${r.tags.start_date})`).join("、"));
+if (withoutLines.length > 0) console.log("どの版にも線が残らなかった国（島など、国境が海岸線・海上の線だけのもの。例）:", [...new Set(withoutLines.map((r) => r.properties.name))].filter((name) => relationInputs.every((r) => r.properties.name !== name || r.wayIds.length === 0)).slice(0, 15).join("、"));
