@@ -130,23 +130,6 @@ export const sampleEvents: readonly HistEvent[] = [
     importance: 2,
     source: "https://ja.wikipedia.org/wiki/蔡倫",
   },
-  {
-    id: "Q821711",
-    title: { ja: "ユスティニアヌスのペスト", en: "Plague of Justinian" },
-    description: {
-      ja: "541年にエジプトに到達し、549年まで地中海全域・ヨーロッパ・近東で流行したペスト。542年には首都コンスタンティノープルで猛威を振るった。",
-    },
-    domain: "population",
-    tags: ["population"],
-    // R6b から、生成データでは data/diffusion/plague-of-justinian.json の diffusion 版に置き換わる（この項目はデータに出ない）。
-    // 年は出典（英語版の冒頭 "AD 541–549"）で確認。
-    kind: "period",
-    start: 541,
-    end: 549,
-    places: [{ lon: 28.98, lat: 41.01, label: "コンスタンティノープル" }],
-    importance: 2,
-    source: "https://en.wikipedia.org/wiki/Plague_of_Justinian",
-  },
 
   // ── 中世 ────────────────────────────────────────────────
   {
@@ -184,36 +167,6 @@ export const sampleEvents: readonly HistEvent[] = [
     places: [{ lon: -0.56, lat: 51.44, label: "ラニーミード" }],
     importance: 2,
     source: "https://ja.wikipedia.org/wiki/マグナ・カルタ",
-  },
-  {
-    id: "Q42005",
-    title: { ja: "ヨーロッパの黒死病流行", en: "Black Death in Europe" },
-    description: {
-      ja: "1347年にシチリアのメッシーナなどへ到達し、1351年にかけてヨーロッパ全域で流行が頂点に達した。",
-    },
-    domain: "population",
-    tags: ["population", "economy"],
-    // R6b から、生成データでは data/diffusion/black-death.json の diffusion 版（黒死病、1346〜1353年）に置き換わる（この項目はデータに出ない）。
-    // 年は出典（日本語版の冒頭「ヨーロッパでは1347年から1351年にかけてピークに達した」）で確認。
-    // パンデミック全体（1346〜1353年）ではなく、この項目のタイトルどおりヨーロッパでの流行期間にしている。
-    kind: "period",
-    start: 1347,
-    end: 1351,
-    places: [{ lon: 15.55, lat: 38.19, label: "メッシーナ" }],
-    importance: 3,
-    source: "https://ja.wikipedia.org/wiki/黒死病",
-  },
-  {
-    id: "gutenberg-printing-press",
-    title: { ja: "グーテンベルクの活版印刷", en: "Gutenberg's printing press" },
-    description: { ja: "マインツで金属活字による活版印刷が実用化された（1450年頃）。" },
-    domain: "technology",
-    tags: ["technology", "culture"],
-    kind: "instant",
-    start: 1450,
-    places: [{ lon: 8.27, lat: 50.0, label: "マインツ" }],
-    importance: 3,
-    source: "https://ja.wikipedia.org/wiki/印刷機",
   },
 
   // ── 近世 ────────────────────────────────────────────────

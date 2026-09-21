@@ -28,16 +28,16 @@
   },
   "stages": [
     {
-      "year": 634,
+      "year": 636,
       "qid": "Q3766",
       "label": "ダマスカス",
       "labelEn": "Damascus",
       "from": -1,
-      "source": "en: Siege of Damascus (634) 冒頭",
-      "summary": "包囲は634年8月21日から9月19日まで続き、都市は正統カリフ軍に落ちた",
+      "source": "en: Early Muslim conquests § Conquest of Syria: 634–641; en: Siege of Damascus (634) 冒頭",
+      "summary": "ヤルムークの勝利に続いて、アラブ軍は636年にダマスカスを再び取った (en_early_muslim_conquests.txt:76)。最初の陥落は634年9月（en: Siege of Damascus (634)）で、その後ヘラクレイオスに奪い返されていた",
       "fromBasis": "出典に明記",
       "fromNote": "同じ冒頭に、634年4月にアブー・バクル（マディーナ）がビザンツ領レヴァントへ侵攻、とある。ハーリドの部隊はイラクから来た（en: Early Muslim conquests § Conquest of Syria）",
-      "needsCheck": "en: Early Muslim conquests § Conquest of Syria は、6か月の包囲で取り、ヘラクレイオスに奪い返され、636年に再び取った、とする。634（最初の陥落）か 636（最終）かを選ぶ必要がある"
+      "note": "年は人の確認で 636（最終的な占領）に決めた（2026-09-21）。634 は一時的な占領"
     },
     {
       "year": 637,
@@ -126,11 +126,23 @@
       "qid": "Q126148",
       "label": "タンジェ",
       "labelEn": "Tangier",
-      "from": 7,
+      "from": 6,
       "source": "en: Muslim conquest of the Maghreb（ムーサー・イブン・ヌサイルの節）",
       "summary": "708年、タンジェに守備隊を置いた後、ムーサーはカイラワーンに戻った",
-      "fromBasis": "推測（年代と地理から）",
-      "fromNote": "ムーサーはカイラワーンを基地に、ヌミディアから西の果てへ進んだ。from はカルタゴ（7）が地理的な連なり、カイラワーン（6）でも同じくらい妥当"
+      "fromBasis": "人の判断（2026-09-21 の確認）",
+      "fromNote": "ムーサーの基地はカイラワーンで、708年にタンジェに守備隊を置いた後もカイラワーンに戻っている（en: Muslim conquest of the Maghreb）。調査時はカルタゴ（地理的な連なり）につないでいた"
+    },
+    {
+      "year": 709,
+      "qid": "Q5764",
+      "label": "ブハラ",
+      "labelEn": "Bukhara",
+      "source": "en: Muslim conquest of Transoxiana; en: Early Muslim conquests § Conquest of Transoxiana: 673–751",
+      "summary": "709年の戦役でアラブ軍はブハラを直接攻め、強襲して取り、城塞に守備隊を置いた。その直後にサマルカンドの支配者が使者を送って貢納した (en_Muslim_conquest_of_Transoxiana.txt:74)",
+      "fromBasis": "出典に明記",
+      "fromNote": "クタイバの基地はメルヴ（en: Muslim conquest of Transoxiana。調査時の報告による。本文との突き合わせは、ブハラの陥落の文だけ）",
+      "note": "人の確認で追加した stage（2026-09-21）",
+      "from": 5
     },
     {
       "year": 711,
@@ -149,11 +161,11 @@
       "qid": "Q5753",
       "label": "サマルカンド",
       "labelEn": "Samarkand",
-      "from": 5,
+      "from": 9,
       "source": "en: Early Muslim conquests § Conquest of Transoxiana: 673–751",
       "summary": "706–712年にブハラとサマルカンドが征服された",
       "fromBasis": "出典に明記",
-      "fromNote": "en: Muslim conquest of Transoxiana: クタイバは軍を基地のメルヴに戻した。en: Qutayba ibn Muslim: 711/712年の冬にサマルカンドへの進軍を準備した",
+      "fromNote": "人の確認でブハラ経由にした（2026-09-21）。出典は、706–712年にブハラとサマルカンドが征服された、ブハラ（709年）の後にサマルカンドへ進んだ、と書く。en: Muslim conquest of Transoxiana: クタイバは軍を基地のメルヴに戻した。en: Qutayba ibn Muslim: 711/712年の冬にサマルカンドへの進軍を準備した",
       "needsCheck": "712 は範囲の終わりで、「711/712年の冬」からの推定。「712年にサマルカンドが落ちた」と書く文は無い。別の候補: ブハラ 709年（Q5764。709年の戦役で強襲して取った、と年が明記されている）"
     },
     {
