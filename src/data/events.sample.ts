@@ -138,7 +138,7 @@ export const sampleEvents: readonly HistEvent[] = [
     },
     domain: "population",
     tags: ["population"],
-    // 本来は diffusion（地中海全域に伝播）。diffusion は R6 で実装するため、それまで period として扱う。
+    // R6b から、生成データでは data/diffusion/plague-of-justinian.json の diffusion 版に置き換わる（この項目はデータに出ない）。
     // 年は出典（英語版の冒頭 "AD 541–549"）で確認。
     kind: "period",
     start: 541,
@@ -193,7 +193,7 @@ export const sampleEvents: readonly HistEvent[] = [
     },
     domain: "population",
     tags: ["population", "economy"],
-    // 本来は diffusion（ヨーロッパ全域に伝播）。diffusion は R6 で実装するため、それまで period として扱う。
+    // R6b から、生成データでは data/diffusion/black-death.json の diffusion 版（黒死病、1346〜1353年）に置き換わる（この項目はデータに出ない）。
     // 年は出典（日本語版の冒頭「ヨーロッパでは1347年から1351年にかけてピークに達した」）で確認。
     // パンデミック全体（1346〜1353年）ではなく、この項目のタイトルどおりヨーロッパでの流行期間にしている。
     kind: "period",

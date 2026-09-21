@@ -1,5 +1,5 @@
 {
-  "status": "draft",
+  "status": "confirmed",
   "id": "Q821711",
   "title": {
     "ja": "ユスティニアヌスのペスト",
@@ -13,7 +13,7 @@
     "population"
   ],
   "importance": 2,
-  "note": "手書きのサンプルの Q821711（541〜549年の暫定 period）を置き換える。日本語版 Wikipedia に単独の記事は無い（Q821711 の sitelink に jawiki が無い。調査時の wbgetentities の出力、2026-09-21）。英語版の記事には到達点ごとの年がほとんど無く、年の多くはフランス語版・ドイツ語版の記事から取った。Wikidata の Q821711 には P580 / P582 が無く、541〜549 年は英語版の冒頭の記述。フランス語版・ドイツ語版は第1波を 541〜544 年としている。ペルシウムはプロコピオスが最初に流行を記録した場所で、病気そのものの起源ではない（クシュ／ヌビア、ヒムヤル、中央アジアなどの説がある）。",
+  "note": "手書きのサンプルの Q821711（541〜549年の暫定 period）を置き換える。日本語版 Wikipedia に単独の記事は無い（Q821711 の sitelink に jawiki が無い。調査時の wbgetentities の出力、2026-09-21）。英語版の記事には到達点ごとの年がほとんど無く、年の多くはフランス語版・ドイツ語版の記事から取った。Wikidata の Q821711 には P580 / P582 が無く、541〜549 年は英語版の冒頭の記述。フランス語版・ドイツ語版は第1波を 541〜544 年としている。ペルシウムはプロコピオスが最初に流行を記録した場所で、病気そのものの起源ではない（クシュ／ヌビア、ヒムヤル、中央アジアなどの説がある）。 ／ アトロパテネ（543年。Q260437 は古代王国の項目）の stage は削除した（2026-09-21）。出典（de: Justinianische Pest § Die Ausbreitung der ersten Welle、de-justinian.txt:21）は「543年にアトロパテネに達し、ペルシア軍を襲った」とだけ書き、都市名が無い。fr / en の記事にも該当する都市名は無かった（調査時に保存した本文を grep）。",
   "start": 541,
   "end": 549,
   "source": "https://en.wikipedia.org/wiki/Plague_of_Justinian",
@@ -84,18 +84,6 @@
     },
     {
       "year": 543,
-      "qid": "Q260437",
-      "label": "アトロパテネ",
-      "labelEn": "Atropatene",
-      "from": 3,
-      "source": "de: Justinianische Pest § Die Ausbreitung…",
-      "summary": "543年にアトロパテネに達し、ペルシア軍を襲った。ホスロー1世も543年に罹患 (de-justinian.txt:21)",
-      "fromBasis": "推測（年代と地理から）",
-      "fromNote": "シリアから東へ、という地理的な推測のみ",
-      "needsCheck": "QID は紀元前323年〜紀元226年の古代王国の項目で、時代が合わず、都市でもない（P625 はある）。より適切な項目を人が選ぶ必要がある（候補 Q274536 は未検証）。この stage を外す選択もある"
-    },
-    {
-      "year": 543,
       "qid": "Q48292",
       "label": "アルル",
       "labelEn": "Arles",
@@ -123,7 +111,7 @@
       "qid": "Q22890",
       "label": "アイルランド島",
       "labelEn": "Ireland",
-      "from": 6,
+      "from": 5,
       "source": "fr: Peste de Justinien § Europe méridionale et du nord; de: § Quellenlage",
       "summary": "544年または545年にアイルランドからブリテン諸島に到達 (fr-justinien.txt:192)。ガリアからコーンウォールとアイルランドに達した可能性 (de-justinian.txt:10)",
       "fromBasis": "出典に明記",

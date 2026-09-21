@@ -1,12 +1,12 @@
 {
-  "status": "draft",
+  "status": "confirmed",
   "id": "Q42005",
   "title": {
     "ja": "黒死病",
     "en": "Black Death"
   },
   "description": {
-    "ja": "1346年にクリミアのカッファで記録され、1347年にコンスタンティノープルとシチリアへ、1348年にイタリア・フランス・イングランドへ、1353年にモスクワへ達したペストの大流行。"
+    "ja": "1346年にクリミアのカッファで記録され、1347年にコンスタンティノープル、シチリア、マルセイユへ、1348年にイタリア北部・フランス・イングランドへ、1353年にモスクワへ達したペストの大流行。"
   },
   "domain": "population",
   "tags": [
@@ -14,7 +14,7 @@
     "economy"
   ],
   "importance": 3,
-  "note": "手書きのサンプルの Q42005（ヨーロッパの黒死病流行、1347〜1351年の暫定 period）を置き換える。期間は、en / ja の Wikipedia の冒頭の 1346〜1353 年。Wikidata の Q42005 は P580 = 1346、P582 = 1352（調査時の wbgetentities の出力。2026-09-21）で、終了年が 1 年食い違う。description は到達点の表からの要約で、表の確認後に直す。",
+  "note": "手書きのサンプルの Q42005（ヨーロッパの黒死病流行、1347〜1351年の暫定 period）を置き換える。期間は、en / ja の Wikipedia の冒頭の 1346〜1353 年。Wikidata の Q42005 は P580 = 1346、P582 = 1352（調査時の wbgetentities の出力。2026-09-21）で、終了年が 1 年食い違う。終了年は人の確認で 1353 に決めた（2026-09-21）。",
   "start": 1346,
   "end": 1353,
   "source": "https://ja.wikipedia.org/wiki/黒死病",
@@ -62,35 +62,34 @@
       "summary": "1347年秋までに、コンスタンティノープルから奴隷を運ぶ商船1隻により海路で伝染 (en-black-death.txt:86; ja-kokushibyo.txt:64)"
     },
     {
+      "year": 1347,
+      "qid": "Q23482",
+      "label": "マルセイユ",
+      "labelEn": "Marseille",
+      "from": 1,
+      "source": "en: Black Death in France 冒頭 / § Southern France; en: Black Death § Transmission – Europe",
+      "fromBasis": "人の判断（2026-09-21 の確認）",
+      "fromNote": "出典が書くのは「イタリアから船で」「ジェノヴァを追われたジェノヴァ船」までで、メッシーナ発とは書いていない。1347年のうちに到達していたイタリア側の stage はメッシーナだけなので（ジェノヴァは1348年1月）、メッシーナにつないだ",
+      "summary": "ペストは1347年11月にイタリアからの船でマルセイユに達した (en-bd-france.txt:1,16)。ハイリゲンによれば1347年12月、東方から戻って母港ジェノヴァを追われたジェノヴァ船がマルセイユに入った (en-bd-france.txt:24)",
+      "note": "年は人の確認で 1347 に決めた（2026-09-21）。出典は割れている: en: Black Death in France は冒頭で1347年11月、§ Southern France で1347年12月。en: Black Death § Transmission – Europe (en-black-death.txt:79) と ja: 黒死病 は1348年1月末"
+    },
+    {
       "year": 1348,
       "qid": "Q1449",
       "label": "ジェノヴァ",
       "labelEn": "Genoa",
-      "from": -1,
-      "source": "en: Black Death § Transmission – Europe; ja: 黒死病 § ヨーロッパでの感染爆発",
+      "from": 1,
+      "source": "en: Black Death migration § European outbreak; en: Black Death § Transmission – Europe; ja: 黒死病 § ヨーロッパでの感染爆発",
       "fromBasis": "出典に明記",
-      "fromNote": "カッファ発のガレー船と明記",
-      "needsCheck": "en: Black Death migration § European outbreak (:37) は『そこ(メッシーナ)からジェノヴァ・ヴェネツィアへ、1347–48年の変わり目までに』とし、from=1 の解釈もある",
-      "summary": "カッファからのガレー船が1348年1月にジェノヴァとヴェネツィアに到着 (en-black-death.txt:79; ja-kokushibyo.txt:57)"
-    },
-    {
-      "year": 1348,
-      "qid": "Q23482",
-      "label": "マルセイユ",
-      "labelEn": "Marseille",
-      "from": 3,
-      "source": "en: Black Death § Transmission – Europe; en: Black Death in France § Southern France",
-      "fromBasis": "出典に明記",
-      "fromNote": "ジェノヴァを追われた船と明記 (en-bd-france.txt:24)",
-      "needsCheck": "到着年が不一致: en Black Death と ja 黒死病 は 1348年1月末、en Black Death in France は lead で 1347年11月、§ Southern France で 1347年12月。1347年だとジェノヴァ(1348年1月)より前になり from と矛盾する",
-      "summary": "1月末頃、イタリアから追放されたガレー船がマルセイユに到着。ハイリゲンによれば母港ジェノヴァを追われたジェノヴァ船 (en-black-death.txt:79; en-bd-france.txt:24)"
+      "fromNote": "en: Black Death migration は「そこ（メッシーナ）から」と明記。en: Black Death は「カッファからのガレー船」と書いており、起点から直接とする読み方もある。人の確認でメッシーナに決めた（2026-09-21）",
+      "summary": "1347年10月にカッファから逃れたジェノヴァの船団がメッシーナに着き、そこから1347〜48年の変わり目までにジェノヴァとヴェネツィアへ広がった (en-black-death-migration.txt:36-37)。カッファからのガレー船は1348年1月にジェノヴァとヴェネツィアに着いた (en-black-death.txt:79; ja-kokushibyo.txt:57)"
     },
     {
       "year": 1348,
       "qid": "Q1479",
       "label": "ボルドー",
       "labelEn": "Bordeaux",
-      "from": 4,
+      "from": 3,
       "source": "en: Black Death in France § Southern France",
       "fromBasis": "推測（年代と地理から）",
       "fromNote": "マルセイユの船が南仏沿岸を西(トゥールーズ方面)へ進んだ記述 (:24) と年代順から",
@@ -101,7 +100,7 @@
       "qid": "Q90",
       "label": "パリ",
       "labelEn": "Paris",
-      "from": 4,
+      "from": 3,
       "source": "en: Black Death in England § The Black Death; en: Black Death in France § Northern France",
       "fromBasis": "推測（年代と地理から）",
       "fromNote": "『マルセイユから南仏、続いて北仏へ』(en-bd-france.txt:1) という国単位の記述に基づく。パリへの直接の経路は出典に無い",

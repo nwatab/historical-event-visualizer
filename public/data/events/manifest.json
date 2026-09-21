@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-09-21T01:09:57.018Z",
+ "generatedAt": "2026-09-21T06:24:14.266Z",
  "sources": {
   "wikidata": {
    "license": "CC0",
@@ -92,9 +92,13 @@
   "placeOverrides": {
    "file": "scripts/wikidata/place-overrides.json",
    "applied": 36
+  },
+  "diffusion": {
+   "dir": "data/diffusion",
+   "count": 4
   }
  },
- "total": 19789,
+ "total": 19790,
  "byDomain": {
   "conflict": 14818,
   "culture": 957,
@@ -102,17 +106,17 @@
   "polity": 990,
   "population": 2180,
   "science": 117,
-  "technology": 407
+  "technology": 408
  },
  "byImportance": {
   "1": 13457,
   "2": 5503,
-  "3": 829
+  "3": 830
  },
  "byPlaceKind": {
   "none": 463,
   "origin": 12,
-  "point": 19314
+  "point": 19315
  },
  "byTitlePredicate": {
   "completion": 254,
@@ -128,7 +132,7 @@
  },
  "placesByGranularity": {
   "country": 1116,
-  "fine": 18082,
+  "fine": 18083,
   "region": 1544
  },
  "countryOnlyEvents": 851,
@@ -215,21 +219,21 @@
    "from": 500,
    "to": 600,
    "count": 110,
-   "bytes": 31899
+   "bytes": 33467
   },
   {
    "file": "600.json",
    "from": 600,
    "to": 700,
    "count": 166,
-   "bytes": 48349
+   "bytes": 50646
   },
   {
    "file": "700.json",
    "from": 700,
    "to": 800,
-   "count": 120,
-   "bytes": 34763
+   "count": 121,
+   "bytes": 37349
   },
   {
    "file": "800.json",
@@ -271,21 +275,21 @@
    "from": 1300,
    "to": 1400,
    "count": 468,
-   "bytes": 128697
+   "bytes": 131275
   },
   {
    "file": "1400.json",
    "from": 1400,
    "to": 1500,
-   "count": 543,
-   "bytes": 151154
+   "count": 544,
+   "bytes": 154380
   },
   {
    "file": "1500.json",
    "from": 1500,
    "to": 1600,
-   "count": 935,
-   "bytes": 258520
+   "count": 936,
+   "bytes": 261746
   },
   {
    "file": "1600.json",

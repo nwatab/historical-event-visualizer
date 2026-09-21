@@ -16,10 +16,10 @@
 
 ## 黒死病（1346〜1353）
 
-- ファイル: `data/diffusion/black-death.json`　状態: **draft**
+- ファイル: `data/diffusion/black-death.json`　状態: **confirmed**
 - id: Q42005　分類: population（tags: population, economy）　importance: 3
 - 出典: https://ja.wikipedia.org/wiki/黒死病
-- 補足: 手書きのサンプルの Q42005（ヨーロッパの黒死病流行、1347〜1351年の暫定 period）を置き換える。期間は、en / ja の Wikipedia の冒頭の 1346〜1353 年。Wikidata の Q42005 は P580 = 1346、P582 = 1352（調査時の wbgetentities の出力。2026-09-21）で、終了年が 1 年食い違う。description は到達点の表からの要約で、表の確認後に直す。
+- 補足: 手書きのサンプルの Q42005（ヨーロッパの黒死病流行、1347〜1351年の暫定 period）を置き換える。期間は、en / ja の Wikipedia の冒頭の 1346〜1353 年。Wikidata の Q42005 は P580 = 1346、P582 = 1352（調査時の wbgetentities の出力。2026-09-21）で、終了年が 1 年食い違う。終了年は人の確認で 1353 に決めた（2026-09-21）。
 
 | # | 年 | 地名 | QID | Wikidata のラベル（ja / en） | 緯度, 経度（P625） | 粒度 | from | from の根拠 | 出典 | 要確認 |
 |---:|---:|---|---|---|---|---|---|---|---|---|
@@ -27,10 +27,10 @@
 | 0 | 1347 | コンスタンティノープル | Q16869 | コンスタンティノープル / Constantinople | 41.01, 28.98 | region | 起点 | 出典に明記。カッファ→コンスタンティノープルと明記 | en: Black Death § Transmission – Europe; ja: 黒死病 § ヨーロッパでの感染爆発 要旨: ジェノヴァ商人がカッファから黒海を渡って逃れ、1347年夏にコンスタンティノープルに到来 (en-black-death.txt:77; ja-kokushibyo.txt:55) |  |
 | 1 | 1347 | メッシーナ | Q13666 | メッシーナ / Messina | 38.19, 15.55 | fine | 起点 | 出典に明記。クリミア/カッファ発と明記。ただし出典間に不一致あり(要確認の列) | en: Black Death in Italy § lead / § Southern Italy; en: Black Death migration § European outbreak 要旨: 1347年10月、カッファ(クリミア)から来たジェノヴァ船12隻がシチリアのメッシーナに入港 (en-bd-italy.txt:1,21; en-black-death-migration.txt:36) | ja: ペストの歴史 § ヨーロッパへの上陸 (ja-pest-history.txt:51) は「コンスタンティノープルから出港した12隻」とし、en: Black Death § Origin (:21) も『コンスタンティノープル経由』と書く。from=0 とする解釈も可能 |
 | 2 | 1347 | アレクサンドリア | Q87 | アレクサンドリア / Alexandria | 31.20, 29.89 | fine | 0: コンスタンティノープル | 出典に明記。コンスタンティノープル発の船と明記 | en: Black Death § West Asia and North Africa; ja: 黒死病 § 西アジアおよび北アフリカの感染爆発 要旨: 1347年秋までに、コンスタンティノープルから奴隷を運ぶ商船1隻により海路で伝染 (en-black-death.txt:86; ja-kokushibyo.txt:64) |  |
-| 3 | 1348 | ジェノヴァ | Q1449 | ジェノヴァ / Genoa | 44.41, 8.93 | fine | 起点 | 出典に明記。カッファ発のガレー船と明記 | en: Black Death § Transmission – Europe; ja: 黒死病 § ヨーロッパでの感染爆発 要旨: カッファからのガレー船が1348年1月にジェノヴァとヴェネツィアに到着 (en-black-death.txt:79; ja-kokushibyo.txt:57) | en: Black Death migration § European outbreak (:37) は『そこ(メッシーナ)からジェノヴァ・ヴェネツィアへ、1347–48年の変わり目までに』とし、from=1 の解釈もある |
-| 4 | 1348 | マルセイユ | Q23482 | マルセイユ / Marseille | 43.30, 5.38 | fine | 3: ジェノヴァ | 出典に明記。ジェノヴァを追われた船と明記 (en-bd-france.txt:24) | en: Black Death § Transmission – Europe; en: Black Death in France § Southern France 要旨: 1月末頃、イタリアから追放されたガレー船がマルセイユに到着。ハイリゲンによれば母港ジェノヴァを追われたジェノヴァ船 (en-black-death.txt:79; en-bd-france.txt:24) | 到着年が不一致: en Black Death と ja 黒死病 は 1348年1月末、en Black Death in France は lead で 1347年11月、§ Southern France で 1347年12月。1347年だとジェノヴァ(1348年1月)より前になり from と矛盾する |
-| 5 | 1348 | ボルドー | Q1479 | ボルドー / Bordeaux | 44.84, -0.58 | fine | 4: マルセイユ | 推測（年代と地理から）。マルセイユの船が南仏沿岸を西(トゥールーズ方面)へ進んだ記述 (:24) と年代順から | en: Black Death in France § Southern France 要旨: ボルドーでは1348年6月に確認(3月には既に存在した可能性)。カルカソンヌ1月、トゥールーズ4月 (en-bd-france.txt:26) |  |
-| 6 | 1348 | パリ | Q90 | パリ / Paris | 48.86, 2.35 | fine | 4: マルセイユ | 推測（年代と地理から）。『マルセイユから南仏、続いて北仏へ』(en-bd-france.txt:1) という国単位の記述に基づく。パリへの直接の経路は出典に無い | en: Black Death in England § The Black Death; en: Black Death in France § Northern France 要旨: 1348年6月までに北はパリまで到達 (en-bd-england.txt:22)。ジャン・ド・ヴネットによれば6月にゴネス近郊ロワシーに初到来 (en-bd-france.txt:34) | 6月の記録はパリ市内ではなく近郊ロワシー。パリ市内の大量死の記述は1348年11–12月 |
+| 3 | 1347 | マルセイユ | Q23482 | マルセイユ / Marseille | 43.30, 5.38 | fine | 1: メッシーナ | 人の判断（2026-09-21 の確認）。出典が書くのは「イタリアから船で」「ジェノヴァを追われたジェノヴァ船」までで、メッシーナ発とは書いていない。1347年のうちに到達していたイタリア側の stage はメッシーナだけなので（ジェノヴァは1348年1月）、メッシーナにつないだ | en: Black Death in France 冒頭 / § Southern France; en: Black Death § Transmission – Europe 要旨: ペストは1347年11月にイタリアからの船でマルセイユに達した (en-bd-france.txt:1,16)。ハイリゲンによれば1347年12月、東方から戻って母港ジェノヴァを追われたジェノヴァ船がマルセイユに入った (en-bd-france.txt:24) 年は人の確認で 1347 に決めた（2026-09-21）。出典は割れている: en: Black Death in France は冒頭で1347年11月、§ Southern France で1347年12月。en: Black Death § Transmission – Europe (en-black-death.txt:79) と ja: 黒死病 は1348年1月末 |  |
+| 4 | 1348 | ジェノヴァ | Q1449 | ジェノヴァ / Genoa | 44.41, 8.93 | fine | 1: メッシーナ | 出典に明記。en: Black Death migration は「そこ（メッシーナ）から」と明記。en: Black Death は「カッファからのガレー船」と書いており、起点から直接とする読み方もある。人の確認でメッシーナに決めた（2026-09-21） | en: Black Death migration § European outbreak; en: Black Death § Transmission – Europe; ja: 黒死病 § ヨーロッパでの感染爆発 要旨: 1347年10月にカッファから逃れたジェノヴァの船団がメッシーナに着き、そこから1347〜48年の変わり目までにジェノヴァとヴェネツィアへ広がった (en-black-death-migration.txt:36-37)。カッファからのガレー船は1348年1月にジェノヴァとヴェネツィアに着いた (en-black-death.txt:79; ja-kokushibyo.txt:57) |  |
+| 5 | 1348 | ボルドー | Q1479 | ボルドー / Bordeaux | 44.84, -0.58 | fine | 3: マルセイユ | 推測（年代と地理から）。マルセイユの船が南仏沿岸を西(トゥールーズ方面)へ進んだ記述 (:24) と年代順から | en: Black Death in France § Southern France 要旨: ボルドーでは1348年6月に確認(3月には既に存在した可能性)。カルカソンヌ1月、トゥールーズ4月 (en-bd-france.txt:26) |  |
+| 6 | 1348 | パリ | Q90 | パリ / Paris | 48.86, 2.35 | fine | 3: マルセイユ | 推測（年代と地理から）。『マルセイユから南仏、続いて北仏へ』(en-bd-france.txt:1) という国単位の記述に基づく。パリへの直接の経路は出典に無い | en: Black Death in England § The Black Death; en: Black Death in France § Northern France 要旨: 1348年6月までに北はパリまで到達 (en-bd-england.txt:22)。ジャン・ド・ヴネットによれば6月にゴネス近郊ロワシーに初到来 (en-bd-france.txt:34) | 6月の記録はパリ市内ではなく近郊ロワシー。パリ市内の大量死の記述は1348年11–12月 |
 | 7 | 1348 | ウェイマス | Q661619 | ウェイマス / Weymouth | 50.61, -2.45 | fine | 5: ボルドー | 出典に明記。出典は『ガスコーニュから』と明記。ボルドーをガスコーニュの代表とするのは推測 | en: Black Death in England § lead / § Progress of the plague 要旨: 1348年6月24日の少し前、ガスコーニュからの船でメルカム(ウェイマス)に到来 (en-bd-england.txt:3,27) | 出典はガスコーニュの出港地を明記していない。別の上陸地(ブリストル、サウサンプトン)を挙げる史料もあると同記事にある。より正確な地点は Q748863 メルカム・レジス(P625 あり) |
 | 8 | 1349 | ベルゲン | Q26793 | ベルゲン / Bergen | 60.39, 5.32 | fine | 7: ウェイマス | 出典に明記。『イングランドから』は明記。ウェイマスに割り当てたのは便宜 | en: Black Death in Norway § Western Norway; en: Black Death § Transmission – Europe; ja: 黒死病 § ヨーロッパでの感染爆発 要旨: 1349年夏の終わり(おそらく8月)、イングランドからの船でベルゲンに到達 (en-bd-norway.txt:28; en-black-death.txt:80; ja-kokushibyo.txt:58) | イングランドの出港地は出典に無い。同記事 § Eastern Norway (:37) は、オスロが1349年5–6月でベルゲンより先だったとする |
 | 9 | 1350 | リューベック | Q2843 | リューベック / Lübeck | 53.87, 10.69 | region | 8: ベルゲン | 推測（年代と地理から）。HRE 記事 (:18) は北ドイツへは『デンマークから』とし、デンマークの伝承はイングランド発のノルウェー船 (en-bd-denmark.txt:16) | en: Black Death in the Holy Roman Empire § Northern Germany 要旨: 1350年初夏に北ドイツ(マクデブルク、ハルバーシュタット、リューベック、ハンブルク)に到達、海路とみられる (en-bd-hre.txt:38) | 出典間で矛盾: en-bd-hre.txt:18 は『デンマーク→北ドイツ』、en-bd-denmark.txt:12 は『ドイツ→デンマーク』。from は弱い推測。パリ(北仏→ライン)からとする案もある |
@@ -42,7 +42,7 @@
 - ファイル: `data/diffusion/covid-19.json`　状態: **draft**
 - id: Q81068910　分類: population（tags: population）　importance: 3
 - 出典: https://ja.wikipedia.org/wiki/新型コロナウイルス感染症の世界的流行_(2019年-)
-- 補足: Wikidata 由来の Q81068910（instant、start 2019、武漢市）を置き換える。title は既存データ（Wikidata のラベル）のまま。end 2020 は「最初の広がりだけを描く」という依頼の指定で、流行の終わりの年ではない（en は、WHO の緊急事態の終了を2023年5月とする。Wikidata に P582 は無い）。Wikidata の P580 は 2019-11-15〜2019-12-12 の 6 つの値。日本語版の記事は、日付ごとの「〇〇で感染者を確認」だけで渡航歴が無く、from の根拠はすべて英語版の記事。10 の stage がすべて 2020 年（1〜2月）なので、このアプリの 1 年の分解能では同時に出る。
+- 補足: 【見送り（2026-09-21、人の判断）】年の分解能が 1 年のため、数か月で広がるパンデミックは伝播として描く意味が薄い。見送り。status は draft のまま残す（build-app-data はデータに入れない）。 ／ Wikidata 由来の Q81068910（instant、start 2019、武漢市）を置き換える。title は既存データ（Wikidata のラベル）のまま。end 2020 は「最初の広がりだけを描く」という依頼の指定で、流行の終わりの年ではない（en は、WHO の緊急事態の終了を2023年5月とする。Wikidata に P582 は無い）。Wikidata の P580 は 2019-11-15〜2019-12-12 の 6 つの値。日本語版の記事は、日付ごとの「〇〇で感染者を確認」だけで渡航歴が無く、from の根拠はすべて英語版の記事。10 の stage がすべて 2020 年（1〜2月）なので、このアプリの 1 年の分解能では同時に出る。
 
 | # | 年 | 地名 | QID | Wikidata のラベル（ja / en） | 緯度, 経度（P625） | 粒度 | from | from の根拠 | 出典 | 要確認 |
 |---:|---:|---|---|---|---|---|---|---|---|---|
@@ -60,7 +60,7 @@
 
 ## イスラームの拡大（632〜750）
 
-- ファイル: `data/diffusion/early-muslim-conquests.json`　状態: **draft**
+- ファイル: `data/diffusion/early-muslim-conquests.json`　状態: **confirmed**
 - id: Q275918　分類: conflict（tags: conflict, polity, culture）　importance: 3
 - 出典: https://en.wikipedia.org/wiki/Early_Muslim_conquests
 - 補足: Wikidata 由来の Q275918（instant、start 622、場所は P625 のシリア付近の 1 点）を置き換える。Wikidata の P580 は 622、P582 は 750（調査時の wbgetentities の出力、2026-09-21）。start を 632（ムハンマドの死後、アラビアの外への征服が始まる）にしたのは依頼の指定で、Wikidata の値から変えている。title.ja は依頼の表記（Wikidata の日本語ラベルは「アラブ・イスラミック・コンクエスト」）。分類は既存データの conflict のまま（要確認。「宗教の伝播」と見るなら culture）。日本語版に該当する単独の記事は無く、出典は英語版。
@@ -83,10 +83,10 @@
 
 ## ユスティニアヌスのペスト（541〜549）
 
-- ファイル: `data/diffusion/plague-of-justinian.json`　状態: **draft**
+- ファイル: `data/diffusion/plague-of-justinian.json`　状態: **confirmed**
 - id: Q821711　分類: population（tags: population）　importance: 2
 - 出典: https://en.wikipedia.org/wiki/Plague_of_Justinian
-- 補足: 手書きのサンプルの Q821711（541〜549年の暫定 period）を置き換える。日本語版 Wikipedia に単独の記事は無い（Q821711 の sitelink に jawiki が無い。調査時の wbgetentities の出力、2026-09-21）。英語版の記事には到達点ごとの年がほとんど無く、年の多くはフランス語版・ドイツ語版の記事から取った。Wikidata の Q821711 には P580 / P582 が無く、541〜549 年は英語版の冒頭の記述。フランス語版・ドイツ語版は第1波を 541〜544 年としている。ペルシウムはプロコピオスが最初に流行を記録した場所で、病気そのものの起源ではない（クシュ／ヌビア、ヒムヤル、中央アジアなどの説がある）。
+- 補足: 手書きのサンプルの Q821711（541〜549年の暫定 period）を置き換える。日本語版 Wikipedia に単独の記事は無い（Q821711 の sitelink に jawiki が無い。調査時の wbgetentities の出力、2026-09-21）。英語版の記事には到達点ごとの年がほとんど無く、年の多くはフランス語版・ドイツ語版の記事から取った。Wikidata の Q821711 には P580 / P582 が無く、541〜549 年は英語版の冒頭の記述。フランス語版・ドイツ語版は第1波を 541〜544 年としている。ペルシウムはプロコピオスが最初に流行を記録した場所で、病気そのものの起源ではない（クシュ／ヌビア、ヒムヤル、中央アジアなどの説がある）。 ／ アトロパテネ（543年。Q260437 は古代王国の項目）の stage は削除した（2026-09-21）。出典（de: Justinianische Pest § Die Ausbreitung der ersten Welle、de-justinian.txt:21）は「543年にアトロパテネに達し、ペルシア軍を襲った」とだけ書き、都市名が無い。fr / en の記事にも該当する都市名は無かった（調査時に保存した本文を grep）。
 
 | # | 年 | 地名 | QID | Wikidata のラベル（ja / en） | 緯度, 経度（P625） | 粒度 | from | from の根拠 | 出典 | 要確認 |
 |---:|---:|---|---|---|---|---|---|---|---|---|
@@ -96,14 +96,13 @@
 | 2 | 542 | コンスタンティノープル | Q16869 | コンスタンティノープル / Constantinople | 41.01, 28.98 | region | 1: アレクサンドリア | 出典に明記。『エジプトからの穀物船』は明記。出港地をアレクサンドリアとするのは推測 | en: Plague of Justinian § History; de: § Die Ausbreitung…; fr: § Deux premières vagues 要旨: エジプトからの穀物船に乗った感染ネズミが運んだと同時代史料は考えた (en-plague-of-justinian.txt:9)。542年春 (de:21)、3–8月 (fr:76) |  |
 | 3 | 542 | アンティオキア | Q200441 | アンティオキア / Antioch | 36.20, 36.15 | fine | 0: ガザ | 推測（年代と地理から）。『パレスチナ経由の陸路の拡散』(fr-justinien.txt:41) と地理から、ガザ発とした | de: Justinianische Pest § Die Ausbreitung…; fr: § Deux premières vagues / § Géographie 要旨: 542年、コンスタンティノープルと同じ年のうちにアンティオキア、イリュリア、チュニジア、スペインへ (de-justinian.txt:21)。パレスチナは542年初頭 (fr:76) | fr:77 は、542年秋に首都とアンティオキアを結ぶ幹線道路沿いに小アジアへ到達と書く。from=2(コンスタンティノープル)の解釈も可能 |
 | 4 | 543 | カルタゴ | Q6343 | カルタゴ / Carthage | 36.85, 10.31 | fine | 2: コンスタンティノープル | 推測（年代と地理から）。海上交易(港から港)による拡散という一般的な記述のみで、経路の明記は無い | fr: Peste de Justinien § Deux premières vagues; de: § Die Ausbreitung… 要旨: 543年初めにチュニジアに到達、沿岸部が先に感染 (fr-justinien.txt:77) | 出典は『チュニジア』とだけ書き、カルタゴの名は無い(都市の選択は調査時の推測)。年も不一致: de:21 は 542年、fr:77 は 543年初め。from はアレクサンドリア(1)の可能性もある |
-| 5 | 543 | アトロパテネ | Q260437 | アトロパテネ王国 / Atropatene | 37.00, 48.00 | country | 3: アンティオキア | 推測（年代と地理から）。シリアから東へ、という地理的な推測のみ | de: Justinianische Pest § Die Ausbreitung… 要旨: 543年にアトロパテネに達し、ペルシア軍を襲った。ホスロー1世も543年に罹患 (de-justinian.txt:21) | QID は紀元前323年〜紀元226年の古代王国の項目で、時代が合わず、都市でもない（P625 はある）。より適切な項目を人が選ぶ必要がある（候補 Q274536 は未検証）。この stage を外す選択もある |
-| 6 | 543 | アルル | Q48292 | アルル / Arles | 43.68, 4.63 | fine | 4: カルタゴ | 推測（年代と地理から）。地中海の港伝い、ローヌ川軸という一般的な記述 (fr-justinien.txt:102) のみ。どの港から来たかは出典に無い | de: Justinianische Pest § Quellenlage; en: First plague pandemic § Plagues in Francia; fr: § Chroniqueurs 要旨: トゥールのグレゴリウスによれば、543年にローヌ渓谷で流行し、アルル周辺がほぼ無人になった (de-justinian.txt:10) | 年が不一致: de は 543年、fr:16 は 549年、en:19 は 540年代後半。de:21 の『543年にガリア』と整合するのは 543年 |
-| 7 | 544 | ローマ | Q220 | ローマ / Rome | 41.89, 12.48 | fine | 2: コンスタンティノープル | 出典に明記。『コンスタンティノープルからの軍の移動』は明記(イタリアについて) | fr: Peste de Justinien § Deux premières vagues; de: § Die Ausbreitung… 要旨: イタリアは543年、コンスタンティノープルからの軍の移動により感染。ローマは544年に達した可能性 (fr-justinien.txt:77; de:21 もイタリア543年) | ローマの544年は fr に『peut-être(おそらく)』とある。確実なのは『イタリア 543年』で、都市は特定されていない |
-| 8 | 544 | アイルランド島 | Q22890 | アイルランド島 / Ireland | 53.35, -7.92 | region | 6: アルル | 出典に明記。de は『möglicherweise(可能性)』付きでガリア発と書く | fr: Peste de Justinien § Europe méridionale et du nord; de: § Quellenlage 要旨: 544年または545年にアイルランドからブリテン諸島に到達 (fr-justinien.txt:192)。ガリアからコーンウォールとアイルランドに達した可能性 (de-justinian.txt:10) | 年は『544 または 545』。ja: ペストの歴史 (:26) は『ブリテン島周辺には547年』。粒度が島全体で都市ではない。fr:104 には、ブリテン諸島の流行はペストではないとするビラベンの見解もある |
+| 5 | 543 | アルル | Q48292 | アルル / Arles | 43.68, 4.63 | fine | 4: カルタゴ | 推測（年代と地理から）。地中海の港伝い、ローヌ川軸という一般的な記述 (fr-justinien.txt:102) のみ。どの港から来たかは出典に無い | de: Justinianische Pest § Quellenlage; en: First plague pandemic § Plagues in Francia; fr: § Chroniqueurs 要旨: トゥールのグレゴリウスによれば、543年にローヌ渓谷で流行し、アルル周辺がほぼ無人になった (de-justinian.txt:10) | 年が不一致: de は 543年、fr:16 は 549年、en:19 は 540年代後半。de:21 の『543年にガリア』と整合するのは 543年 |
+| 6 | 544 | ローマ | Q220 | ローマ / Rome | 41.89, 12.48 | fine | 2: コンスタンティノープル | 出典に明記。『コンスタンティノープルからの軍の移動』は明記(イタリアについて) | fr: Peste de Justinien § Deux premières vagues; de: § Die Ausbreitung… 要旨: イタリアは543年、コンスタンティノープルからの軍の移動により感染。ローマは544年に達した可能性 (fr-justinien.txt:77; de:21 もイタリア543年) | ローマの544年は fr に『peut-être(おそらく)』とある。確実なのは『イタリア 543年』で、都市は特定されていない |
+| 7 | 544 | アイルランド島 | Q22890 | アイルランド島 / Ireland | 53.35, -7.92 | region | 5: アルル | 出典に明記。de は『möglicherweise(可能性)』付きでガリア発と書く | fr: Peste de Justinien § Europe méridionale et du nord; de: § Quellenlage 要旨: 544年または545年にアイルランドからブリテン諸島に到達 (fr-justinien.txt:192)。ガリアからコーンウォールとアイルランドに達した可能性 (de-justinian.txt:10) | 年は『544 または 545』。ja: ペストの歴史 (:26) は『ブリテン島周辺には547年』。粒度が島全体で都市ではない。fr:104 には、ブリテン諸島の流行はペストではないとするビラベンの見解もある |
 
 ## 活版印刷の伝播（1450〜1500）
 
-- ファイル: `data/diffusion/printing-press-spread.json`　状態: **draft**
+- ファイル: `data/diffusion/printing-press-spread.json`　状態: **confirmed**
 - id: printing-press-spread　分類: technology（tags: technology, culture）　importance: 3
 - 出典: https://en.wikipedia.org/wiki/Global_spread_of_the_printing_press
 - 補足: 新しい項目（id は slug）。「Global spread of the printing press」の Wikidata の項目 Q656515 は、P31 が印刷機（Q144334）で P580 / P582 も無く、出来事の項目として使えない（調査時の wbgetentities の出力、2026-09-21）。手書きのサンプルの gutenberg-printing-press（1450年、マインツ、instant）はそのまま残る。都市ごとの年は、英語版の記事の表（出典は Meyers Konversations-Lexikon 第4版、1888–1890）によるもので、同じ記事の本文と表が食い違う箇所がある（ケルン、ロンドン／ウェストミンスター）。start 1450・end 1500 は依頼の指定（1500 年はインキュナブラの区切り）。日本語版に伝播そのものの記事は無く、ja: 印刷機 § 印刷本の大量生産と普及 は起点のマインツと約270都市への普及だけを裏付ける。importance は gutenberg-printing-press と同じ 3 にした（要確認）。
@@ -129,7 +128,7 @@
 - ファイル: `data/diffusion/spanish-flu.json`　状態: **draft**
 - id: Q178275　分類: population（tags: population, conflict）　importance: 3
 - 出典: https://ja.wikipedia.org/wiki/スペインかぜ
-- 補足: 既存のデータに Q178275 は無い（新しい項目。2026-09-21 に public/data/events/ を検索）。起源は出典でも特定できないとされ、争いがある（エタプル／オールダーショット 1916–17、オーストリア 1917、中国北部 1917年11月などの説）。ここでは、出典が広がりの始点として書いている最初の記録地（キャンプ・ファンストン、1918年3月4日）を起点にした。英語版の冒頭は「1918年3月にハスケル郡」、同じ記事の年表は「早ければ1918年1月にハスケル郡」で、記事の中で食い違う（別の候補: Q374663 ハスケル郡）。期間は en / ja とも 1918〜1920年、Wikidata は P580 1918-01・P582 1920-12。このアプリの時間の分解能は 1 年なので、10 の stage が 1918 年に同時に出る（月は month に書いた）。importance は要確認。
+- 補足: 【見送り（2026-09-21、人の判断）】年の分解能が 1 年のため、数か月で広がるパンデミックは伝播として描く意味が薄い。見送り。status は draft のまま残す（build-app-data はデータに入れない）。 ／ 既存のデータに Q178275 は無い（新しい項目。2026-09-21 に public/data/events/ を検索）。起源は出典でも特定できないとされ、争いがある（エタプル／オールダーショット 1916–17、オーストリア 1917、中国北部 1917年11月などの説）。ここでは、出典が広がりの始点として書いている最初の記録地（キャンプ・ファンストン、1918年3月4日）を起点にした。英語版の冒頭は「1918年3月にハスケル郡」、同じ記事の年表は「早ければ1918年1月にハスケル郡」で、記事の中で食い違う（別の候補: Q374663 ハスケル郡）。期間は en / ja とも 1918〜1920年、Wikidata は P580 1918-01・P582 1920-12。このアプリの時間の分解能は 1 年なので、10 の stage が 1918 年に同時に出る（月は month に書いた）。importance は要確認。
 
 | # | 年 | 地名 | QID | Wikidata のラベル（ja / en） | 緯度, 経度（P625） | 粒度 | from | from の根拠 | 出典 | 要確認 |
 |---:|---:|---|---|---|---|---|---|---|---|---|
