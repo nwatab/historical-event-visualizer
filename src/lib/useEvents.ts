@@ -9,11 +9,10 @@ import {
   mergeEventFiles,
   type EventManifest,
 } from "./eventData";
-import { EVENT_WINDOW_YEARS } from "./timeline";
 import type { HistEvent, Year } from "@/types/event";
 
 interface LoadedEvents {
-  /** 現在年の表示に使うイベント。必要なファイルが読めるまでは、直前の年のものを返し続ける。 */
+  /** 現在年の表示（地図と年表）に使うイベント。必要なファイルが読めるまでは、直前のものを返し続ける。 */
   readonly events: readonly HistEvent[];
   /** これまでに読んだすべてのイベント（詳細パネルが、窓の外に出た選択中のイベントを引けるように）。 */
   readonly eventsById: ReadonlyMap<string, HistEvent>;
@@ -28,10 +27,11 @@ const fetchJson = async <T,>(path: `/${string}`): Promise<T> => {
 };
 
 /**
- * 現在年の前後の区間のファイルだけを読み、読んだものはキャッシュする（ページを開いている間だけ。localStorage は使わない）。
+ * 現在年の前後 margin 年（地図の窓と年表の窓の広いほう）と重なる区間のファイルだけを読み、読んだものはキャッシュする
+ * （ページを開いている間だけ。localStorage は使わない）。年表の窓が ±500 年のとき、最大 11 ファイル。
  * 読み込み中は既存のイベントをそのまま返し、必要なファイルが揃ってから差し替える（マーカーが一瞬消えるのを避ける）。
  */
-export const useEvents = (year: Year): LoadedEvents => {
+export const useEvents = (year: Year, margin: number): LoadedEvents => {
   const [manifest, setManifest] = useState<EventManifest | null>(null);
   // file 名 → イベント。読み込みの開始は requested で管理し、同じファイルを二度取りに行かない
   const [cache, setCache] = useState<ReadonlyMap<string, readonly HistEvent[]>>(new Map());
@@ -52,8 +52,8 @@ export const useEvents = (year: Year): LoadedEvents => {
   const [shown, setShown] = useState<readonly HistEvent[]>([]);
 
   const needed = useMemo(
-    () => (manifest === null ? [] : filesForYear(manifest.files, year, EVENT_WINDOW_YEARS)),
-    [manifest, year],
+    () => (manifest === null ? [] : filesForYear(manifest.files, year, margin)),
+    [manifest, year, margin],
   );
 
   useEffect(() => {

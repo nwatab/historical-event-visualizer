@@ -1,31 +1,23 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useMemo, type CSSProperties } from "react";
 import { LINE_HEIGHT, SLIDER, SPACE, YEAR_LABEL_MIN_WIDTH, surfaceStyle, textStyle } from "@/lib/design";
+import { useWidth } from "@/lib/useWidth";
 import { formatYear } from "@/lib/year";
-import {
-  axisLabels,
-  axisTicks,
-  yearToX,
-  type EventTicks,
-  type SliderScale,
-} from "@/lib/yearAxis";
+import { axisLabels, axisTicks, yearToX, type SliderScale } from "@/lib/yearAxis";
 import type { Year } from "@/types/event";
 
 interface YearSliderProps {
   readonly year: Year;
   readonly min: Year;
   readonly max: Year;
-  /** B（イベントの目盛り）。非表示の分類は親が除いて渡す。 */
-  readonly eventTicks: EventTicks;
   readonly onChange: (year: Year) => void;
 }
 
 const AXIS_TICKS = axisTicks();
 
-/** トラックの上端・下端（input の高さの中で、トラックは中央に描かれる） */
-const TRACK_TOP = (SLIDER.height - SLIDER.trackHeight) / 2;
-const TRACK_BOTTOM = TRACK_TOP + SLIDER.trackHeight;
+/** トラックの下端（input の高さの中で、トラックは中央に描かれる） */
+const TRACK_BOTTOM = (SLIDER.height + SLIDER.trackHeight) / 2;
 
 /** x を中心とする縦線 */
 const vLine = (x: number, top: number, width: number, length: number, color: string): CSSProperties => ({
@@ -38,12 +30,11 @@ const vLine = (x: number, top: number, width: number, length: number, color: str
 });
 
 /**
- * 目盛りの層。input の背後に置く（input が後に描かれ、つまみが目盛りを覆う）。
- * - A はトラックの下側、B はトラックの上側に描くので、両者は重ならない。
+ * 時間軸の目盛りの層。input の背後に置く（input が後に描かれ、つまみが目盛りを覆う）。トラックの下側に描く。
+ * イベントのある年を示す目盛り（トラックの上側）は、R5a で年表に役割を移して廃止した。
  */
-function YearTicks({ scale, eventTicks }: { readonly scale: SliderScale; readonly eventTicks: EventTicks }) {
-  const { axisTick, epochTick, eventTick, periodBandThickness } = SLIDER;
-  const eventTop = TRACK_TOP - eventTick.length;
+function YearTicks({ scale }: { readonly scale: SliderScale }) {
+  const { axisTick, epochTick } = SLIDER;
   return (
     <div className="pointer-events-none absolute inset-0" aria-hidden>
       {AXIS_TICKS.map((tick) => {
@@ -57,33 +48,6 @@ function YearTicks({ scale, eventTicks }: { readonly scale: SliderScale; readonl
           />
         );
       })}
-      {eventTicks.periods.map(({ start, end }) => {
-        const left = yearToX(start, scale);
-        return (
-          <span
-            key={`period-${start}-${end}`}
-            data-tick="period"
-            data-year={start}
-            data-end={end}
-            style={{
-              position: "absolute",
-              left,
-              top: eventTop,
-              width: Math.max(eventTick.width, yearToX(end, scale) - left),
-              height: periodBandThickness,
-              backgroundColor: eventTick.color,
-            }}
-          />
-        );
-      })}
-      {eventTicks.instants.map((year) => (
-        <span
-          key={`event-${year}`}
-          data-tick="event"
-          data-year={year}
-          style={vLine(yearToX(year, scale), eventTop, eventTick.width, eventTick.length, eventTick.color)}
-        />
-      ))}
     </div>
   );
 }
@@ -108,21 +72,7 @@ function AxisLabels({ scale }: { readonly scale: SliderScale }) {
   );
 }
 
-/** 要素の幅 (px) を追跡する。目盛りの位置は input の実際の幅から計算する。 */
-const useWidth = () => {
-  const ref = useRef<HTMLDivElement>(null);
-  const [width, setWidth] = useState(0);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const observer = new ResizeObserver(([entry]) => setWidth(entry.contentRect.width));
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-  return [ref, width] as const;
-};
-
-export function YearSlider({ year, min, max, eventTicks, onChange }: YearSliderProps) {
+export function YearSlider({ year, min, max, onChange }: YearSliderProps) {
   const label = formatYear(year);
   const [trackRef, width] = useWidth();
   const scale = useMemo<SliderScale>(
@@ -145,7 +95,7 @@ export function YearSlider({ year, min, max, eventTicks, onChange }: YearSliderP
       </span>
       <div className="min-w-0 flex-1">
         <div ref={trackRef} className="relative" style={{ height: SLIDER.height }}>
-          {width > 0 && <YearTicks scale={scale} eventTicks={eventTicks} />}
+          {width > 0 && <YearTicks scale={scale} />}
           <input
             type="range"
             min={min}

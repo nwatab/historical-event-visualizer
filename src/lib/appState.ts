@@ -7,6 +7,8 @@ import { clampYear } from "./year";
  */
 export interface AppState {
   readonly year: Year;
+  /** 年表の窓の片側の幅（年）。窓は year を中心に ± この値 */
+  readonly timelineHalfSpan: number;
   /** 非表示にしている分類 */
   readonly hiddenDomains: readonly Domain[];
   /** 詳細パネルの状態。null なら閉じている。 */
@@ -25,6 +27,7 @@ export interface Selection {
 export type AppAction =
   | { readonly type: "setYear"; readonly year: Year }
   | { readonly type: "stepYear"; readonly delta: number }
+  | { readonly type: "setTimelineHalfSpan"; readonly halfSpan: number }
   | { readonly type: "toggleDomain"; readonly domain: Domain }
   | { readonly type: "showAllDomains" }
   | { readonly type: "selectEvents"; readonly eventIds: readonly string[] }
@@ -35,10 +38,13 @@ export type AppAction =
 export interface YearBounds {
   readonly min: Year;
   readonly max: Year;
+  /** 年表の窓の片側の幅の範囲 */
+  readonly halfSpan: { readonly min: number; readonly max: number };
 }
 
-export const initialAppState = (year: Year): AppState => ({
+export const initialAppState = ({ year, timelineHalfSpan }: Pick<AppState, "year" | "timelineHalfSpan">): AppState => ({
   year,
+  timelineHalfSpan,
   hiddenDomains: [],
   selection: null,
 });
@@ -58,6 +64,11 @@ export const appReducer =
         return { ...state, year: clampYear(action.year, bounds.min, bounds.max) };
       case "stepYear":
         return { ...state, year: clampYear(state.year + action.delta, bounds.min, bounds.max) };
+      case "setTimelineHalfSpan":
+        return {
+          ...state,
+          timelineHalfSpan: Math.min(bounds.halfSpan.max, Math.max(bounds.halfSpan.min, action.halfSpan)),
+        };
       case "toggleDomain":
         return {
           ...state,

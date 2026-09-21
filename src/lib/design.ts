@@ -198,9 +198,9 @@ export const DETAIL_PANEL = {
 
 /**
  * 年スライダーと目盛り。目盛りは input の背後に重ねた別の要素で描く（擬似要素には子要素を置けないため）。
- * - A 時間軸の目盛り（固定）: トラックの下側に、薄いグレー（GRAY.line）の短い線。紀元元年だけ太く長くする。
- * - B イベントの目盛り（可変）: トラックの上側に、濃いグレー（GRAY.weak）の細い線。period は開始〜終了の帯。
- * どちらもつまみ（直径 16px の GRAY.weak の円）より細く小さい。
+ * - 時間軸の目盛り（固定）: トラックの下側に、薄いグレー（GRAY.line）の短い線。紀元元年だけ太く長くする。
+ *   つまみ（直径 16px の GRAY.weak の円）より細く小さい。
+ * - イベントのある年を示す目盛り（R2〜R4 の「目盛り B」）は、R5a で年表に役割を移して廃止した。
  */
 export const SLIDER = {
   /** input の高さ。トラックはこの中央に描かれる。 */
@@ -211,11 +211,47 @@ export const SLIDER = {
   axisTick: { color: GRAY.line, width: 1, length: SPACE[4] },
   /** 紀元元年（天文年 1）の目盛り。色は変えず、太さと長さで区別する。 */
   epochTick: { color: GRAY.line, width: 2, length: SPACE[8] },
-  eventTick: { color: GRAY.weak, width: 1, length: SPACE[8] },
-  /** period の帯の太さ。B の領域の上端に、開始年から終了年まで横に引く。 */
-  periodBandThickness: 2,
   /** 時間軸のラベルどうしの中心間隔の下限。「紀元前2000年」（約 70px）＋余白。これより詰まるなら間引く。 */
   axisLabelMinSpacing: 96,
+} as const;
+
+/**
+ * 年表（年スライダーの上）。横軸が年（現在年を中心とした窓）、縦軸が分類のレーン。SVG で描く。
+ * - instant は分類色の点（直径はレーンの高さの半分）。period は同じ色の帯で、薄い塗り＋輪郭
+ *   （地図の period は中抜きの輪だが、帯は細長く、中を抜くと線2本に見えるため）。
+ * - ラベルは caption。背景が白なので、地図のラベルのような白いハローは付けない。
+ */
+export const TIMELINE = {
+  laneHeight: 22,
+  /** instant の点の直径 = レーンの高さの半分 */
+  pointDiameter: 11,
+  /** period の帯の高さ。点の直径と同じ */
+  bandHeight: 11,
+  /** 窓に対して短すぎる period でも見えるようにする、帯の最小の幅 */
+  minBandWidth: SPACE[4],
+  /**
+   * period の帯の塗りの不透明度（輪郭は不透明度 1）。レーンの帯の塗りをまとめて1つのグループにし、グループに掛ける。
+   * 帯ごとに掛けると、重なった帯（同時期の戦争）の塗りが積み重なって、濃い色のベタ塗りになる。
+   */
+  bandFillOpacity: 0.25,
+  bandStrokeWidth: 1,
+  /** レーンの区切り線と、時間軸の線 */
+  laneLine: { color: GRAY.line, width: 1 },
+  /** 現在年の縦線 */
+  cursorLine: { color: GRAY.weak, width: 1 },
+  axisTick: { color: GRAY.line, width: 1, length: SPACE[4] },
+  /** 時間軸（目盛り＋ラベル）の高さ */
+  axisHeight: SPACE[24],
+  /** 項目とラベルの間、ラベルどうしの間 */
+  labelGap: SPACE[4],
+  /** 時間軸のラベルどうしの中心間隔の下限。「紀元前500年」（約 66px）＋余白。±50 年の窓で 10 年刻みが入る幅 */
+  axisLabelMinSpacing: 80,
+  /** クリック・ホバーの判定の余裕 (px) */
+  hitTolerance: SPACE[4],
+  /** これ以上動かしたらクリックではなくドラッグとみなす (px) */
+  dragThreshold: SPACE[4],
+  /** ホバーの吹き出しに出す件数の上限（混んだレーンでは何十件も重なるため） */
+  tooltipMaxItems: 8,
 } as const;
 
 /** 年表示の最小幅（「紀元前3001年」が収まり、桁数の変化で揺れない幅） */

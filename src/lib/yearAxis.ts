@@ -1,11 +1,10 @@
-import type { Domain, HistEvent, Year } from "@/types/event";
+import type { Year } from "@/types/event";
 import { bce, formatYear } from "./year";
 
 /*
- * 年スライダーの目盛りの位置計算。YearSlider の描画から切り離した純粋関数。
- * - A 時間軸の目盛り（axisTicks）: 年の絶対位置。データやフィルタで変わらない。
- * - B イベントの目盛り（eventTicks）: イベントのある年。非表示の分類を除く。
- * どちらも yearToX で x 座標に変換する。
+ * 年スライダーの時間軸の目盛り（axisTicks）の位置計算。YearSlider の描画から切り離した純粋関数。
+ * 年の絶対位置で、データやフィルタで変わらない。yearToX で x 座標に変換する。
+ * イベントのある年を示す目盛り（R2〜R4 の「目盛り B」）は、R5a で年表（timelineChart.ts）に役割を移して廃止した。
  */
 
 export interface SliderScale {
@@ -28,8 +27,6 @@ export const yearToX = (year: Year, scale: SliderScale): number => {
   const radius = scale.thumbDiameter / 2;
   return radius + fraction * Math.max(0, scale.width - scale.thumbDiameter);
 };
-
-// ── A. 時間軸の目盛り ─────────────────────────────────────
 
 export interface AxisTick {
   /** 天文年 */
@@ -97,39 +94,4 @@ export const axisLabels = (
       return x >= minSpacing / 2 && x <= scale.width - minSpacing / 2;
     })
     .map((tick) => ({ year: tick.year, text: axisLabelText(tick) }));
-};
-
-// ── B. イベントの目盛り ───────────────────────────────────
-
-export interface PeriodSpan {
-  readonly start: Year;
-  readonly end: Year;
-}
-
-export interface EventTicks {
-  /** instant の年（重複なし・昇順） */
-  readonly instants: readonly Year[];
-  /** period の開始〜終了（重複なし・開始年順） */
-  readonly periods: readonly PeriodSpan[];
-}
-
-/** 表示中の分類のイベントから、B の目盛りを作る。分類による色分けはしない。 */
-export const eventTicks = (
-  events: readonly Pick<HistEvent, "kind" | "start" | "end" | "domain">[],
-  hiddenDomains: readonly Domain[],
-): EventTicks => {
-  const visible = events.filter((event) => !hiddenDomains.includes(event.domain));
-  const instants = [...new Set(visible.filter((e) => e.kind === "instant").map((e) => e.start))].sort(
-    (a, b) => a - b,
-  );
-  const periodKeys = new Set(
-    visible.flatMap((e) => (e.kind === "period" && e.end !== undefined ? [`${e.start}:${e.end}`] : [])),
-  );
-  const periods = [...periodKeys]
-    .map((key): PeriodSpan => {
-      const [start, end] = key.split(":").map(Number);
-      return { start, end };
-    })
-    .sort((a, b) => a.start - b.start || a.end - b.end);
-  return { instants, periods };
 };

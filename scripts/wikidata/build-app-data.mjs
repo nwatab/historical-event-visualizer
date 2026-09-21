@@ -312,11 +312,6 @@ const manifest = {
   placesByGranularity: countBy(events.flatMap((e) => e.places), (p) => p.granularity ?? "fine"),
   // 置ける場所が国だけの項目の数（世界全体の表示には出て、拡大すると消える）
   countryOnlyEvents: events.filter((e) => e.places.length > 0 && e.places.every((/** @type {any} */ p) => p.granularity === "country")).length,
-  // 年スライダーの目盛り用の要約。全区間のファイルを読まなくても目盛りを出せるように、importance 3 の項目だけを入れる
-  // （全件だとほぼ毎年に目盛りが付き、目盛りの意味が無くなる）。地図に出ない項目（places が空）は除く。
-  ticks: events
-    .filter((e) => e.importance === 3 && e.places.length > 0)
-    .map((e) => ({ kind: e.kind, start: e.start, ...(e.end !== undefined ? { end: e.end } : {}), domain: e.domain })),
   files: files.map((f) => ({ file: f.file, from: f.bin.from, to: f.bin.to, count: f.events.length, bytes: Buffer.byteLength(f.json) })),
 };
 await writeFile(join(APP_DATA_DIR, "manifest.json"), JSON.stringify(manifest, null, 1));

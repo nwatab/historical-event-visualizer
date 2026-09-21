@@ -2,17 +2,24 @@
 
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { appReducer, initialAppState, type AppAction, type AppState } from "@/lib/appState";
-import { SCREEN_INSET, SLIDER_PANEL_MAX_WIDTH } from "@/lib/design";
-import { INITIAL_YEAR, YEAR_MAX, YEAR_MIN, eventMarkers } from "@/lib/timeline";
+import { SCREEN_INSET, SLIDER_PANEL_MAX_WIDTH, SPACE } from "@/lib/design";
+import {
+  EVENT_WINDOW_YEARS,
+  INITIAL_YEAR,
+  TIMELINE_HALF_SPAN,
+  YEAR_MAX,
+  YEAR_MIN,
+  eventMarkers,
+} from "@/lib/timeline";
 import { useEvents } from "@/lib/useEvents";
-import { eventTicks } from "@/lib/yearAxis";
 import type { Domain } from "@/types/event";
 import { DetailPanel } from "./DetailPanel";
 import { Legend } from "./Legend";
+import { Timeline } from "./Timeline";
 import { WorldMapClient } from "./WorldMapClient";
 import { YearSlider } from "./YearSlider";
 
-const reducer = appReducer({ min: YEAR_MIN, max: YEAR_MAX });
+const reducer = appReducer({ min: YEAR_MIN, max: YEAR_MAX, halfSpan: TIMELINE_HALF_SPAN });
 
 const isTextInput = (target: EventTarget | null): boolean =>
   target instanceof HTMLElement &&
@@ -33,13 +40,15 @@ const actionFromKey = (event: KeyboardEvent, state: AppState): AppAction | null 
 };
 
 export function EventMapApp() {
-  const [state, dispatch] = useReducer(reducer, INITIAL_YEAR, initialAppState);
+  const [state, dispatch] = useReducer(
+    reducer,
+    { year: INITIAL_YEAR, timelineHalfSpan: TIMELINE_HALF_SPAN.initial },
+    initialAppState,
+  );
   const [hoveredDomain, setHoveredDomain] = useState<Domain | null>(null);
-  // イベントは public/data/events/ から、現在年の前後の区間だけを読む。読み込み中は直前のものが返る
-  const { events, eventsById, manifest } = useEvents(state.year);
+  // イベントは public/data/events/ から、現在年の前後（地図の窓と年表の窓の広いほう）の区間だけを読む。読み込み中は直前のものが返る
+  const { events, eventsById } = useEvents(state.year, Math.max(EVENT_WINDOW_YEARS, state.timelineHalfSpan));
   const markers = useMemo(() => eventMarkers(events, state.year), [events, state.year]);
-  // 年スライダーの目盛りは、全区間を読まなくても出せるように manifest に入っている要約（importance 3）から作る
-  const ticks = useMemo(() => eventTicks(manifest?.ticks ?? [], state.hiddenDomains), [manifest, state.hiddenDomains]);
 
   // キーハンドラは一度だけ登録し、最新の状態は ref から読む
   const stateRef = useRef(state);
@@ -65,6 +74,8 @@ export function EventMapApp() {
   // 地図の何もない所をクリックしたら詳細パネルを閉じる。凡例やスライダーは地図の上に重なった別の要素なので、
   // そこでのクリックは地図に届かず、パネルは閉じない
   const onClickEmpty = useCallback(() => dispatch({ type: "closeSelection" }), []);
+  const onSetYear = useCallback((year: number) => dispatch({ type: "setYear", year }), []);
+  const onSetHalfSpan = useCallback((halfSpan: number) => dispatch({ type: "setTimelineHalfSpan", halfSpan }), []);
 
   const selectedIds = useMemo(
     () =>
@@ -87,7 +98,7 @@ export function EventMapApp() {
         onClickEmpty={onClickEmpty}
       />
       {/*
-        地図の上に重ねる UI。上段（凡例・詳細パネル）と下段（年スライダー、R5 で年表も入る）に分け、
+        地図の上に重ねる UI。上段（凡例・詳細パネル）と下段（年表・年スライダー）に分け、
         上段は残りの高さに収めるので、詳細パネルが下段と重なることはない。
         UI の無い部分は pointer-events: none にして、地図の操作を通す。
       */}
@@ -120,13 +131,29 @@ export function EventMapApp() {
             </div>
           )}
         </div>
-        <div className="pointer-events-auto mx-auto w-full" style={{ maxWidth: SLIDER_PANEL_MAX_WIDTH }}>
+        <div
+          className="pointer-events-auto mx-auto flex w-full flex-col"
+          style={{ maxWidth: SLIDER_PANEL_MAX_WIDTH, gap: SPACE[8] }}
+        >
+          <Timeline
+            year={state.year}
+            min={YEAR_MIN}
+            max={YEAR_MAX}
+            halfSpan={state.timelineHalfSpan}
+            events={events}
+            hiddenDomains={state.hiddenDomains}
+            highlightedDomain={hoveredDomain}
+            selectedIds={selectedIds}
+            onSetYear={onSetYear}
+            onSetHalfSpan={onSetHalfSpan}
+            onSelectEvents={onSelectEvents}
+            onClickEmpty={onClickEmpty}
+          />
           <YearSlider
             year={state.year}
             min={YEAR_MIN}
             max={YEAR_MAX}
-            eventTicks={ticks}
-            onChange={(year) => dispatch({ type: "setYear", year })}
+            onChange={onSetYear}
           />
         </div>
       </div>

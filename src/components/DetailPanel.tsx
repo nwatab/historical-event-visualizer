@@ -2,6 +2,7 @@
 
 import { FONT_WEIGHT, GRAY, SPACE, surfaceStyle, swatchStyle, textStyle } from "@/lib/design";
 import { DOMAIN_LABELS } from "@/lib/domain";
+import { neverOnMap } from "@/lib/mapFilters";
 import type { Selection } from "@/lib/appState";
 import { formatYear, formatYearRange } from "@/lib/year";
 import type { HistEvent } from "@/types/event";
@@ -66,6 +67,8 @@ const EventDetail = ({ event }: { readonly event: HistEvent }) => {
       <DomainLabel event={event} />
       <h2 style={textStyle.emphasis}>{event.title.ja}</h2>
       <p style={{ ...textStyle.body, fontVariantNumeric: "tabular-nums" }}>{eventYears(event)}</p>
+      {/* 年表から選べるが、地図には出ない項目（場所が無い、または国の代表点だけで拡大前に消える） */}
+      {neverOnMap(event) && <p style={textStyle.caption}>地図上の位置は不明</p>}
       {event.description && <p style={textStyle.body}>{event.description.ja}</p>}
       {source && event.source && (
         <p style={textStyle.caption}>

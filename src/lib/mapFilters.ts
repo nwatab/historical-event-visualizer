@@ -59,3 +59,17 @@ export const markerFilter = (
     ...stops.flatMap((zoom) => [zoom, at(zoom)]),
   ] as unknown as ExpressionSpecification;
 };
+
+/**
+ * どのズームでも地図に出ない項目か。
+ * - places が空（placeKind が "none"）
+ * - 場所が国の代表点だけで、その importance のマーカーが出始めるズームが COUNTRY_MAX_ZOOM 以上（現状は importance 1）
+ * 年表には出るので、詳細パネルでその旨を伝えるのに使う。
+ */
+export const neverOnMap = (
+  event: Pick<HistEvent, "places" | "importance">,
+  thresholds: Readonly<Record<Importance, number>> = MIN_ZOOM_BY_IMPORTANCE,
+  countryMaxZoom: number = COUNTRY_MAX_ZOOM,
+): boolean =>
+  event.places.length === 0 ||
+  (event.places.every((place) => place.granularity === "country") && thresholds[event.importance] >= countryMaxZoom);

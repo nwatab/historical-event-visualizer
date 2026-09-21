@@ -25,11 +25,10 @@ import {
   MARKER_HIT_TOLERANCE,
   SELECTION_RING,
   SPACE,
-  swatchStyle,
-  textStyle,
 } from "@/lib/design";
-import { DOMAINS, DOMAIN_LABELS } from "@/lib/domain";
+import { DOMAINS } from "@/lib/domain";
 import { markerFilter } from "@/lib/mapFilters";
+import { popupContent, type PopupItem } from "@/lib/popupContent";
 import { LABEL_MIN_ZOOM_BY_IMPORTANCE, type EventMarkerCollection, type MarkerKind } from "@/lib/timeline";
 import type { Domain } from "@/types/event";
 
@@ -293,11 +292,6 @@ const constrainCenterOnly: TransformConstrainFunction = (lngLat, zoom) => ({
   zoom,
 });
 
-interface PopupItem {
-  readonly title: string;
-  readonly domain: Domain;
-}
-
 /** カーソル位置に重なっているマーカー（タイトルで重複除去）。 */
 const itemsAt = (event: MapLayerMouseEvent): readonly PopupItem[] => {
   const items = (event.features ?? []).map((f) => ({
@@ -305,48 +299,6 @@ const itemsAt = (event: MapLayerMouseEvent): readonly PopupItem[] => {
     domain: f.properties?.domain as Domain,
   }));
   return items.filter((item, i) => items.findIndex((other) => other.title === item.title) === i);
-};
-
-const px = (value: number): string => `${value}px`;
-
-/** ポップアップの中身。分類は色に頼らずテキストでも示す。 */
-const popupContent = (items: readonly PopupItem[]): HTMLElement => {
-  const root = document.createElement("div");
-  Object.assign(root.style, { display: "flex", flexDirection: "column", gap: px(SPACE[8]) });
-  items.forEach(({ title, domain }) => {
-    const label = document.createElement("div");
-    Object.assign(label.style, {
-      display: "flex",
-      alignItems: "center",
-      gap: px(SPACE[4]),
-      fontSize: px(textStyle.caption.fontSize),
-      color: textStyle.caption.color,
-    });
-    const swatch = document.createElement("span");
-    const swatchCss = swatchStyle(domain);
-    Object.assign(swatch.style, {
-      display: "inline-block",
-      width: px(Number(swatchCss.width)),
-      height: px(Number(swatchCss.height)),
-      borderRadius: px(Number(swatchCss.borderRadius)),
-      backgroundColor: String(swatchCss.backgroundColor),
-    });
-    const labelText = document.createElement("span");
-    labelText.textContent = DOMAIN_LABELS[domain] ?? "";
-    label.append(swatch, labelText);
-
-    const titleEl = document.createElement("div");
-    Object.assign(titleEl.style, {
-      fontSize: px(textStyle.body.fontSize),
-      color: textStyle.body.color,
-    });
-    titleEl.textContent = title;
-
-    const item = document.createElement("div");
-    item.append(label, titleEl);
-    root.append(item);
-  });
-  return root;
 };
 
 interface WorldMapProps {
