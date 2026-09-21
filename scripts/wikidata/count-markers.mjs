@@ -9,7 +9,7 @@ import { join } from "node:path";
 import { APP_DATA_DIR } from "./config.mjs";
 import { importFromSrc } from "./load-ts.mjs";
 
-const [{ eventMarkers, EVENT_WINDOW_YEARS }, { importancesVisibleAt, granularityVisibleAt }, { filesForYear, mergeEventFiles }] =
+const [{ eventMarkers, EVENT_WINDOW_YEARS, MIN_ZOOM_BY_IMPORTANCE, DENSITY_FLOOR, densityLevel, promotedThresholds }, { importancesVisibleAt, granularityVisibleAt }, { filesForYear, mergeEventFiles }] =
   await Promise.all([importFromSrc("lib/timeline.ts"), importFromSrc("lib/mapFilters.ts"), importFromSrc("lib/eventData.ts")]);
 
 /** 世界全体の初期表示のズーム（幅の広い画面 1.3、縦長の画面 -0.6）と、閾値の前後。 */
@@ -22,13 +22,22 @@ const rows = await Promise.all(
     const files = filesForYear(manifest.files, year, EVENT_WINDOW_YEARS);
     const chunks = await Promise.all(files.map(async (/** @type {{ file: string }} */ f) => JSON.parse(await readFile(join(APP_DATA_DIR, f.file), "utf8"))));
     const events = mergeEventFiles(chunks);
-    const features = eventMarkers(events, year).features.filter((/** @type {any} */ f) => f.properties.placeKind !== "none");
+    const markers = eventMarkers(events, year);
+    const features = markers.features.filter((/** @type {any} */ f) => f.properties.placeKind !== "none");
+    // 密度による調整（timeline.ts）: マーカーが少ない年は、importance 2（さらに 1）を 3 と同じ扱いにする
+    const level = densityLevel(markers);
+    const thresholds = promotedThresholds(MIN_ZOOM_BY_IMPORTANCE, level);
+    const byImportance = [3, 2, 1].map((i) => `${i}: ${features.filter((/** @type {any} */ f) => f.properties.importance === i).length}`).join("、");
     const counts = ZOOMS.map((zoom) => {
-      const visible = importancesVisibleAt(zoom);
+      const visible = importancesVisibleAt(zoom, thresholds);
       const shown = features.filter((/** @type {any} */ f) => visible.includes(f.properties.importance) && granularityVisibleAt(zoom, f.properties.granularity));
       return `zoom ${zoom}: マーカー ${shown.length}（イベント ${new Set(shown.map((/** @type {any} */ f) => f.properties.id)).size}）`;
     });
-    return `${year}年  読むファイル ${files.map((/** @type {{ file: string }} */ f) => f.file).join(", ")}（${events.length} 件）\n  ${counts.join("\n  ")}`;
+    const shownThresholds = [3, 2, 1].map((i) => `${i} → ${Number.isFinite(thresholds[i]) ? `zoom ${thresholds[i]} 以上` : "常時"}`).join("、");
+    return (
+      `${year}年  読むファイル ${files.map((/** @type {{ file: string }} */ f) => f.file).join(", ")}（${events.length} 件）\n` +
+      `  窓の中のマーカー（importance 別）${byImportance}。下限 ${DENSITY_FLOOR} → 繰り上げの段階 ${level}（有効な閾値: ${shownThresholds}）\n  ${counts.join("\n  ")}`
+    );
   }),
 );
 console.log(rows.join("\n"));

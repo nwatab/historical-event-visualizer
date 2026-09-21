@@ -8,10 +8,13 @@ import {
   EVENT_WINDOW_YEARS,
   INITIAL_YEAR,
   PLAYBACK_PREFETCH_SECONDS,
+  MIN_ZOOM_BY_IMPORTANCE,
   TIMELINE_HALF_SPAN,
   YEAR_MAX,
   YEAR_MIN,
+  densityLevel,
   eventMarkers,
+  promotedThresholds,
 } from "@/lib/timeline";
 import { useEvents } from "@/lib/useEvents";
 import { usePlayback } from "@/lib/usePlayback";
@@ -80,6 +83,10 @@ export function EventMapApp() {
   );
   const markers = useMemo(() => eventMarkers(events, state.year), [events, state.year]);
   const lines = useMemo(() => diffusionLines(events, state.year), [events, state.year]);
+  // 密度による調整: 現在年のマーカーが少ない年は、importance 2（さらに 1）を 3 と同じ扱いにする。GeoJSON は作り直さず、filter 式の閾値だけを変える
+  const density = useMemo(() => densityLevel(markers), [markers]);
+  // 年表と詳細パネルが「どのズームでも地図に出ない項目」を判定するのにも、同じ閾値を使う
+  const mapThresholds = useMemo(() => promotedThresholds(MIN_ZOOM_BY_IMPORTANCE, density), [density]);
 
   // キーハンドラは一度だけ登録し、最新の状態は ref から読む
   const stateRef = useRef(state);
@@ -136,6 +143,7 @@ export function EventMapApp() {
         lines={lines}
         highlightedDomain={hoveredDomain}
         hiddenDomains={state.hiddenDomains}
+        densityLevel={density}
         selectedIds={selectedIds}
         onSelectEvents={onSelectEvents}
         onClickEmpty={onClickEmpty}
@@ -167,6 +175,7 @@ export function EventMapApp() {
               <DetailPanel
                 selection={state.selection}
                 eventsById={eventsById}
+                mapThresholds={mapThresholds}
                 onOpen={(eventId) => dispatch({ type: "openEvent", eventId })}
                 onBack={() => dispatch({ type: "backToList" })}
                 onClose={() => dispatch({ type: "closeSelection" })}
@@ -185,6 +194,7 @@ export function EventMapApp() {
             halfSpan={state.timelineHalfSpan}
             events={events}
             hiddenDomains={state.hiddenDomains}
+            mapThresholds={mapThresholds}
             highlightedDomain={hoveredDomain}
             selectedIds={selectedIds}
             playing={playback.playing}

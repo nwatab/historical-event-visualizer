@@ -158,12 +158,50 @@ export const eventMarkers = (
  * zoom 2 では全世界で 120 / 408 / 908、zoom 4 では 239 / 1546 / 2382（画面に入るのはその一部。
  * zoom 4 以上では、国の代表点のマーカーは除かれる。COUNTRY_MAX_ZOOM）。
  * データを作り直したら数え直すこと（CLAUDE.md「データパイプライン」）。
+ * マーカーの少ない年は、この閾値を密度で下げる（下の DENSITY_FLOOR）。
  */
 export const MIN_ZOOM_BY_IMPORTANCE: Readonly<Record<HistEvent["importance"], number>> = {
   3: -Infinity,
   2: 2,
   1: 4,
 };
+
+/**
+ * 密度による調整の下限。現在年に地図に出る importance 3 のマーカーがこの数に満たない年は、importance 2 も 3 と同じ扱い（常時表示）にする。
+ * 3 と 2 を合わせても満たなければ、importance 1 も同じ扱いにする。
+ * 理由: 古代は importance 3 の項目が無い年が多く（importance は年代の区分ごとの sitelinks の上位 5% で、区分「〜499 年」は 3500 年ぶんある）、
+ * 固定の閾値だと、世界全体の表示で地図が空になる。
+ */
+export const DENSITY_FLOOR = 15;
+
+/** 密度による繰り上げの段階。0: しない、1: importance 2 を 3 と同じ扱いに、2: importance 1 も。 */
+export type DensityLevel = 0 | 1 | 2;
+
+/**
+ * 現在年のマーカー（eventMarkers の結果。instant は ±EVENT_WINDOW_YEARS の窓、period は期間中、diffusion は起点と到達点）から、繰り上げの段階を決める。
+ * 数えるのはマーカー（places の各点）で、イベントの数ではない。地図に出ない項目（placeKind が "none"）は数えない。
+ */
+export const densityLevel = (markers: EventMarkerCollection, floor: number = DENSITY_FLOOR): DensityLevel => {
+  const onMap = markers.features.filter((f) => f.properties.placeKind !== "none");
+  const count = (importance: HistEvent["importance"]): number =>
+    onMap.filter((f) => f.properties.importance === importance).length;
+  if (count(3) >= floor) return 0;
+  return count(3) + count(2) >= floor ? 1 : 2;
+};
+
+/**
+ * 繰り上げた後の閾値。繰り上げた importance には、importance 3 の閾値をそのまま使う（マーカーの MIN_ZOOM_BY_IMPORTANCE にも、
+ * ラベルの LABEL_MIN_ZOOM_BY_IMPORTANCE にも同じ関数を使うので、ラベルも同じだけ下がる）。
+ * 変わるのは filter 式に渡す閾値だけで、マーカーの GeoJSON と大きさ（importance ごとの半径）は変わらない。
+ */
+export const promotedThresholds = (
+  base: Readonly<Record<HistEvent["importance"], number>>,
+  level: DensityLevel,
+): Readonly<Record<HistEvent["importance"], number>> => ({
+  3: base[3],
+  2: level >= 1 ? base[3] : base[2],
+  1: level >= 2 ? base[3] : base[1],
+});
 
 /**
  * 粒度が country の場所（国の代表点）は、ズームがこの値以上になったら出さない。マーカーもラベルも同じ。

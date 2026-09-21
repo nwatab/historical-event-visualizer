@@ -10,6 +10,8 @@ import { DOMAIN_LABELS } from "./domain";
 export interface PopupItem {
   readonly title: string;
   readonly domain: Domain;
+  /** タイトルの後ろに添える注記（年表の「（地図に位置なし）」）。弱い文字色で出す */
+  readonly note?: string;
 }
 
 const px = (value: number): string => `${value}px`;
@@ -35,7 +37,7 @@ export const popupContent = (
     headingEl.textContent = heading;
     root.append(headingEl);
   }
-  items.forEach(({ title, domain }) => {
+  items.forEach(({ title, domain, note }) => {
     const label = document.createElement("div");
     Object.assign(label.style, {
       display: "flex",
@@ -63,6 +65,12 @@ export const popupContent = (
       color: textStyle.body.color,
     });
     titleEl.textContent = title;
+    if (note !== undefined) {
+      const noteEl = document.createElement("span");
+      Object.assign(noteEl.style, { fontSize: px(textStyle.caption.fontSize), color: textStyle.caption.color });
+      noteEl.textContent = note;
+      titleEl.append(noteEl);
+    }
 
     const item = document.createElement("div");
     item.append(label, titleEl);

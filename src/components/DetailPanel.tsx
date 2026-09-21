@@ -11,6 +11,8 @@ import type { DiffusionStage, HistEvent } from "@/types/event";
 interface DetailPanelProps {
   readonly selection: Selection;
   readonly eventsById: ReadonlyMap<string, HistEvent>;
+  /** 地図のマーカーの、importance ごとの表示を始めるズーム（密度による繰り上げ後）。「地図上の位置は不明」の判定に使う */
+  readonly mapThresholds: Readonly<Record<HistEvent["importance"], number>>;
   readonly onOpen: (eventId: string) => void;
   readonly onBack: () => void;
   readonly onClose: () => void;
@@ -97,7 +99,13 @@ const StageList = ({ stages }: { readonly stages: readonly DiffusionStage[] }) =
   );
 };
 
-const EventDetail = ({ event }: { readonly event: HistEvent }) => {
+const EventDetail = ({
+  event,
+  mapThresholds,
+}: {
+  readonly event: HistEvent;
+  readonly mapThresholds: DetailPanelProps["mapThresholds"];
+}) => {
   const source = event.source ? sourceInfo(event.source) : null;
   return (
     <article className="flex flex-col" style={{ gap: SPACE[8] }}>
@@ -105,7 +113,7 @@ const EventDetail = ({ event }: { readonly event: HistEvent }) => {
       <h2 style={textStyle.emphasis}>{event.title.ja}</h2>
       <p style={{ ...textStyle.body, fontVariantNumeric: "tabular-nums" }}>{eventYears(event)}</p>
       {/* 年表から選べるが、地図には出ない項目（場所が無い、または国の代表点だけで拡大前に消える） */}
-      {neverOnMap(event) && <p style={textStyle.caption}>地図上の位置は不明</p>}
+      {neverOnMap(event, mapThresholds) && <p style={textStyle.caption}>地図上の位置は不明</p>}
       {event.kind === "diffusion" && event.stages && event.stages.length > 0 && (
         <StageList key={event.id} stages={event.stages} />
       )}
@@ -166,7 +174,7 @@ const EventList = ({
  * マーカーをクリックしたときの詳細パネル。重なったマーカーなら一覧から選ぶ。
  * 配置（右側の固定幅パネル／上部のシート）は親が決める。
  */
-export function DetailPanel({ selection, eventsById, onOpen, onBack, onClose }: DetailPanelProps) {
+export function DetailPanel({ selection, eventsById, mapThresholds, onOpen, onBack, onClose }: DetailPanelProps) {
   const events = selection.eventIds.flatMap((id) => {
     const event = eventsById.get(id);
     return event ? [event] : [];
@@ -197,7 +205,7 @@ export function DetailPanel({ selection, eventsById, onOpen, onBack, onClose }: 
           閉じる
         </button>
       </div>
-      {active ? <EventDetail event={active} /> : <EventList events={events} onOpen={onOpen} />}
+      {active ? <EventDetail event={active} mapThresholds={mapThresholds} /> : <EventList events={events} onOpen={onOpen} />}
     </aside>
   );
 }
