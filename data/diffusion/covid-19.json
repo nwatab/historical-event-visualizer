@@ -1,0 +1,156 @@
+{
+  "status": "draft",
+  "id": "Q81068910",
+  "title": {
+    "ja": "新型コロナウイルス感染症 (COVID-19) の世界的流行",
+    "en": "COVID-19 pandemic"
+  },
+  "domain": "population",
+  "tags": [
+    "population"
+  ],
+  "importance": 3,
+  "note": "【見送り（2026-09-21、人の判断）】年の分解能が 1 年のため、数か月で広がるパンデミックは伝播として描く意味が薄い。見送り。status は draft のまま残す（build-app-data はデータに入れない）。 ／ Wikidata 由来の Q81068910（instant、start 2019、武漢市）を置き換える。title は既存データ（Wikidata のラベル）のまま。end 2020 は「最初の広がりだけを描く」という依頼の指定で、流行の終わりの年ではない（en は、WHO の緊急事態の終了を2023年5月とする。Wikidata に P582 は無い）。Wikidata の P580 は 2019-11-15〜2019-12-12 の 6 つの値。日本語版の記事は、日付ごとの「〇〇で感染者を確認」だけで渡航歴が無く、from の根拠はすべて英語版の記事。10 の stage がすべて 2020 年（1〜2月）なので、このアプリの 1 年の分解能では同時に出る。",
+  "start": 2019,
+  "end": 2020,
+  "source": "https://ja.wikipedia.org/wiki/新型コロナウイルス感染症の世界的流行_(2019年-)",
+  "origin": {
+    "qid": "Q11746",
+    "label": "武漢",
+    "labelEn": "Wuhan",
+    "source": "en: COVID-19 pandemic 冒頭; ja: 同記事 § 背景",
+    "summary": "2019年12月に中国の武漢での集団発生から始まった"
+  },
+  "stages": [
+    {
+      "year": 2020,
+      "month": "2020-01",
+      "qid": "Q1861",
+      "label": "バンコク",
+      "labelEn": "Bangkok",
+      "from": -1,
+      "source": "en: COVID-19 pandemic in Thailand § Timeline; en: Timeline … January 2020 § 13 January; ja § 2020年1月",
+      "summary": "最初の確認例は、武漢在住の61歳の中国人女性",
+      "fromBasis": "出典に明記",
+      "fromNote": "1月8日に到着、1月13日に確認。中国国外で最初",
+      "needsCheck": "到着地は、Thailand の記事ではサムットプラーカーン県のスワンナプーム空港、Timeline では「バンコクに到着」。空港の項目は Q194316（P625 あり）"
+    },
+    {
+      "year": 2020,
+      "month": "2020-01",
+      "qid": "Q127513",
+      "label": "神奈川県",
+      "labelEn": "Kanagawa Prefecture",
+      "from": -1,
+      "source": "en: COVID-19 pandemic in Japan 冒頭・§ Timeline; ja § 2020年1月（1月16日）",
+      "summary": "武漢から戻った神奈川県の住民で確認された",
+      "fromBasis": "出典に明記",
+      "fromNote": "1月16日確認。Timeline（1月）は、10〜15日の入院中に陽性、とする",
+      "needsCheck": "出典が県までしか書いていないので県の項目（粒度 region）"
+    },
+    {
+      "year": 2020,
+      "month": "2020-01",
+      "qid": "Q392599",
+      "label": "エバレット",
+      "labelEn": "Everett",
+      "from": -1,
+      "source": "en: COVID-19 pandemic in Washington (state) § Timeline › January",
+      "summary": "スノホミッシュ郡に住む35歳の男性で、武漢から戻っていた",
+      "fromBasis": "出典に明記",
+      "fromNote": "1月15日にシアトル・タコマ空港に到着、1月20日にエバレットの病院へ",
+      "needsCheck": "確認日が出典で割れている: Washington の記事と ja は1月21日、en: … in the United States と Timeline は1月20日、en: COVID-19 pandemic § North America は「1月13日に到着」。患者の居住地は郡（Q110403、P625 あり）で、エバレットは搬送先の病院の所在地"
+    },
+    {
+      "year": 2020,
+      "month": "2020-01",
+      "qid": "Q1479",
+      "label": "ボルドー",
+      "labelEn": "Bordeaux",
+      "from": -1,
+      "source": "en: COVID-19 pandemic in France § First cases; en: COVID-19 pandemic § Europe",
+      "summary": "2020年1月24日、ヨーロッパで最初の症例がボルドーで確認された",
+      "fromBasis": "出典に明記",
+      "fromNote": "1月22日に中国からフランスに着いた48歳のフランス人。中国からとは書くが、武漢とは書いていない（同日のパリの2例は武漢から）",
+      "needsCheck": "ja はフランスを1月25日とする（1日ずれ）。武漢滞在は、取得した本文では未確認"
+    },
+    {
+      "year": 2020,
+      "month": "2020-01",
+      "qid": "Q3141",
+      "label": "メルボルン",
+      "labelEn": "Melbourne",
+      "from": -1,
+      "source": "en: COVID-19 pandemic § Oceania; en: COVID-19 pandemic in Australia 冒頭・§ Timeline",
+      "summary": "オセアニアで最初の確認例は、メルボルンで報告された",
+      "fromBasis": "出典に明記",
+      "fromNote": "1月25日。Australia の記事の冒頭は「武漢から戻った男性」",
+      "needsCheck": "同じ記事の § Timeline は「1月19日に広州から着いた中国人」で、冒頭（武漢）と食い違う"
+    },
+    {
+      "year": 2020,
+      "month": "2020-02",
+      "qid": "Q85",
+      "label": "カイロ",
+      "labelEn": "Cairo",
+      "from": -1,
+      "source": "en: COVID-19 pandemic in Egypt § February; en: COVID-19 pandemic in Africa § Egypt; ja § 2020年2月（2月14日）",
+      "summary": "国内最初の症例は、カイロ国際空港での中国人",
+      "fromBasis": "推測（年代と地理から）",
+      "fromNote": "出典は「中国人」とだけ書き、渡航歴は書いていない。en: … in Africa は、輸入例の多くは中国ではなくヨーロッパとアメリカから来た、とも書く",
+      "needsCheck": "Timeline（2月）§ 14 February は「国籍非公表の外国人」。場所は空港（Q461793、P625 あり）で、カイロ市で代表させた。アフリカで最初"
+    },
+    {
+      "year": 2020,
+      "month": "2020-02",
+      "qid": "Q170573",
+      "label": "ゴム",
+      "labelEn": "Qom",
+      "from": -1,
+      "source": "en: COVID-19 pandemic in Iran 冒頭・§ Early cases (19–23 February); en: COVID-19 pandemic § Asia",
+      "summary": "最初の2例は、武漢への渡航歴のある商人がきっかけとされた",
+      "fromBasis": "出典に明記",
+      "fromNote": "2月19日。ただし伝聞・推定の書き方",
+      "needsCheck": "同じ記事の § Early unofficial cases は、公式の初確認より前にゴルガーンなどに患者がいたという報道を載せている"
+    },
+    {
+      "year": 2020,
+      "month": "2020-02",
+      "qid": "Q42298",
+      "label": "コドーニョ",
+      "labelEn": "Codogno",
+      "from": -1,
+      "source": "en: COVID-19 pandemic in Italy 冒頭・§ First measures",
+      "summary": "2月21日にロンバルディアとヴェネトで集団感染が見つかった",
+      "fromBasis": "推測（年代と地理から）",
+      "fromNote": "出典に、コドーニョの初発例の感染経路は書かれていない",
+      "needsCheck": "コドーニョの名は「コドーニョでの最初の確認例の後」に出るだけで、日付とは直接結び付いていない。イタリアの最初の確認は1月31日のローマ（中国人旅行者2人。Q220。ja は1月30日）"
+    },
+    {
+      "year": 2020,
+      "month": "2020-02",
+      "qid": "Q174",
+      "label": "サンパウロ",
+      "labelEn": "São Paulo",
+      "from": 7,
+      "source": "en: Timeline … February 2020 § 25 February; en: COVID-19 pandemic in Brazil § 2020; en: COVID-19 pandemic § South America",
+      "summary": "イタリアのロンバルディアに渡航した、サンパウロの61歳の男性",
+      "fromBasis": "出典に明記",
+      "fromNote": "2月9〜21日にロンバルディアに滞在。南アメリカで最初",
+      "needsCheck": "日付が割れている: Brazil の記事・Timeline・ja は2月25日、en: COVID-19 pandemic § South America と en: … in South America は2月26日"
+    },
+    {
+      "year": 2020,
+      "month": "2020-02",
+      "qid": "Q8673",
+      "label": "ラゴス",
+      "labelEn": "Lagos",
+      "from": 7,
+      "source": "en: Timeline … February 2020 § 27 February; en: COVID-19 pandemic in Nigeria 冒頭",
+      "summary": "ナイジェリアで働くイタリア人で、ミラノから戻った",
+      "fromBasis": "出典に明記",
+      "fromNote": "2月27日。サハラ以南のアフリカで最初。出典はミラノ発とするが、ミラノは stage に無い。ミラノをロンバルディアの集団感染（stage 7）に結び付けたのは調査時の推測で、取得した本文にその記述は無い",
+      "needsCheck": "from の「出典に明記」は「イタリア（ミラノ）から」まで。コドーニョとのつながりは推測"
+    }
+  ]
+}

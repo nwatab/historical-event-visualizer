@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-09-21T01:09:57.018Z",
+ "generatedAt": "2026-09-21T06:34:20.969Z",
  "sources": {
   "wikidata": {
    "license": "CC0",
@@ -87,11 +87,15 @@
   },
   "handwritten": {
    "file": "src/data/events.sample.ts",
-   "count": 38
+   "count": 35
   },
   "placeOverrides": {
    "file": "scripts/wikidata/place-overrides.json",
    "applied": 36
+  },
+  "diffusion": {
+   "dir": "data/diffusion",
+   "count": 4
   }
  },
  "total": 19789,
@@ -215,21 +219,21 @@
    "from": 500,
    "to": 600,
    "count": 110,
-   "bytes": 31899
+   "bytes": 33467
   },
   {
    "file": "600.json",
    "from": 600,
    "to": 700,
    "count": 166,
-   "bytes": 48349
+   "bytes": 50922
   },
   {
    "file": "700.json",
    "from": 700,
    "to": 800,
-   "count": 120,
-   "bytes": 34763
+   "count": 121,
+   "bytes": 37625
   },
   {
    "file": "800.json",
@@ -271,21 +275,21 @@
    "from": 1300,
    "to": 1400,
    "count": 468,
-   "bytes": 128697
+   "bytes": 131816
   },
   {
    "file": "1400.json",
    "from": 1400,
    "to": 1500,
    "count": 543,
-   "bytes": 151154
+   "bytes": 153877
   },
   {
    "file": "1500.json",
    "from": 1500,
    "to": 1600,
-   "count": 935,
-   "bytes": 258520
+   "count": 936,
+   "bytes": 261683
   },
   {
    "file": "1600.json",

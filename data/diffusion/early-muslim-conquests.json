@@ -1,0 +1,184 @@
+{
+  "status": "confirmed",
+  "id": "Q275918",
+  "title": {
+    "ja": "イスラームの拡大",
+    "en": "Early Muslim conquests"
+  },
+  "description": {
+    "ja": "ムハンマドの死（632年）の後、マディーナを起点に、イスラーム勢力がシリア・エジプト・ペルシア・北アフリカ・イベリア半島・中央アジア・インダス川流域へ広がった。"
+  },
+  "domain": "conflict",
+  "tags": [
+    "conflict",
+    "polity",
+    "culture"
+  ],
+  "importance": 3,
+  "note": "Wikidata 由来の Q275918（instant、start 622、場所は P625 のシリア付近の 1 点）を置き換える。Wikidata の P580 は 622、P582 は 750（調査時の wbgetentities の出力、2026-09-21）。start を 632（ムハンマドの死後、アラビアの外への征服が始まる）にしたのは依頼の指定で、Wikidata の値から変えている。title.ja は依頼の表記（Wikidata の日本語ラベルは「アラブ・イスラミック・コンクエスト」）。分類は既存データの conflict のまま（要確認。「宗教の伝播」と見るなら culture）。日本語版に該当する単独の記事は無く、出典は英語版。",
+  "start": 632,
+  "end": 750,
+  "source": "https://en.wikipedia.org/wiki/Early_Muslim_conquests",
+  "origin": {
+    "qid": "Q35484",
+    "label": "マディーナ",
+    "labelEn": "Medina",
+    "source": "en: Early Muslim conquests 冒頭",
+    "summary": "622年にマディーナに最初のイスラーム国家が建てられ、ムスリムの軍がアラビアの外へ急速に広がった"
+  },
+  "stages": [
+    {
+      "year": 636,
+      "qid": "Q3766",
+      "label": "ダマスカス",
+      "labelEn": "Damascus",
+      "from": -1,
+      "source": "en: Early Muslim conquests § Conquest of Syria: 634–641; en: Siege of Damascus (634) 冒頭",
+      "summary": "ヤルムークの勝利に続いて、アラブ軍は636年にダマスカスを再び取った (en_early_muslim_conquests.txt:76)。最初の陥落は634年9月（en: Siege of Damascus (634)）で、その後ヘラクレイオスに奪い返されていた",
+      "fromBasis": "出典に明記",
+      "fromNote": "同じ冒頭に、634年4月にアブー・バクル（マディーナ）がビザンツ領レヴァントへ侵攻、とある。ハーリドの部隊はイラクから来た（en: Early Muslim conquests § Conquest of Syria）",
+      "note": "年は人の確認で 636（最終的な占領）に決めた（2026-09-21）。634 は一時的な占領"
+    },
+    {
+      "year": 637,
+      "qid": "Q192541",
+      "label": "クテシフォン",
+      "labelEn": "Ctesiphon",
+      "from": -1,
+      "source": "en: Siege of Ctesiphon (637) 冒頭",
+      "summary": "クテシフォンの包囲は637年1月から3月",
+      "fromBasis": "推測（年代と地理から）",
+      "fromNote": "§ Prelude: カリフのウマル（マディーナ）が、イラク方面の司令官サアドにクテシフォンへの進軍を命じた。イラク戦線はシリアとは別なので、起点につないだ",
+      "needsCheck": "カーディシーヤの戦いの年が、en: Arab conquest of Egypt は 637、Early Muslim conquests は 636。クテシフォンの記事は、包囲をその「直後」とする"
+    },
+    {
+      "year": 638,
+      "qid": "Q1218",
+      "label": "エルサレム",
+      "labelEn": "Jerusalem",
+      "from": 0,
+      "source": "en: Early Muslim conquests § Conquest of Syria: 634–641",
+      "summary": "エルサレムは638年、カエサレアは640年に落ちた",
+      "fromBasis": "推測（年代と地理から）",
+      "fromNote": "ダマスカスと同じ戦役・同じ軍（アブー・ウバイダ）。出典は、ヤルムークとダマスカス再占領に続けて書いている",
+      "needsCheck": "en: First Muslim conquest of Jerusalem は、包囲を636年11月から、ウマルへの降伏を「637年または638年」とする"
+    },
+    {
+      "year": 642,
+      "qid": "Q87",
+      "label": "アレクサンドリア",
+      "labelEn": "Alexandria",
+      "from": 2,
+      "source": "en: Early Muslim conquests § Conquest of Egypt: 639–642",
+      "summary": "アレクサンドリアは642年9月に降伏した",
+      "fromBasis": "出典に明記",
+      "fromNote": "en: Arab conquest of Egypt: エルサレムの包囲の後、アムルがエジプト侵攻を提案した。軍はパレスチナからラファ、アリーシュを通って入った",
+      "needsCheck": "別の候補: バビロン城（641年4月9日に降伏。Q2421968、P625 あり）、フスタート（Q839456、P625 あり）。ビザンツは646年に一時アレクサンドリアを奪い返した"
+    },
+    {
+      "year": 642,
+      "qid": "Q720045",
+      "label": "ニハーヴァンド",
+      "labelEn": "Nahavand",
+      "from": 1,
+      "source": "en: Early Muslim conquests § Conquest of Mesopotamia and Persia: 633–651",
+      "summary": "642年のニハーヴァンドの戦いで、サーサーン朝の運命は決まった",
+      "fromBasis": "出典に明記",
+      "fromNote": "同じ節: クテシフォンの後、ペルシア軍はザグロスを越えて退き、アラブ軍はイラン高原を追った"
+    },
+    {
+      "year": 651,
+      "qid": "Q193325",
+      "label": "メルヴ",
+      "labelEn": "Merv",
+      "from": 4,
+      "source": "en: Muslim conquest of Persia（ホラーサーンの節）",
+      "summary": "651年、ホラーサーンの征服がアフナフに任された",
+      "fromBasis": "推測（年代と地理から）",
+      "fromNote": "出典は、アフナフがクーファからレイ、ニーシャープール、ヘラートを経てメルヴへ北上した、とする。クーファはイラクで、経路はニハーヴァンドで開かれた高原を通る",
+      "needsCheck": "Wikidata の日本語ラベルは「メルブ遺跡」（遺跡の項目）。en: Muslim conquest of Khorasan は出発地を「ファールスから」とし、少し食い違う"
+    },
+    {
+      "year": 670,
+      "qid": "Q179570",
+      "label": "ケルアン",
+      "labelEn": "Kairouan",
+      "from": 3,
+      "source": "en: Early Muslim conquests § Conquest of the Maghreb: 647–742",
+      "summary": "670年にアラブ人がカイラワーンの町を築き、前進基地にした",
+      "fromBasis": "出典に明記",
+      "fromNote": "同じ節: 襲撃はエジプト征服のすぐ後に始まった。en: Muslim conquest of the Maghreb: 司令官はたびたびエジプトに戻り、この地域は705年までエジプトの支配下にあった"
+    },
+    {
+      "year": 698,
+      "qid": "Q6343",
+      "label": "カルタゴ",
+      "labelEn": "Carthage",
+      "from": 6,
+      "source": "en: Early Muslim conquests § Conquest of the Maghreb: 647–742",
+      "summary": "アラブ軍は698年にカルタゴを、708年までにタンジェを取った",
+      "fromBasis": "推測（年代と地理から）",
+      "fromNote": "ハッサーンの軍はカリフが送ったもので、カルタゴへ直行した。征服後にカイラワーンへ戻った。カイラワーンは地域の基地だが、軍がそこから出たわけではない",
+      "needsCheck": "年が不一致: en: Muslim conquest of the Maghreb は、最初の入城を695/6年とし、ビザンツが奪い返した後に最終的に取った、とする。ja: ウマイヤ朝（年表）は697年"
+    },
+    {
+      "year": 708,
+      "qid": "Q126148",
+      "label": "タンジェ",
+      "labelEn": "Tangier",
+      "from": 6,
+      "source": "en: Muslim conquest of the Maghreb（ムーサー・イブン・ヌサイルの節）",
+      "summary": "708年、タンジェに守備隊を置いた後、ムーサーはカイラワーンに戻った",
+      "fromBasis": "人の判断（2026-09-21 の確認）",
+      "fromNote": "ムーサーの基地はカイラワーンで、708年にタンジェに守備隊を置いた後もカイラワーンに戻っている（en: Muslim conquest of the Maghreb）。調査時はカルタゴ（地理的な連なり）につないでいた"
+    },
+    {
+      "year": 709,
+      "qid": "Q5764",
+      "label": "ブハラ",
+      "labelEn": "Bukhara",
+      "source": "en: Muslim conquest of Transoxiana; en: Early Muslim conquests § Conquest of Transoxiana: 673–751",
+      "summary": "709年の戦役でアラブ軍はブハラを直接攻め、強襲して取り、城塞に守備隊を置いた。その直後にサマルカンドの支配者が使者を送って貢納した (en_Muslim_conquest_of_Transoxiana.txt:74)",
+      "fromBasis": "出典に明記",
+      "fromNote": "クタイバの基地はメルヴ（en: Muslim conquest of Transoxiana。調査時の報告による。本文との突き合わせは、ブハラの陥落の文だけ）",
+      "note": "人の確認で追加した stage（2026-09-21）",
+      "from": 5
+    },
+    {
+      "year": 711,
+      "qid": "Q5836",
+      "label": "トレド",
+      "labelEn": "Toledo",
+      "from": 8,
+      "source": "en: Early Muslim conquests § Conquest of Hispania and Septimania: 711–721",
+      "summary": "タンジェに駐留していたターリクが、ジブラルタル海峡を渡った",
+      "fromBasis": "出典に明記",
+      "fromNote": "タンジェからの渡海は明記。同じ節は、グアダレーテ（711年7月19日）の後、ムーサーの712年の渡海の前に、首都トレドが降伏したと書く",
+      "needsCheck": "トレドの陥落の年は明記されていない。en: Muslim conquest of the Iberian Peninsula は「強襲して無条件に取った」とし、「平和裏に降伏」と食い違う。コルドバ（Q5818、P625 あり）も年が見つからなかった"
+    },
+    {
+      "year": 712,
+      "qid": "Q5753",
+      "label": "サマルカンド",
+      "labelEn": "Samarkand",
+      "from": 9,
+      "source": "en: Early Muslim conquests § Conquest of Transoxiana: 673–751",
+      "summary": "706–712年にブハラとサマルカンドが征服された",
+      "fromBasis": "出典に明記",
+      "fromNote": "人の確認でブハラ経由にした（2026-09-21）。出典は、706–712年にブハラとサマルカンドが征服された、ブハラ（709年）の後にサマルカンドへ進んだ、と書く。en: Muslim conquest of Transoxiana: クタイバは軍を基地のメルヴに戻した。en: Qutayba ibn Muslim: 711/712年の冬にサマルカンドへの進軍を準備した",
+      "needsCheck": "712 は範囲の終わりで、「711/712年の冬」からの推定。「712年にサマルカンドが落ちた」と書く文は無い。別の候補: ブハラ 709年（Q5764。709年の戦役で強襲して取った、と年が明記されている）"
+    },
+    {
+      "year": 713,
+      "qid": "Q185453",
+      "label": "ムルターン",
+      "labelEn": "Multan",
+      "from": 4,
+      "source": "en: Arab conquest of Sindh 冒頭・§ Conquest of Brahmanabad, Alor and Multan",
+      "summary": "711年から713年の間に、ウマイヤ朝はチャチ朝を破った",
+      "fromBasis": "推測（年代と地理から）",
+      "fromNote": "en: Muhammad ibn al-Qasim: 軍はシーラーズを出て、マクラーンを通ってデーバルへ、そこから北へ。シーラーズ（ペルシア）は stage に無いので、ペルシアのニハーヴァンドにつないだ",
+      "needsCheck": "ムルターンの陥落の年は取得した本文に無い。713 は冒頭の範囲の終わりで、ムルターンは「最後の征服」とされる。Early Muslim conquests は 711–714。最初に取られたデーバル（Q26890）は P625 が無く使えない"
+    }
+  ]
+}
