@@ -31,7 +31,14 @@ import { DOMAINS } from "@/lib/domain";
 import { markerFilter } from "@/lib/mapFilters";
 import { popupContent, type PopupItem } from "@/lib/popupContent";
 import type { DiffusionLineCollection } from "@/lib/diffusion";
-import { LABEL_MIN_ZOOM_BY_IMPORTANCE, type EventMarkerCollection, type MarkerKind } from "@/lib/timeline";
+import {
+  LABEL_MIN_ZOOM_BY_IMPORTANCE,
+  MIN_ZOOM_BY_IMPORTANCE,
+  promotedThresholds,
+  type DensityLevel,
+  type EventMarkerCollection,
+  type MarkerKind,
+} from "@/lib/timeline";
 import type { Domain } from "@/types/event";
 
 const EVENTS_SOURCE_ID = "events";
@@ -144,12 +151,23 @@ const isPriorityLabel: ExpressionSpecification = [
  * ラベルを出す条件。マーカーの表示条件に加えて、ラベル用のズームの閾値と「places の最初の1点だけ」を掛ける。
  * priority が true なら優先ラベルの対象だけ、false ならそれ以外。
  */
-const labelFilter = (hiddenDomains: readonly Domain[], priority: boolean): ExpressionSpecification =>
+const labelFilter = (
+  hiddenDomains: readonly Domain[],
+  priority: boolean,
+  level: DensityLevel = 0,
+): ExpressionSpecification =>
   markerFilter(
     hiddenDomains,
     ["all", ["==", ["get", "primary"], true], priority ? isPriorityLabel : ["!", isPriorityLabel]],
-    LABEL_MIN_ZOOM_BY_IMPORTANCE,
+    promotedThresholds(LABEL_MIN_ZOOM_BY_IMPORTANCE, level),
   );
+
+/** マーカー（と経路の線、ラベル除け）の表示条件。密度による繰り上げ（timeline.ts の densityLevel）を閾値に反映する。 */
+const densityFilter = (
+  hiddenDomains: readonly Domain[],
+  level: DensityLevel,
+  extra: ExpressionSpecification | null = null,
+): ExpressionSpecification => markerFilter(hiddenDomains, extra, promotedThresholds(MIN_ZOOM_BY_IMPORTANCE, level));
 
 /** マーカーの白い縁取りの外側から MAP_LABEL.gap だけ離す（text-radial-offset は em 単位）。 */
 const labelOffset: ExpressionSpecification = ["/", ["+", markerOuterRadius, MAP_LABEL.gap], MAP_LABEL.fontSize];
@@ -369,8 +387,8 @@ const createStyle = (
 });
 
 /** 選択中のイベント（表示条件を満たすもの）だけに輪を付けるための filter */
-const selectedFilter = (hiddenDomains: readonly Domain[], selectedIds: readonly string[]) =>
-  markerFilter(hiddenDomains, ["in", ["get", "id"], ["literal", [...selectedIds]]]);
+const selectedFilter = (hiddenDomains: readonly Domain[], selectedIds: readonly string[], level: DensityLevel = 0) =>
+  densityFilter(hiddenDomains, level, ["in", ["get", "id"], ["literal", [...selectedIds]]]);
 
 const clamp = (value: number, min: number, max: number): number =>
   Math.min(max, Math.max(min, value));
@@ -399,6 +417,8 @@ interface WorldMapProps {
   readonly lines: DiffusionLineCollection;
   readonly highlightedDomain: Domain | null;
   readonly hiddenDomains: readonly Domain[];
+  /** 密度による importance の繰り上げの段階（現在年のマーカー数から決まる。timeline.ts の densityLevel） */
+  readonly densityLevel: DensityLevel;
   /** 詳細パネルで選択中のイベント（地図上で輪を付ける） */
   readonly selectedIds: readonly string[];
   /** マーカー（またはラベル）をクリックしたとき。重なっていれば複数の id が渡る。 */
@@ -411,6 +431,7 @@ interface WorldMapProps {
 interface MapViewState {
   readonly highlightedDomain: Domain | null;
   readonly hiddenDomains: readonly Domain[];
+  readonly densityLevel: DensityLevel;
   readonly selectedIds: readonly string[];
 }
 
@@ -419,6 +440,7 @@ export function WorldMap({
   lines,
   highlightedDomain,
   hiddenDomains,
+  densityLevel,
   selectedIds,
   onSelectEvents,
   onClickEmpty,
@@ -427,7 +449,7 @@ export function WorldMap({
   const mapRef = useRef<MapLibreMap | null>(null);
   const markersRef = useRef(markers);
   const linesRef = useRef(lines);
-  const viewRef = useRef<MapViewState>({ highlightedDomain, hiddenDomains, selectedIds });
+  const viewRef = useRef<MapViewState>({ highlightedDomain, hiddenDomains, densityLevel, selectedIds });
   const onSelectRef = useRef(onSelectEvents);
   const onClickEmptyRef = useRef(onClickEmpty);
   const hoverPopupRef = useRef<Popup | null>(null);
@@ -527,11 +549,11 @@ export function WorldMap({
   }, [onSelectEvents, onClickEmpty]);
 
   useEffect(() => {
-    const view = { highlightedDomain, hiddenDomains, selectedIds };
+    const view = { highlightedDomain, hiddenDomains, densityLevel, selectedIds };
     viewRef.current = view;
     const map = mapRef.current;
     if (map?.getLayer(EVENTS_LAYER_ID)) applyViewState(map, view);
-  }, [highlightedDomain, hiddenDomains, selectedIds]);
+  }, [highlightedDomain, hiddenDomains, densityLevel, selectedIds]);
 
   // 縦長画面では世界の外側（上下）も見えるため、コンテナ自体も海の色で塗る。
   return (
@@ -549,15 +571,15 @@ const applyViewState = (map: MapLibreMap, view: MapViewState): void => {
     map.setPaintProperty(id, "circle-opacity", opacity);
     map.setPaintProperty(id, "circle-stroke-opacity", opacity);
     map.setLayoutProperty(id, "circle-sort-key", markerSortKey(view.highlightedDomain));
-    map.setFilter(id, markerFilter(view.hiddenDomains, only));
+    map.setFilter(id, densityFilter(view.hiddenDomains, view.densityLevel, only));
   });
   [LINE_CASING_LAYER_ID, LINE_LAYER_ID].forEach((id) => {
     map.setPaintProperty(id, "line-opacity", opacity);
-    map.setFilter(id, markerFilter(view.hiddenDomains));
+    map.setFilter(id, densityFilter(view.hiddenDomains, view.densityLevel));
   });
-  map.setFilter(SELECTED_LAYER_ID, selectedFilter(view.hiddenDomains, view.selectedIds));
-  map.setFilter(LABEL_LAYER_ID, labelFilter(view.hiddenDomains, false));
-  map.setFilter(PRIORITY_LABEL_LAYER_ID, labelFilter(view.hiddenDomains, true));
-  map.setFilter(LABEL_BLOCKER_LAYER_ID, markerFilter(view.hiddenDomains));
+  map.setFilter(SELECTED_LAYER_ID, selectedFilter(view.hiddenDomains, view.selectedIds, view.densityLevel));
+  map.setFilter(LABEL_LAYER_ID, labelFilter(view.hiddenDomains, false, view.densityLevel));
+  map.setFilter(PRIORITY_LABEL_LAYER_ID, labelFilter(view.hiddenDomains, true, view.densityLevel));
+  map.setFilter(LABEL_BLOCKER_LAYER_ID, densityFilter(view.hiddenDomains, view.densityLevel));
   LABEL_LAYER_IDS.forEach((id) => map.setPaintProperty(id, "text-opacity", opacity));
 };

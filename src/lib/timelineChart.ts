@@ -1,6 +1,7 @@
 import type { Domain, HistEvent, Year } from "@/types/event";
 import { DOMAINS } from "./domain";
-import { TIMELINE_IMPORTANCE_BY_WINDOW } from "./timeline";
+import { neverOnMap } from "./mapFilters";
+import { MIN_ZOOM_BY_IMPORTANCE, TIMELINE_IMPORTANCE_BY_WINDOW } from "./timeline";
 import { axisLabelText, type AxisTick } from "./yearAxis";
 
 /*
@@ -55,18 +56,25 @@ export interface TimelineItem {
   readonly start: Year;
   /** period / diffusion の終了年。instant は start と同じ */
   readonly end: Year;
+  /**
+   * どのズームでも地図に出ない項目か（mapFilters.ts の neverOnMap。places が空、または場所が国の代表点だけで、拡大する前に消える）。
+   * 年表では、点を輪郭だけ、帯を塗り無しの破線にして区別する。
+   */
+  readonly offMap: boolean;
 }
 
 /**
  * 窓に入るイベントを、年表の項目にする。
  * - instant は start が窓の中、period / diffusion は [start, end] が窓と重なるもの
- * - 地図と違い、placeKind が "none" の項目（places が空）も出す。年表に場所は要らないため
+ * - 地図と違い、placeKind が "none" の項目（places が空）も出す。年表に場所は要らないため。地図に出ない項目には offMap を付ける
+ *   （mapThresholds は、地図のマーカーの importance ごとの閾値。密度による繰り上げ後のものを渡す）
  * - diffusion は period と同じ帯にする。地図のように end の後まで残すことはしない
  */
 export const timelineItems = (
   events: readonly HistEvent[],
   window: TimelineWindow,
   hiddenDomains: readonly Domain[],
+  mapThresholds: Readonly<Record<HistEvent["importance"], number>> = MIN_ZOOM_BY_IMPORTANCE,
 ): readonly TimelineItem[] => {
   const from = window.center - window.halfSpan;
   const to = window.center + window.halfSpan;
@@ -86,6 +94,7 @@ export const timelineItems = (
         kind,
         start: event.start,
         end,
+        offMap: neverOnMap(event, mapThresholds),
       },
     ];
   });

@@ -51,6 +51,8 @@ interface TimelineProps {
   readonly halfSpan: number;
   readonly events: readonly HistEvent[];
   readonly hiddenDomains: readonly Domain[];
+  /** 地図のマーカーの、importance ごとの表示を始めるズーム（密度による繰り上げ後）。地図に出ない項目の判定に使う */
+  readonly mapThresholds: Readonly<Record<1 | 2 | 3, number>>;
   /** 凡例でホバー中の分類。そのレーンだけを強調する */
   readonly highlightedDomain: Domain | null;
   readonly selectedIds: readonly string[];
@@ -76,6 +78,9 @@ interface Hover {
 }
 
 const POINT_RADIUS = TIMELINE.pointDiameter / 2;
+
+/** ホバーの吹き出しで、どのズームでも地図に出ない項目に添える注記 */
+const OFF_MAP_NOTE = "（地図に位置なし）";
 
 /**
  * ヒストグラムのレーン。1 年刻みの棒を、1つの path にまとめて描く（±500 年で 1,000 本になるため）。
@@ -188,6 +193,7 @@ export function Timeline({
   halfSpan,
   events,
   hiddenDomains,
+  mapThresholds,
   highlightedDomain,
   selectedIds,
   playing,
@@ -213,7 +219,10 @@ export function Timeline({
     [width],
   );
   const lanes = useMemo(() => timelineLanes(hiddenDomains), [hiddenDomains]);
-  const items = useMemo(() => timelineItems(events, view, hiddenDomains), [events, view, hiddenDomains]);
+  const items = useMemo(
+    () => timelineItems(events, view, hiddenDomains, mapThresholds),
+    [events, view, hiddenDomains, mapThresholds],
+  );
   const painted = useMemo(() => [...items].sort(byTimelinePaintOrder), [items]);
   // 項目が多すぎて点が並びきらないレーンは、ヒストグラムにする
   const modes = useMemo(() => laneModes(items, geometry), [items, geometry]);
@@ -365,7 +374,9 @@ export function Timeline({
   const tooltipRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (hover === null || tooltipRef.current === null) return;
-    const shown = hover.items.slice(0, TIMELINE.tooltipMaxItems);
+    const shown = hover.items
+      .slice(0, TIMELINE.tooltipMaxItems)
+      .map((item) => ({ title: item.title, domain: item.domain, ...(item.offMap ? { note: OFF_MAP_NOTE } : {}) }));
     tooltipRef.current.replaceChildren(popupContent(shown, hover.items.length - shown.length, hover.heading));
   }, [hover]);
 
@@ -499,10 +510,10 @@ export function Timeline({
                           strokeWidth={TIMELINE.histogramLabelTick.width}
                         />
                       ))}
-                    {/* 帯の塗り。不透明度はグループに掛ける（重なっても濃くならない） */}
+                    {/* 帯の塗り。不透明度はグループに掛ける（重なっても濃くならない）。地図に出ない項目の帯は塗らない */}
                     <g opacity={TIMELINE.bandFillOpacity}>
                       {lanePainted
-                        .filter((item) => item.kind === "period")
+                        .filter((item) => item.kind === "period" && !item.offMap)
                         .map((item) => {
                           const [x0, x1] = itemExtent(item, view, geometry);
                           return (
@@ -524,6 +535,7 @@ export function Timeline({
                         "data-timeline-item": item.id,
                         "data-kind": item.kind,
                         "data-importance": item.importance,
+                        ...(item.offMap ? { "data-off-map": true } : {}),
                         ...(selected ? { "data-selected": true } : {}),
                       };
                       return item.kind === "instant" ? (
@@ -533,8 +545,9 @@ export function Timeline({
                           cx={(x0 + x1) / 2}
                           cy={cy}
                           r={POINT_RADIUS}
-                          fill={color}
-                          stroke={selected ? SELECTION_RING.color : GRAY.surface}
+                          // 地図に出ない項目は、塗りつぶさずに分類色の輪郭だけにする（中は面の色で抜く。下の帯や線が透けて見えないように）
+                          fill={item.offMap ? GRAY.surface : color}
+                          stroke={selected ? SELECTION_RING.color : item.offMap ? color : GRAY.surface}
                           strokeWidth={selected ? SELECTION_RING.width : TIMELINE.bandStrokeWidth}
                         />
                       ) : (
@@ -548,6 +561,7 @@ export function Timeline({
                           fill="none"
                           stroke={selected ? SELECTION_RING.color : color}
                           strokeWidth={selected ? SELECTION_RING.width : TIMELINE.bandStrokeWidth}
+                          {...(item.offMap ? { strokeDasharray: TIMELINE.offMapDash } : {})}
                         />
                       );
                     })}
