@@ -18,6 +18,9 @@ import {
   byTimelinePaintOrder,
   itemExtent,
   itemsAtX,
+  itemsInYear,
+  laneHistogram,
+  laneModes,
   pxToYears,
   timelineAxisLabel,
   timelineAxisStep,
@@ -26,7 +29,9 @@ import {
   timelineLabels,
   timelineLanes,
   timelineX,
+  yearAtX,
   zoomedHalfSpan,
+  type HistogramBin,
   type TimelineGeometry,
   type TimelineItem,
   type TimelineWindow,
@@ -59,9 +64,42 @@ interface Hover {
   readonly x: number;
   readonly y: number;
   readonly items: readonly TimelineItem[];
+  /** ヒストグラムのレーンでは、その年と件数を見出しに出す */
+  readonly heading: string | null;
 }
 
 const POINT_RADIUS = TIMELINE.pointDiameter / 2;
+
+/**
+ * ヒストグラムのレーン。1 年刻みの棒を、1つの path にまとめて描く（±500 年で 1,000 本になるため）。
+ * 棒は、その年を中心に 1 年ぶんの幅。高さは、窓の中でいちばん件数の多い年をレーンの高さに合わせて正規化する。
+ */
+function LaneHistogram({
+  bins,
+  view,
+  width,
+  bottom,
+  color,
+}: {
+  readonly bins: readonly HistogramBin[];
+  readonly view: TimelineWindow;
+  readonly width: number;
+  readonly bottom: number;
+  readonly color: string;
+}) {
+  const max = Math.max(1, ...bins.map((bin) => bin.count));
+  const clampX = (x: number): number => Math.min(width, Math.max(0, x));
+  const d = bins
+    .filter((bin) => bin.count > 0)
+    .map((bin) => {
+      const x0 = clampX(timelineX(bin.year - 0.5, view, width));
+      const x1 = clampX(timelineX(bin.year + 0.5, view, width));
+      const top = bottom - (bin.count / max) * TIMELINE.laneHeight * TIMELINE.histogramMaxHeightRatio;
+      return `M${x0} ${bottom}V${top}H${x1}V${bottom}Z`;
+    })
+    .join("");
+  return <path data-timeline-histogram data-max={max} d={d} fill={color} fillOpacity={TIMELINE.histogramFillOpacity} />;
+}
 
 /** レーンの中心の y 座標 */
 const laneCenterY = (index: number): number => index * TIMELINE.laneHeight + TIMELINE.laneHeight / 2;
@@ -98,15 +136,20 @@ export function Timeline({
   const lanes = useMemo(() => timelineLanes(hiddenDomains), [hiddenDomains]);
   const items = useMemo(() => timelineItems(events, view, hiddenDomains), [events, view, hiddenDomains]);
   const painted = useMemo(() => [...items].sort(byTimelinePaintOrder), [items]);
+  // 項目が多すぎて点が並びきらないレーンは、ヒストグラムにする
+  const modes = useMemo(() => laneModes(items, geometry), [items, geometry]);
   const labels = useMemo(
     () =>
       width === 0
         ? []
-        : timelineLabels(items, view, geometry, {
-            fontSize: textStyle.caption.fontSize,
-            gap: TIMELINE.labelGap,
-          }),
-    [items, view, geometry, width],
+        : timelineLabels(
+            items,
+            view,
+            geometry,
+            { fontSize: textStyle.caption.fontSize, gap: TIMELINE.labelGap },
+            modes,
+          ),
+    [items, view, geometry, width, modes],
   );
   const axisStep = timelineAxisStep(view, width, TIMELINE.axisLabelMinSpacing);
   const ticks = useMemo(
@@ -117,10 +160,16 @@ export function Timeline({
   const lanesHeight = lanes.length * TIMELINE.laneHeight;
   const height = lanesHeight + TIMELINE.axisHeight;
 
-  /** ポインタの位置にある項目（レーンの外なら空） */
-  const itemsAt = (x: number, y: number): readonly TimelineItem[] => {
+  /** ポインタの位置にある項目（レーンの外なら空）。ヒストグラムのレーンでは、その年に存在する項目 */
+  const hitAt = (x: number, y: number): Pick<Hover, "items" | "heading"> => {
     const lane = lanes[Math.floor(y / TIMELINE.laneHeight)];
-    return lane === undefined || y < 0 ? [] : itemsAtX(items, lane, x, TIMELINE.hitTolerance, view, geometry);
+    if (lane === undefined || y < 0) return { items: [], heading: null };
+    if (modes[lane] === "items") {
+      return { items: itemsAtX(items, lane, x, TIMELINE.hitTolerance, view, geometry), heading: null };
+    }
+    const hitYear = yearAtX(x, view, width);
+    const found = itemsInYear(items, lane, hitYear, view.center);
+    return { items: found, heading: `${formatYear(hitYear)}: ${found.length}件` };
   };
 
   // ── ドラッグ（現在年を動かす）とクリック ──
@@ -139,8 +188,8 @@ export function Timeline({
     const started = drag.current;
     if (started === null) {
       const { x, y } = localPoint(event);
-      const hit = itemsAt(x, y);
-      setHover(hit.length === 0 ? null : { x, y, items: hit });
+      const hit = hitAt(x, y);
+      setHover(hit.items.length === 0 ? null : { x, y, ...hit });
       return;
     }
     const dx = event.clientX - started.x;
@@ -155,7 +204,7 @@ export function Timeline({
     drag.current = null;
     if (started === null || started.moved) return;
     const { x, y } = localPoint(event);
-    const hit = itemsAt(x, y);
+    const hit = hitAt(x, y).items;
     if (hit.length === 0) onClickEmpty();
     else onSelectEvents(hit.map((item) => item.id));
   };
@@ -184,7 +233,7 @@ export function Timeline({
   useEffect(() => {
     if (hover === null || tooltipRef.current === null) return;
     const shown = hover.items.slice(0, TIMELINE.tooltipMaxItems);
-    tooltipRef.current.replaceChildren(popupContent(shown, hover.items.length - shown.length));
+    tooltipRef.current.replaceChildren(popupContent(shown, hover.items.length - shown.length, hover.heading));
   }, [hover]);
 
   const laneOpacity = (domain: Domain): number =>
@@ -272,10 +321,39 @@ export function Timeline({
             {lanes.map((domain, index) => {
               const cy = laneCenterY(index);
               const color = DOMAIN_COLORS[domain];
-              const lanePainted = painted.filter((item) => item.domain === domain);
+              const histogram = modes[domain] === "histogram";
+              const lanePainted = histogram ? [] : painted.filter((item) => item.domain === domain);
+              const laneLabels = labels.filter((label) => label.domain === domain);
               return (
-                <g key={domain} data-timeline-lane={domain} opacity={laneOpacity(domain)}>
+                <g
+                  key={domain}
+                  data-timeline-lane={domain}
+                  data-timeline-lane-mode={modes[domain]}
+                  opacity={laneOpacity(domain)}
+                >
                   <title>{DOMAIN_LABELS[domain]}</title>
+                  {histogram && (
+                    <LaneHistogram
+                      bins={laneHistogram(items, domain, view)}
+                      view={view}
+                      width={width}
+                      bottom={(index + 1) * TIMELINE.laneHeight}
+                      color={color}
+                    />
+                  )}
+                  {/* ヒストグラムのレーンには点が無いので、ラベルの付いた項目の開始年に縦線を引いて、どの年かを示す */}
+                  {histogram &&
+                    laneLabels.map((label) => (
+                      <line
+                        key={label.id}
+                        x1={label.anchor}
+                        x2={label.anchor}
+                        y1={index * TIMELINE.laneHeight}
+                        y2={(index + 1) * TIMELINE.laneHeight}
+                        stroke={color}
+                        strokeWidth={TIMELINE.histogramLabelTick.width}
+                      />
+                    ))}
                   {/* 帯の塗り。不透明度はグループに掛ける（重なっても濃くならない） */}
                   <g opacity={TIMELINE.bandFillOpacity}>
                     {lanePainted
@@ -328,9 +406,7 @@ export function Timeline({
                       />
                     );
                   })}
-                  {labels
-                    .filter((label) => label.domain === domain)
-                    .map((label) => (
+                  {laneLabels.map((label) => (
                       <text
                         key={label.id}
                         data-timeline-label={label.id}

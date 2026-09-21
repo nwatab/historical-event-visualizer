@@ -235,6 +235,15 @@ export const TIMELINE = {
    */
   bandFillOpacity: 0.25,
   bandStrokeWidth: 1,
+  /**
+   * ヒストグラム（項目が多すぎるレーン）の塗りの不透明度。分類色の薄い塗りで、輪郭は付けない。
+   * 上に caption のラベルを置いても読める濃さにする。
+   */
+  histogramFillOpacity: 0.35,
+  /** 棒のいちばん高い年が、レーンの高さに対して占める割合（レーンの区切り線に触れないように少し空ける） */
+  histogramMaxHeightRatio: 0.9,
+  /** ヒストグラムのレーンで、ラベルの付いた項目の開始年に引く縦線 */
+  histogramLabelTick: { width: 1 },
   /** レーンの区切り線と、時間軸の線 */
   laneLine: { color: GRAY.line, width: 1 },
   /** 現在年の縦線 */

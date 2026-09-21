@@ -99,7 +99,8 @@ const EventList = ({
   readonly onOpen: (eventId: string) => void;
 }) => (
   <div className="flex flex-col" style={{ gap: SPACE[8] }}>
-    <p style={textStyle.caption}>この地点のイベント（{events.length}件）</p>
+    {/* 地図の重なったマーカーからも、年表の重なった項目（ヒストグラムならその年の項目）からも開く */}
+    <p style={textStyle.caption}>該当するイベント（{events.length}件）</p>
     <ul className="flex flex-col" style={{ gap: SPACE[4] }}>
       {events.map((event) => (
         <li key={event.id}>
