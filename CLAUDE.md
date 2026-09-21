@@ -239,7 +239,10 @@ node scripts/wikidata/count-markers.mjs 1500 1800 1950   # 世界全体の表示
   - 一部の way だけを落とすと線が途切れ、途切れた国境は「そこに境界が無い」という誤情報になる。だから、license を理由に way を落とすことはしない。
   - 受け入れると決めていない値（SA / NC / 読めない値）が、relation か、残す way に 1 つでもあれば、`pnpm ohm:build` は止まって報告する。表記ゆれは `normalizeLicense` が吸収し、
     それで済まない値は、人が確認して `REVIEWED_LICENSE_VALUES` に根拠つきで書く。
-  - 表示は「© OpenHistoricalMap contributors（CC0 / CC BY 4.0）」。README の出典と、凡例の注記に書く。manifest に、license 別の way の本数を出す。
+  - 人が確認して受け入れた値（2026-09-21）: `CCO 4.0`（105 本。書き間違いとみられ、出典の HDX のデータセットは CC BY-IGO だった）と、
+    `CC-BY (NLS): …`（21 本。スコットランド国立図書館の地図が出典で、値が CC BY と言っている）。根拠は `licenses.mjs` に書いてある。
+  - 表示: 凡例の注記は短く「出典: OpenHistoricalMap（CC0 / CC BY）」。README の出典には内訳を書く（「© OpenHistoricalMap contributors（CC0 / CC BY 4.0）。
+    一部の国境線は HDX（CC BY-IGO）および National Library of Scotland（CC BY）に由来」）。manifest の `waysByLicense` に、license 別（正規化後）の way の本数を出す。
 - **除外の表（`exclusions.mjs`）に入れるのは、日付が異常な relation だけ**（紀元前 501 年から続くスルターン朝、など）。名目上だけ続いた国や、階層の違うものは、OHM が描いているとおりに出す。
   Kingdom of Leinster の 2875840（800〜1603 年）は、レンスター王国が名目上 1603 年まで続いたという事実に合っているので、除かない。
 
@@ -259,6 +262,16 @@ OHM の `start_date` / `end_date` は ISO 8601 の文字列で、**すでに天�
     代わりに、relation の id は出力に残らない。
 - 簡略化は mapshaper（devDependency）。way は端点を共有しているので、端点を動かさない mapshaper の簡略化で、国境のつながりが保たれる。許容は 0.05°（合計が 8 MB を超えたら 0.1°）、座標は小数 2 桁。
 - `manifest.json`: 生成日、OHM の取得日、許容、relation と way の数、落とした way の理由別の数、license 別の way の本数、除外した relation、ファイルごとの件数と大きさ。
+
+### 実測（2026-09-21 の `pnpm ohm:build` の出力。OHM のデータは 2026-09-21 取得）
+
+- 対象の relation 3,265 件（admin_level=2 の全 4,041 件のうち、1500〜2025 年に存在するもの）。除外 2 件（Sindh Sultanate、Catawba。表の残り 2 件は 1500 年より前に終わる）。
+  線が残った relation 2,919 件、1 本も残らなかった 344 件（ギルバート諸島、バハマ、ジャマイカ、グレートブリテン王国など、国境が海岸線と海上の線だけの島）。
+- way: 使われている 32,663 本 → 海上 5,834 本と海岸線 170 本を落として、26,659 本。
+- license（残した way、正規化後）: CC0 25,889 本（うちタグ無し 22,921 本）、CC BY 4.0 644 本、CC BY-IGO 105 本、CC BY 21 本。relation は CC0 だけ（タグ無し 3,174、CC0-1.0 61、CC0 28）。
+- 大きさ: 許容 0.05° で合計 9.26 MB → 8 MB を超えたので 0.1° にして 8.35 MB、feature 8,689 件。
+  1500.json 571 KB（911 件）/ 1600.json 936 KB（1,244）/ 1700.json 1,515 KB（1,957）/ 1800.json 2,365 KB（3,108）/ 1900.json 2,335 KB（3,127）/ 2000.json 428 KB（632）。アプリが一度に読むのは 1 世紀ぶん。
+  - 許容を倍にしても 1 割しか減らない。大きさを決めているのは点の数ではなく、短い way の多さ（ドイツ国とオーストリア＝ハンガリーの国境が 752 本）。way をつないで 1 本にすれば減るはずだが、やっていない。
 
 ### 再生成の手順
 

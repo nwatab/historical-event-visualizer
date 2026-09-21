@@ -168,8 +168,8 @@ const manifest = {
   source: {
     name: "OpenHistoricalMap",
     url: "https://www.openhistoricalmap.org/",
-    license: "CC0 / CC BY 4.0",
-    attribution: "© OpenHistoricalMap contributors（CC0 / CC BY 4.0）",
+    license: "CC0 / CC BY",
+    attribution: "© OpenHistoricalMap contributors（CC0 / CC BY 4.0）。一部の国境線は HDX（CC BY-IGO）および National Library of Scotland（CC BY）に由来",
     query: 'relation["boundary"="administrative"]["admin_level"="2"]',
     tagsFetchedAt: tagsFile.fetchedAt,
     osmBase: tagsFile.osmBase,
