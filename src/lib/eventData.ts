@@ -1,3 +1,4 @@
+import type { DensityRuns } from "@/lib/timeline";
 import type { HistEvent, Year } from "@/types/event";
 
 /**
@@ -18,6 +19,11 @@ export interface EventManifest {
   readonly generatedAt: string;
   readonly total: number;
   readonly files: readonly EventFile[];
+  /**
+   * 密度による繰り上げの段階の表（timeline.ts の densityRuns）。生成時に全データから計算してある。
+   * windowYears と floor は、計算に使った値（DENSITY_WINDOW_YEARS と DENSITY_FLOOR。確認用）。
+   */
+  readonly density: { readonly windowYears: number; readonly floor: number; readonly runs: DensityRuns };
 }
 
 export const MANIFEST_PATH = "/data/events/manifest.json" as const;

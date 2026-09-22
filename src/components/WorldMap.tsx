@@ -166,7 +166,7 @@ const labelFilter = (
     promotedThresholds(LABEL_MIN_ZOOM_BY_IMPORTANCE, level),
   );
 
-/** マーカー（と経路の線、ラベル除け）の表示条件。密度による繰り上げ（timeline.ts の densityLevel）を閾値に反映する。 */
+/** マーカー（と経路の線、ラベル除け）の表示条件。密度による繰り上げ（timeline.ts の densityRuns）を閾値に反映する。 */
 const densityFilter = (
   hiddenDomains: readonly Domain[],
   level: DensityLevel,
@@ -446,7 +446,7 @@ interface WorldMapProps {
   readonly year: Year;
   readonly highlightedDomain: Domain | null;
   readonly hiddenDomains: readonly Domain[];
-  /** 密度による importance の繰り上げの段階（現在年のマーカー数から決まる。timeline.ts の densityLevel） */
+  /** 密度による importance の繰り上げの段階（前後 ±10 年のイベント数の平均から、生成時に決めてある。timeline.ts の densityRuns） */
   readonly densityLevel: DensityLevel;
   /** 詳細パネルで選択中のイベント（地図上で輪を付ける） */
   readonly selectedIds: readonly string[];

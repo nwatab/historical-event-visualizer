@@ -24,7 +24,7 @@ import {
 import { loadDiffusionFiles, toDiffusionEvent } from "./diffusion.mjs";
 import { COUNTRY_LEVEL_PLACE_PROPS } from "./lists.mjs";
 import { loadAnalysis, readJsonOr } from "./load-analysis.mjs";
-import { loadSampleEvents } from "./load-ts.mjs";
+import { importFromSrc, loadSampleEvents } from "./load-ts.mjs";
 import { isMappedClass } from "./classify.mjs";
 import { granularityOf } from "./place-granularity.mjs";
 import { pickResolved, placeKey } from "./place-overrides.mjs";
@@ -301,6 +301,7 @@ await mkdir(APP_DATA_DIR, { recursive: true });
 await Promise.all((await readdir(APP_DATA_DIR)).filter((f) => f.endsWith(".json")).map((f) => rm(join(APP_DATA_DIR, f))));
 await Promise.all(files.map((f) => writeFile(join(APP_DATA_DIR, f.file), f.json)));
 
+const { densityRuns, DENSITY_WINDOW_YEARS, DENSITY_FLOOR } = await importFromSrc("lib/timeline.ts");
 const okLog = fetchLog.filter((c) => c.status === "ok").map((c) => c.fetchedAt).sort();
 const listFetched = listPages.map((p) => p.fetchedAt).sort();
 const manifest = {
@@ -332,6 +333,9 @@ const manifest = {
   // 置ける場所が国だけの項目の数（世界全体の表示には出て、拡大すると消える）
   countryOnlyEvents: events.filter((e) => e.places.length > 0 && e.places.every((/** @type {any} */ p) => p.granularity === "country")).length,
   files: files.map((f) => ({ file: f.file, from: f.bin.from, to: f.bin.to, count: f.events.length, bytes: Buffer.byteLength(f.json) })),
+  // 密度による繰り上げの段階の表（src/lib/timeline.ts の densityRuns）。前後 ±windowYears 年の平均で決めるので、アプリが読み込んだ区間の
+  // ファイルだけでは数えられない。全データを持っているここで 1 回だけ計算する
+  density: { windowYears: DENSITY_WINDOW_YEARS, floor: DENSITY_FLOOR, runs: densityRuns(events, APP_YEAR_MIN, APP_YEAR_MAX) },
 };
 await writeFile(join(APP_DATA_DIR, "manifest.json"), JSON.stringify(manifest, null, 1));
 
@@ -386,4 +390,7 @@ console.log("title に述語を足した件数:", JSON.stringify(byPredicate));
 console.log("kind 別:", JSON.stringify(countBy(events, (e) => e.kind)));
 console.log("出典別:", JSON.stringify(countBy(events, (e) => (e.source ?? "").replace(/^https:\/\/([^/]+)\/.*$/, "$1") || "なし")));
 console.log(manifest.files.map((f) => `  ${f.file.padStart(10)}  ${String(f.count).padStart(5)} 件  ${(f.bytes / 1024).toFixed(0).padStart(5)} KB`).join("\n"));
+console.log(
+  `密度による繰り上げの段階（±${DENSITY_WINDOW_YEARS} 年の平均、下限 ${DENSITY_FLOOR}）: ${manifest.density.runs.map(([from, level]) => `${from}〜 ${level}`).join("、")}`,
+);
 console.log(`合計 ${(manifest.files.reduce((s, f) => s + f.bytes, 0) / 1024 / 1024).toFixed(2)} MB、${files.length} ファイル → ${APP_DATA_DIR}`);

@@ -14,7 +14,7 @@ import {
   TIMELINE_HALF_SPAN_LEVELS,
   YEAR_MAX,
   YEAR_MIN,
-  densityLevel,
+  densityLevelAt,
   eventMarkers,
   promotedThresholds,
   timelineLoadMargin,
@@ -80,7 +80,7 @@ export function EventMapApp() {
   const playback = usePlayback(state.year, YEAR_MAX, onPlaybackYear);
   // イベントは public/data/events/ から、現在年の前後（地図の窓と、年表の窓＋その端に掛かる区画の広いほう）の区間だけを読む。読み込み中は直前のものが返る。
   // 再生中は、窓の先の区間も先読みする
-  const { events, eventsById } = useEvents(
+  const { events, eventsById, manifest } = useEvents(
     state.year,
     Math.max(EVENT_WINDOW_YEARS, timelineLoadMargin(state.timelineHalfSpan)),
     playback.playing ? playback.speed * PLAYBACK_PREFETCH_SECONDS : 0,
@@ -89,8 +89,9 @@ export function EventMapApp() {
   const borders = useBorders(state.year, state.bordersVisible, playback.playing ? playback.speed * PLAYBACK_PREFETCH_SECONDS : 0);
   const markers = useMemo(() => eventMarkers(events, state.year), [events, state.year]);
   const lines = useMemo(() => diffusionLines(events, state.year), [events, state.year]);
-  // 密度による調整: 現在年のマーカーが少ない年は、importance 2（さらに 1）を 3 と同じ扱いにする。GeoJSON は作り直さず、filter 式の閾値だけを変える
-  const density = useMemo(() => densityLevel(markers), [markers]);
+  // 密度による調整: 前後 ±10 年に地図に出るイベントが少ない年は、importance 2（さらに 1）を 3 と同じ扱いにする。GeoJSON は作り直さず、filter 式の閾値だけを変える。
+  // 段階は、生成時に全データから計算した表（manifest の density）を引くだけなので、年と表だけで決まる（timeline.ts の densityRuns）
+  const density = useMemo(() => densityLevelAt(manifest?.density.runs ?? [], state.year), [manifest, state.year]);
   // 年表と詳細パネルが「どのズームでも地図に出ない項目」を判定するのにも、同じ閾値を使う
   const mapThresholds = useMemo(() => promotedThresholds(MIN_ZOOM_BY_IMPORTANCE, density), [density]);
 
