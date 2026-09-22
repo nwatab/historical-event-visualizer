@@ -165,7 +165,9 @@ export const sampleEvents: readonly HistEvent[] = [
     kind: "instant",
     start: 1517,
     places: [{ lon: 12.65, lat: 51.87, label: "ヴィッテンベルク" }],
-    importance: 3,
+    // 3 → 2（R6d-1、2026-09-22、人の判断）。ルター派宗教改革の広がり（lutheran-reformation、diffusion）の起点と同じ地点・同じ年で、
+    // 広がり全体を表す diffusion のほうを importance 3 にしたため。Wikidata 由来の Q157506 もあるが、QID が同じ項目は手書きが優先されるので、ここで変える。
+    importance: 2,
     source: "https://ja.wikipedia.org/wiki/95か条の論題",
   },
   {
