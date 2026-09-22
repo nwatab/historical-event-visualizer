@@ -17,7 +17,6 @@
     "wikidata:build-app-data": "node scripts/wikidata/build-app-data.mjs",
     "wikidata:place-overrides-draft": "node scripts/wikidata/build-place-overrides-draft.mjs",
     "wikidata:diffusion-draft": "node scripts/wikidata/build-diffusion-draft.mjs",
-    "wikidata:initial-year-candidates": "node scripts/wikidata/initial-year-candidates.mjs",
     "ohm:fetch": "node scripts/ohm/fetch-borders.mjs",
     "ohm:build": "node scripts/ohm/build-borders.mjs"
   },

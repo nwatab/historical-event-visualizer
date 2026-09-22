@@ -4,7 +4,18 @@ import type { DiffusionStage, Domain, HistEvent, Place, PlaceGranularity, PlaceK
 /** 年スライダーの範囲（天文年）。 */
 export const YEAR_MIN: Year = -3000;
 export const YEAR_MAX: Year = 2025;
-export const INITIAL_YEAR: Year = 1687;
+
+/**
+ * 国境を出す最初の年。これより前は OpenHistoricalMap の穴が大きすぎるので、データを作っていない（scripts/ohm/config.mjs の BORDER_YEAR_MIN と同じ値）。
+ * 初期表示の年（INITIAL_YEAR）にも使うので、年の範囲と同じここに置く（borderData.ts はここから参照する）。
+ */
+export const BORDER_YEAR_MIN: Year = 1500;
+
+/**
+ * 初期表示の年。初期表示は国境データが始まる年。国境の出る最も古い年から見始められるようにするため（2026-09-22、人が決めた）。
+ * それまでの 1687 年は、手書きのサンプルしか無かった頃の『プリンキピア』刊行の年の名残りで、いまのデータに対する根拠が無かった。
+ */
+export const INITIAL_YEAR: Year = BORDER_YEAR_MIN;
 
 /** instant イベントを表示する窓幅。|start - 現在年| がこの値以下なら表示する。diffusion を end の後に残す年数にも使う。 */
 export const EVENT_WINDOW_YEARS = 20;
