@@ -11,7 +11,7 @@ import {
   LIST_TIME_PROPS_SPEC,
   WORK_CLASSES,
 } from "./lists.mjs";
-import { granularityOf } from "./place-granularity.mjs";
+import { granularityOf, isCityOverRegion } from "./place-granularity.mjs";
 import { regionOf } from "./regions.mjs";
 import { isChemicalElement } from "./title-predicates.mjs";
 import { ROOTS } from "./roots.mjs";
@@ -197,9 +197,16 @@ export const buildItems = ({ rawItems, outsideParents, listRecords, countryIndex
     // - P495（原産国）/ P17（国）は外す。「そこで起きた」とは言っていないため（R4b-2 の決定2）
     // - P276 / P189 などの先が国（country）の場所は残す。「そこで起きた」という主張で、粒度が粗いだけなので。
     //   粒度は JSON に出し、アプリが拡大時に country のマーカーを消す（mapFilters.ts）
-    // 並びは fine → region → country（ラベルを付ける最初の1点を、いちばん細かい場所にするため）
+    // 並びは fine → region → country（ラベルを付ける最初の1点を、いちばん細かい場所にするため）。
+    // fine の中では、都市の規則で fine になった場所（行政区画でもある大都市。isCityOverRegion）を後ろに置く。
+    // 以前は region だった場所で、建物や区のような本当に細かい場所より先にラベルが付かないようにするため（R4e-2）
     const onMap = allPlaces.filter((p) => p.granularity !== "coarse" && !COUNTRY_LEVEL_PLACE_PROPS.includes(p.via));
-    const usable = USABLE_FINEST_FIRST.flatMap((g) => onMap.filter((p) => p.granularity === g));
+    const cityOverRegion = (/** @type {GradedPlace} */ p) => p.loc !== undefined && isCityOverRegion(placeClasses[p.loc]?.p31 ?? []);
+    const usable = USABLE_FINEST_FIRST.flatMap((g) =>
+      g === "fine"
+        ? [...onMap.filter((p) => p.granularity === g && !cityOverRegion(p)), ...onMap.filter((p) => p.granularity === g && cityOverRegion(p))]
+        : onMap.filter((p) => p.granularity === g),
+    );
     // 地域の集計には、置ける場所が無い項目でも元の場所を使う（国の代表点でも地域は分かる）
     const places = usable.length > 0 ? usable : allPlaces;
     const p31 = raw?.p31 ?? first?.attrs?.p31 ?? [];
