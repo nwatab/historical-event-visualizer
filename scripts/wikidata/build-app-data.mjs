@@ -2,7 +2,7 @@
 //
 //   pnpm wikidata:build-app-data
 //
-//   pnpm wikidata:build-app-data --with-drafts   … 下書き（data/diffusion/ と place-overrides.json の status: "draft"）も入れる。動作確認用で、出力はコミットしない
+//   pnpm wikidata:build-app-data --with-drafts   … 下書き（data/diffusion/、place-overrides.json、data/first-records.json の status: "draft"）も入れる。動作確認用で、出力はコミットしない
 //
 // ネットワークには出ない（要るものは fetch.mjs / fetch-lists.mjs / fetch-app-extras.mjs が data/raw/ に保存済み）。
 // 出力した JSON はコミットする（取得に1時間かかるので、CI では生成しない）。
@@ -22,6 +22,7 @@ import {
   PLACE_LABELS_PATH,
 } from "./config.mjs";
 import { loadDiffusionFiles, toDiffusionEvent } from "./diffusion.mjs";
+import { firstRecordErrors, loadFirstRecords, toFirstRecordEvent } from "./first-records.mjs";
 import { COUNTRY_LEVEL_PLACE_PROPS } from "./lists.mjs";
 import { loadAnalysis, readJsonOr } from "./load-analysis.mjs";
 import { importFromSrc, loadSampleEvents } from "./load-ts.mjs";
@@ -256,6 +257,16 @@ if (skippedDrafts.length > 0) console.warn(`data/diffusion の下書き（status
 if (withDrafts) console.warn("--with-drafts: data/diffusion の下書きも入れている。この出力はコミットしない");
 const diffusionIds = new Set(diffusion.map((e) => e.id));
 
+// 初出の記録（data/first-records.json。R4i。人が選んだ、年と場所が特定できる最初の記録）。下書き（status: "draft"）は --with-drafts のときだけ入れる
+const firstRecordsFile = await loadFirstRecords();
+const firstRecordProblems = firstRecordErrors(firstRecordsFile.records);
+if (firstRecordProblems.length > 0) throw new Error(`data/first-records.json の誤り:\n  ${firstRecordProblems.join("\n  ")}`);
+const firstRecords = firstRecordsFile.records
+  .filter((r) => r.status === "confirmed" || withDrafts)
+  .map((r) => toFirstRecordEvent(r, resolved, (qid) => granularityOf(placeClasses[qid]?.p31 ?? [])));
+const skippedFirstRecords = firstRecordsFile.records.length - firstRecords.length;
+if (skippedFirstRecords > 0) console.warn(`data/first-records.json の下書き（status が "confirmed" でない）${skippedFirstRecords} 件は入れない`);
+
 // 手書きのサンプルとの統合: QID が同じ項目は手書きを優先し（座標と説明が正確）、手書きにしか無い項目（slug の id）はそのまま足す。
 // diffusion は、同じ id の項目（手書きのサンプルの暫定 period や、Wikidata 由来の instant）を置き換える
 const sampleIds = new Set(sample.map((e) => e.id));
@@ -263,6 +274,7 @@ const duplicates = generated.filter((e) => sampleIds.has(/** @type {string} */ (
 const replacedByDiffusion = [...sample, ...generated].filter((e) => diffusionIds.has(/** @type {string} */ (e.id)));
 const events = [
   ...diffusion,
+  ...firstRecords,
   ...sample.filter((e) => !diffusionIds.has(e.id)),
   ...generated.filter((e) => !sampleIds.has(/** @type {string} */ (e.id)) && !diffusionIds.has(/** @type {string} */ (e.id))),
 ].sort((a, b) => a.start - b.start || b.importance - a.importance || String(a.id).localeCompare(String(b.id)));
@@ -324,6 +336,7 @@ const manifest = {
     handwritten: { file: "src/data/events.sample.ts", count: sample.length },
     placeOverrides: { file: "scripts/wikidata/place-overrides.json", applied: activeOverrides.length - unusedOverrides.length, ...(withDrafts ? { withDrafts: true } : {}) },
     diffusion: { dir: "data/diffusion", count: diffusion.length, ...(withDrafts ? { withDrafts: true } : {}) },
+    firstRecords: { file: "data/first-records.json", count: firstRecords.length, ...(withDrafts ? { withDrafts: true } : {}) },
   },
   // period は重なる区間すべてに入るので、files の count の合計は total より大きい
   total: events.length,

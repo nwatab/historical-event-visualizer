@@ -1,5 +1,5 @@
 // 場所の項目（戦争の P276、リスト項目の P189 / P276 / P159 / P740 / P291 / P495 / P17 の先、place-overrides.json の根拠の項目、
-// data/diffusion/*.json の起点・到達点）の P31 を取得して
+// data/diffusion/*.json の起点・到達点、data/first-records.json の場所）の P31 を取得して
 // data/raw/app/place-classes.json に保存する。場所の粒度（place-granularity.mjs）の判定に使う。
 //
 //   pnpm wikidata:fetch-places
@@ -21,6 +21,7 @@ import {
   WIKIDATA_API,
 } from "./config.mjs";
 import { loadDiffusionFiles } from "./diffusion.mjs";
+import { loadFirstRecords } from "./first-records.mjs";
 import { readJson, readJsonOr } from "./load-analysis.mjs";
 import { sleep } from "./sparql.mjs";
 
@@ -75,11 +76,12 @@ const fill = async (path, qids, props, pick) => {
 };
 
 await mkdir(APP_RAW_DIR, { recursive: true });
-const [events, attrs, placeOverrides, diffusionFiles] = await Promise.all([
+const [events, attrs, placeOverrides, diffusionFiles, firstRecords] = await Promise.all([
   readJson(EVENTS_PATH),
   readJsonOr(LIST_ATTRS_PATH, {}),
   readJson(PLACE_OVERRIDES_PATH),
   loadDiffusionFiles(),
+  loadFirstRecords(),
 ]);
 const placeQids = [
   ...new Set([
@@ -91,6 +93,8 @@ const placeQids = [
     ),
     // 広がる出来事（diffusion）の起点・到達点（下書きのぶんも取る）
     ...diffusionFiles.flatMap(({ data }) => [data.origin, ...data.stages].map((p) => p.qid)),
+    // 初出の記録（data/first-records.json）の場所（下書きのぶんも取る）
+    ...firstRecords.records.map((r) => r.place.qid),
   ]),
 ];
 console.log(`[1/2] 場所の項目の P31（${placeQids.length} 件）`);

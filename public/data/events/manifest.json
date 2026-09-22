@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-09-22T15:56:06.538Z",
+ "generatedAt": "2026-09-22T17:18:09.539Z",
  "sources": {
   "wikidata": {
    "license": "CC0",
@@ -96,6 +96,10 @@
   "diffusion": {
    "dir": "data/diffusion",
    "count": 6
+  },
+  "firstRecords": {
+   "file": "data/first-records.json",
+   "count": 0
   }
  },
  "total": 19790,
