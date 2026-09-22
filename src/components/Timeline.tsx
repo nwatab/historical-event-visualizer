@@ -15,14 +15,24 @@ import {
 } from "@/lib/design";
 import { DOMAIN_LABELS } from "@/lib/domain";
 import { popupContent } from "@/lib/popupContent";
-import { TIMELINE_WHEEL_SENSITIVITY, type PlaybackSpeed } from "@/lib/timeline";
+import {
+  TIMELINE_HALF_SPAN_LEVELS,
+  TIMELINE_WHEEL_SENSITIVITY,
+  quantizeHalfSpan,
+  type PlaybackSpeed,
+} from "@/lib/timeline";
 import {
   byTimelinePaintOrder,
+  existsInYear,
+  histogramBins,
+  inWindow,
   itemExtent,
+  itemModes,
   itemsAtX,
   itemsInYear,
+  labelsInWindow,
   laneHistogram,
-  laneModes,
+  modeOf,
   pxToYears,
   timelineAxisLabel,
   timelineAxisStep,
@@ -34,6 +44,7 @@ import {
   yearAtX,
   zoomedHalfSpan,
   type HistogramBin,
+  type LabelStyle,
   type TimelineGeometry,
   type TimelineItem,
   type TimelineWindow,
@@ -79,27 +90,35 @@ interface Hover {
 
 const POINT_RADIUS = TIMELINE.pointDiameter / 2;
 
+const LABEL_STYLE: LabelStyle = { fontSize: textStyle.caption.fontSize, gap: TIMELINE.labelGap };
+
+/** 項目の描画を年表の枠で切る clipPath の id（年表は画面に 1 つだけ） */
+const CLIP_ID = "timeline-lanes-clip";
+
 /** ホバーの吹き出しで、どのズームでも地図に出ない項目に添える注記 */
 const OFF_MAP_NOTE = "（地図に位置なし）";
 
 /**
- * ヒストグラムのレーン。1 年刻みの棒を、1つの path にまとめて描く（±500 年で 1,000 本になるため）。
- * 棒は、その年を中心に 1 年ぶんの幅。高さは、窓の中でいちばん件数の多い年をレーンの高さに合わせて正規化する。
+ * ヒストグラムの項目の棒。1 年刻みの棒を、1つの path にまとめて描く（±500 年で 1,000 本になるため）。
+ * 棒は、その年を中心に 1 年ぶんの幅。高さは、レーンの全期間でいちばん件数の多い年（max）をレーンの高さに合わせて正規化する
+ * （窓の中の最大にすると、パンで高さが変わる）。
  */
 function LaneHistogram({
   bins,
+  max: laneMax,
   view,
   width,
   bottom,
   color,
 }: {
   readonly bins: readonly HistogramBin[];
+  readonly max: number;
   readonly view: TimelineWindow;
   readonly width: number;
   readonly bottom: number;
   readonly color: string;
 }) {
-  const max = Math.max(1, ...bins.map((bin) => bin.count));
+  const max = Math.max(1, laneMax);
   const clampX = (x: number): number => Math.min(width, Math.max(0, x));
   const d = bins
     .filter((bin) => bin.count > 0)
@@ -219,34 +238,33 @@ export function Timeline({
     [width],
   );
   const lanes = useMemo(() => timelineLanes(hiddenDomains), [hiddenDomains]);
-  const items = useMemo(
-    () => timelineItems(events, view, hiddenDomains, mapThresholds),
-    [events, view, hiddenDomains, mapThresholds],
+  // ── 段階ごとに 1 回だけ計算するもの（窓の位置に依らない。パンでは作り直さない） ──
+  // 項目は窓で絞らない。出す importance は段階で決まる
+  const allItems = useMemo(
+    () => timelineItems(events, halfSpan, hiddenDomains, mapThresholds),
+    [events, halfSpan, hiddenDomains, mapThresholds],
   );
-  const painted = useMemo(() => [...items].sort(byTimelinePaintOrder), [items]);
-  // 項目が多すぎて点が並びきらないレーンは、ヒストグラムにする
-  const modes = useMemo(() => laneModes(items, geometry), [items, geometry]);
-  // ヒストグラムのレーンの、年ごとの件数。ホバーで再描画されるたびに数え直さないよう、項目と窓が変わったときだけ作る
+  // 項目が多すぎて点が並びきらない区画（年の絶対座標にそろえた区画）の項目は、ヒストグラムにする
+  const modes = useMemo(() => itemModes(allItems, halfSpan, geometry), [allItems, halfSpan, geometry]);
+  // ヒストグラムの項目の、レーンごと・年ごとの件数（全期間）
   const histograms = useMemo(
-    () =>
-      new Map(
-        lanes.filter((domain) => modes[domain] === "histogram").map((domain) => [domain, laneHistogram(items, domain, view)]),
-      ),
-    [items, view, lanes, modes],
+    () => new Map(lanes.map((domain) => [domain, laneHistogram(allItems, domain, modes)])),
+    [allItems, lanes, modes],
   );
-  const labels = useMemo(
-    () =>
-      width === 0
-        ? []
-        : timelineLabels(
-            items,
-            view,
-            geometry,
-            { fontSize: textStyle.caption.fontSize, gap: TIMELINE.labelGap },
-            modes,
-          ),
-    [items, view, geometry, width, modes],
+  // どのラベルを出すか。位置は年の絶対座標
+  const layoutLabels = useMemo(
+    () => (width === 0 ? [] : timelineLabels(allItems, halfSpan, geometry, LABEL_STYLE, modes)),
+    [allItems, halfSpan, geometry, width, modes],
   );
+
+  // ── 窓で絞る（描画のみ） ──
+  const items = useMemo(() => allItems.filter((item) => inWindow(item, view)), [allItems, view]);
+  const painted = useMemo(
+    () => items.filter((item) => modeOf(modes, item) === "items").sort(byTimelinePaintOrder),
+    [items, modes],
+  );
+  const histogramItems = useMemo(() => items.filter((item) => modeOf(modes, item) === "histogram"), [items, modes]);
+  const labels = useMemo(() => labelsInWindow(layoutLabels, view, width, LABEL_STYLE), [layoutLabels, view, width]);
   const axisStep = timelineAxisStep(view, width, TIMELINE.axisLabelMinSpacing);
   const ticks = useMemo(
     () => timelineAxisTicks(view, axisStep).filter((tick) => tick.year >= min && tick.year <= max),
@@ -256,22 +274,20 @@ export function Timeline({
   const lanesHeight = lanes.length * TIMELINE.laneHeight;
   const height = lanesHeight + TIMELINE.axisHeight;
 
-  /** ポインタの位置にある項目（レーンの外なら空）。ヒストグラムのレーンでは、その年に存在する項目 */
+  /**
+   * ポインタの位置にある項目（レーンの外なら空）。点と帯を先に見て、無ければヒストグラムの項目のうち、その年に存在するもの。
+   * 1 つのレーンに点の区画とヒストグラムの区画が混ざるので、レーン単位ではなく位置で決める。
+   */
   const hitAt = (x: number, y: number): Pick<Hover, "items" | "heading"> => {
     const lane = lanes[Math.floor(y / TIMELINE.laneHeight)];
     if (lane === undefined || y < 0) return { items: [], heading: null };
-    if (modes[lane] === "items") {
-      return {
-        items: itemsAtX(items, lane, x, TIMELINE.hitTolerance, view, geometry),
-        heading: null,
-      };
-    }
+    const points = itemsAtX(painted, lane, x, TIMELINE.hitTolerance, view, geometry);
+    if (points.length > 0) return { items: points, heading: null };
     const hitYear = yearAtX(x, view, width);
-    const found = itemsInYear(items, lane, hitYear, view.center);
-    return {
-      items: found,
-      heading: `${formatYear(hitYear)}: ${found.length}件`,
-    };
+    const found = itemsInYear(histogramItems, lane, hitYear);
+    return found.length === 0
+      ? { items: [], heading: null }
+      : { items: found, heading: `${formatYear(hitYear)}: ${found.length}件` };
   };
 
   // ── ドラッグ（現在年を動かす）、クリック、ピンチ（窓の幅を変える） ──
@@ -352,19 +368,27 @@ export function Timeline({
   };
 
   // ── ホイール（窓の幅を変える） ──
-  // React の onWheel は passive で preventDefault できないので、自前で登録する。最新の値は ref から読む
+  // React の onWheel は passive で preventDefault できないので、自前で登録する。最新の値は ref から読む。
+  // 窓の幅は段階に丸められる（reducer）ので、ホイールの回転は丸める前の値（target）に積み上げる。
+  // 段階の値に直接掛けると、1 目盛りぶんの回転では隣の段階に届かず、いつまでも動かない
   const svgRef = useRef<SVGSVGElement>(null);
-  const zoomRef = useRef({ halfSpan, onSetHalfSpan });
+  const zoomRef = useRef({ target: halfSpan, onSetHalfSpan });
   useEffect(() => {
-    zoomRef.current = { halfSpan, onSetHalfSpan };
+    // ピンチなど、ホイール以外で段階が変わったら、積み上げをその段階からやり直す
+    const target = quantizeHalfSpan(zoomRef.current.target) === halfSpan ? zoomRef.current.target : halfSpan;
+    zoomRef.current = { target, onSetHalfSpan };
   }, [halfSpan, onSetHalfSpan]);
   useEffect(() => {
     const el = svgRef.current;
     if (!el) return;
+    const [minLevel, maxLevel] = [TIMELINE_HALF_SPAN_LEVELS[0], TIMELINE_HALF_SPAN_LEVELS[TIMELINE_HALF_SPAN_LEVELS.length - 1]];
     const onWheel = (event: WheelEvent) => {
       event.preventDefault();
-      const { halfSpan: current, onSetHalfSpan: set } = zoomRef.current;
-      set(zoomedHalfSpan(current, event.deltaY, TIMELINE_WHEEL_SENSITIVITY));
+      const { target: current, onSetHalfSpan: set } = zoomRef.current;
+      // 端の段階を越えて積み上げない（戻すときに、余計に回さなくて済むように）
+      const target = Math.min(maxLevel, Math.max(minLevel, zoomedHalfSpan(current, event.deltaY, TIMELINE_WHEEL_SENSITIVITY)));
+      zoomRef.current = { ...zoomRef.current, target };
+      set(target);
     };
     el.addEventListener("wheel", onWheel, { passive: false });
     return () => el.removeEventListener("wheel", onWheel);
@@ -473,132 +497,154 @@ export function Timeline({
                 );
               })}
 
-              {/* 項目。レーンごとにまとめ、凡例のホバーで他のレーンを弱める */}
-              {lanes.map((domain, index) => {
-                const cy = laneCenterY(index);
-                const color = DOMAIN_COLORS[domain];
-                const histogram = modes[domain] === "histogram";
-                const lanePainted = histogram ? [] : painted.filter((item) => item.domain === domain);
-                const laneLabels = labels.filter((label) => label.domain === domain);
-                return (
-                  <g
-                    key={domain}
-                    data-timeline-lane={domain}
-                    data-timeline-lane-mode={modes[domain]}
-                    opacity={laneOpacity(domain)}
-                  >
-                    <title>{DOMAIN_LABELS[domain]}</title>
-                    {histogram && (
-                      <LaneHistogram
-                        bins={histograms.get(domain) ?? []}
-                        view={view}
-                        width={width}
-                        bottom={(index + 1) * TIMELINE.laneHeight}
-                        color={color}
-                      />
-                    )}
-                    {/* ヒストグラムのレーンには点が無いので、ラベルの付いた項目の開始年に縦線を引いて、どの年かを示す */}
-                    {histogram &&
-                      laneLabels.map((label) => (
-                        <line
-                          key={label.id}
-                          x1={label.anchor}
-                          x2={label.anchor}
-                          y1={index * TIMELINE.laneHeight}
-                          y2={(index + 1) * TIMELINE.laneHeight}
-                          stroke={color}
-                          strokeWidth={TIMELINE.histogramLabelTick.width}
+              {/* 項目。レーンごとにまとめ、凡例のホバーで他のレーンを弱める。レーンの枠の外（左右にはみ出したラベルなど）は切る */}
+              <defs>
+                <clipPath id={CLIP_ID}>
+                  <rect x={0} y={0} width={width} height={lanesHeight} />
+                </clipPath>
+              </defs>
+              <g clipPath={`url(#${CLIP_ID})`}>
+                {lanes.map((domain, index) => {
+                  const cy = laneCenterY(index);
+                  const color = DOMAIN_COLORS[domain];
+                  const lanePainted = painted.filter((item) => item.domain === domain);
+                  const bins = histogramBins(histograms.get(domain) ?? { first: 0, counts: [], max: 0 }, view);
+                  const hasHistogram = bins.some((bin) => bin.count > 0);
+                  const laneLabels = labels.filter((label) => label.domain === domain);
+                  return (
+                    <g
+                      key={domain}
+                      data-timeline-lane={domain}
+                      data-timeline-lane-mode={
+                        hasHistogram ? (lanePainted.length > 0 ? "mixed" : "histogram") : "items"
+                      }
+                      opacity={laneOpacity(domain)}
+                    >
+                      <title>{DOMAIN_LABELS[domain]}</title>
+                      {hasHistogram && (
+                        <LaneHistogram
+                          bins={bins}
+                          max={histograms.get(domain)?.max ?? 0}
+                          view={view}
+                          width={width}
+                          bottom={(index + 1) * TIMELINE.laneHeight}
+                          color={color}
                         />
-                      ))}
-                    {/* 帯の塗り。不透明度はグループに掛ける（重なっても濃くならない）。地図に出ない項目の帯は塗らない */}
-                    <g opacity={TIMELINE.bandFillOpacity}>
-                      {lanePainted
-                        .filter((item) => item.kind === "period" && !item.offMap)
-                        .map((item) => {
-                          const [x0, x1] = itemExtent(item, view, geometry);
-                          return (
-                            <rect
-                              key={item.id}
-                              x={x0}
-                              y={cy - TIMELINE.bandHeight / 2}
-                              width={x1 - x0}
-                              height={TIMELINE.bandHeight}
-                              fill={color}
-                            />
-                          );
-                        })}
-                    </g>
-                    {lanePainted.map((item) => {
-                      const selected = selectedIds.includes(item.id);
-                      const [x0, x1] = itemExtent(item, view, geometry);
-                      const common = {
-                        "data-timeline-item": item.id,
-                        "data-kind": item.kind,
-                        "data-importance": item.importance,
-                        ...(item.offMap ? { "data-off-map": true } : {}),
-                        ...(selected ? { "data-selected": true } : {}),
-                      };
-                      return item.kind === "instant" ? (
-                        item.offMap ? (
-                          // 地図に出ない項目: 塗りつぶさず、分類色の輪郭と、中心の白い穴だけを描く。レーンの最後に描くので（byTimelinePaintOrder）、
-                          // 同じ年に塗りつぶしの点があれば、その上に白い穴として見える。単独なら、輪郭だけの点に見える
-                          <g key={item.id}>
-                            <circle cx={(x0 + x1) / 2} cy={cy} r={POINT_RADIUS * TIMELINE.offMapHoleRatio} fill={GRAY.surface} />
+                      )}
+                      {/* ヒストグラムの項目には点が無いので、ラベルの付いた項目の開始年に縦線を引いて、どの年かを示す */}
+                      {laneLabels
+                        .filter((label) => label.histogram && !label.pinned)
+                        .map((label) => (
+                          <line
+                            key={label.id}
+                            x1={label.anchor}
+                            x2={label.anchor}
+                            y1={index * TIMELINE.laneHeight}
+                            y2={(index + 1) * TIMELINE.laneHeight}
+                            stroke={color}
+                            strokeWidth={TIMELINE.histogramLabelTick.width}
+                          />
+                        ))}
+                      {/* 帯の塗り。不透明度はグループに掛ける（重なっても濃くならない）。地図に出ない項目の帯は塗らない */}
+                      <g opacity={TIMELINE.bandFillOpacity}>
+                        {lanePainted
+                          .filter((item) => item.kind === "period" && !item.offMap)
+                          .map((item) => {
+                            const [x0, x1] = itemExtent(item, view, geometry);
+                            return (
+                              <rect
+                                key={item.id}
+                                x={x0}
+                                y={cy - TIMELINE.bandHeight / 2}
+                                width={x1 - x0}
+                                height={TIMELINE.bandHeight}
+                                fill={color}
+                              />
+                            );
+                          })}
+                      </g>
+                      {lanePainted.map((item) => {
+                        const selected = selectedIds.includes(item.id);
+                        const [x0, x1] = itemExtent(item, view, geometry);
+                        const common = {
+                          "data-timeline-item": item.id,
+                          "data-kind": item.kind,
+                          "data-importance": item.importance,
+                          ...(item.offMap ? { "data-off-map": true } : {}),
+                          ...(selected ? { "data-selected": true } : {}),
+                          ...(existsInYear(item, year) ? { "data-current": true } : {}),
+                        };
+                        return item.kind === "instant" ? (
+                          item.offMap ? (
+                            // 地図に出ない項目: 塗りつぶさず、分類色の輪郭と、中心の白い穴だけを描く。レーンの最後に描くので（byTimelinePaintOrder）、
+                            // 同じ年に塗りつぶしの点があれば、その上に白い穴として見える。単独なら、輪郭だけの点に見える
+                            <g key={item.id}>
+                              <circle cx={(x0 + x1) / 2} cy={cy} r={POINT_RADIUS * TIMELINE.offMapHoleRatio} fill={GRAY.surface} />
+                              <circle
+                                {...common}
+                                cx={(x0 + x1) / 2}
+                                cy={cy}
+                                r={POINT_RADIUS}
+                                fill="none"
+                                stroke={selected ? SELECTION_RING.color : color}
+                                strokeWidth={selected ? SELECTION_RING.width : TIMELINE.bandStrokeWidth}
+                              />
+                            </g>
+                          ) : (
                             <circle
+                              key={item.id}
                               {...common}
                               cx={(x0 + x1) / 2}
                               cy={cy}
                               r={POINT_RADIUS}
-                              fill="none"
-                              stroke={selected ? SELECTION_RING.color : color}
+                              fill={color}
+                              stroke={selected ? SELECTION_RING.color : GRAY.surface}
                               strokeWidth={selected ? SELECTION_RING.width : TIMELINE.bandStrokeWidth}
                             />
-                          </g>
+                          )
                         ) : (
-                          <circle
+                          <rect
                             key={item.id}
                             {...common}
-                            cx={(x0 + x1) / 2}
-                            cy={cy}
-                            r={POINT_RADIUS}
-                            fill={color}
-                            stroke={selected ? SELECTION_RING.color : GRAY.surface}
-                            strokeWidth={selected ? SELECTION_RING.width : TIMELINE.bandStrokeWidth}
+                            x={x0}
+                            y={cy - TIMELINE.bandHeight / 2}
+                            width={x1 - x0}
+                            height={TIMELINE.bandHeight}
+                            fill="none"
+                            stroke={selected ? SELECTION_RING.color : color}
+                            strokeWidth={
+                              selected
+                                ? SELECTION_RING.width
+                                : existsInYear(item, year)
+                                  ? TIMELINE.current.bandStrokeWidth
+                                  : TIMELINE.bandStrokeWidth
+                            }
+                            {...(item.offMap ? { strokeDasharray: TIMELINE.offMapDash } : {})}
                           />
-                        )
-                      ) : (
-                        <rect
-                          key={item.id}
-                          {...common}
-                          x={x0}
-                          y={cy - TIMELINE.bandHeight / 2}
-                          width={x1 - x0}
-                          height={TIMELINE.bandHeight}
-                          fill="none"
-                          stroke={selected ? SELECTION_RING.color : color}
-                          strokeWidth={selected ? SELECTION_RING.width : TIMELINE.bandStrokeWidth}
-                          {...(item.offMap ? { strokeDasharray: TIMELINE.offMapDash } : {})}
-                        />
-                      );
-                    })}
-                    {laneLabels.map((label) => (
-                      <text
-                        key={label.id}
-                        data-timeline-label={label.id}
-                        x={label.x}
-                        y={cy}
-                        dominantBaseline="central"
-                        fontSize={textStyle.caption.fontSize}
-                        fontWeight={textStyle.caption.fontWeight}
-                        fill={textStyle.caption.color}
-                        pointerEvents="none"
-                      >
-                        {label.text}
-                      </text>
-                    ))}
-                  </g>
-                );
-              })}
+                        );
+                      })}
+                      {/* 現在年を含む項目のラベルは強調する。左外から続く帯のラベルは、左端に貼り付けてある（labelsInWindow） */}
+                      {laneLabels.map((label) => (
+                        <text
+                          key={label.id}
+                          data-timeline-label={label.id}
+                          {...(label.pinned ? { "data-pinned": true } : {})}
+                          {...(label.current ? { "data-current": true } : {})}
+                          x={label.x}
+                          y={cy}
+                          dominantBaseline="central"
+                          fontSize={textStyle.caption.fontSize}
+                          fontWeight={label.current ? TIMELINE.current.labelWeight : textStyle.caption.fontWeight}
+                          fill={label.current ? TIMELINE.current.labelColor : textStyle.caption.color}
+                          pointerEvents="none"
+                        >
+                          {label.text}
+                        </text>
+                      ))}
+                    </g>
+                  );
+                })}
+              </g>
 
               {/* 現在年の縦線（窓の中央） */}
               <line

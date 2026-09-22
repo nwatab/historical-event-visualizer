@@ -223,8 +223,27 @@ export const LABEL_MIN_ZOOM_BY_IMPORTANCE: Readonly<Record<HistEvent["importance
 
 // ── 年表（画面下段） ──────────────────────────────────────
 
-/** 年表の窓の片側の幅（年）。初期値と、ホイールで変えられる範囲。窓の幅はこの 2 倍。 */
-export const TIMELINE_HALF_SPAN = { initial: 50, min: 10, max: 500 } as const;
+/**
+ * 年表の窓の片側の幅（年）の段階。窓の幅はこの 2 倍。ホイールとピンチはこの段階の間を移り、途中の値は取らない（R5d）。
+ * 年表のラベルの配置と、点／ヒストグラムの判定は、段階ごとに 1 回だけ計算する（timelineChart.ts の timelineLayout）。
+ * 段階の中で窓を動かしても（パン）、ラベルは平行移動するだけで入れ替わらない。
+ *
+ * 1-2-5 の系列（公比 2〜2.5、平均 10^(1/3) ≈ 2.15）にした理由:
+ * - R5a の範囲（±10〜±500 年）と初期値（±50 年）を、そのまま段階として含む。
+ * - 出す importance の境目（TIMELINE_IMPORTANCE_BY_WINDOW。窓 60 年・200 年＝片側 30・100 年）が段階の間か上に来るので、
+ *   1 つの段階の中で出す項目が変わらない（段階の中でラベルの集合を固定する前提）。
+ * - 時間軸の目盛り（TIMELINE_AXIS_STEPS の 10 / 50 / 100 / 500 年）と桁がそろい、aria-label の「前後 N 年」も丸い数になる。
+ * - 1 段で px/年 が半分前後になるので、段階を変えたときにラベルが入れ替わるのが「ズームした」結果として分かる。
+ *   公比 √2（12 段階）も考えたが、段階を変えるたびにラベルが少しずつ入れ替わり、どの段階も丸い数にならない。
+ */
+export const TIMELINE_HALF_SPAN_LEVELS: readonly number[] = [10, 20, 50, 100, 200, 500];
+export const TIMELINE_HALF_SPAN_INITIAL = 50;
+
+/** 片側の幅を、いちばん近い段階に丸める（対数の上での距離。倍率で動かすので）。 */
+export const quantizeHalfSpan = (halfSpan: number, levels: readonly number[] = TIMELINE_HALF_SPAN_LEVELS): number =>
+  levels.reduce((best, level) =>
+    Math.abs(Math.log(level / halfSpan)) < Math.abs(Math.log(best / halfSpan)) ? level : best,
+  );
 
 /**
  * 年表に出す importance の下限。窓の幅（＝ 2 × halfSpan。年）が広いほど絞る。上から順に見て、最初に当たったものを使う。
@@ -240,6 +259,20 @@ export const TIMELINE_IMPORTANCE_BY_WINDOW: readonly {
   { minWindowYears: 60, minImportance: 2 },
   { minWindowYears: 0, minImportance: 1 },
 ];
+
+/**
+ * 点／ヒストグラムを判定する区画の幅（年）。窓の幅の 1/4（＝片側の幅の半分）で、年の絶対座標にそろえる
+ * （区画 k は [k × 幅, (k + 1) × 幅)）。窓の位置ではなく区画で決めるので、パンしても判定が変わらない。
+ * 窓の 1/4 にしたのは、窓全体で 1 つに決めていた R5a-2 より局所的にしつつ、区画の容量（幅 870px で 19 点）が
+ * 小さすぎて点とヒストグラムが細かく入れ替わらないようにするため。
+ */
+export const timelineBlockYears = (halfSpan: number): number => halfSpan / 2;
+
+/**
+ * 年表のために読むイベントの範囲（現在年の前後、年）。窓の端にかかる区画は、窓の外へ最大で区画 1 つぶんはみ出すので、
+ * その区画の項目も読んでおく（読めていないと、区画の件数が少なく数えられ、パンの途中で判定が変わる）。
+ */
+export const timelineLoadMargin = (halfSpan: number): number => halfSpan + timelineBlockYears(halfSpan);
 
 /** ホイールの回転量 (deltaY) あたりの、窓の幅の変化率（指数）。100 で約 1.22 倍。 */
 export const TIMELINE_WHEEL_SENSITIVITY = 0.002;

@@ -25,7 +25,7 @@ export const readJson = async (path) => JSON.parse(await readFile(path, "utf8"))
 export const readJsonOr = (path, fallback) => readJson(path).catch(() => fallback);
 
 /** 地域判定用の Natural Earth。無ければ1度だけ取りに行く。 */
-const loadCountries = async () => {
+export const loadCountries = async () => {
   try {
     return await readJson(COUNTRIES_PATH);
   } catch {

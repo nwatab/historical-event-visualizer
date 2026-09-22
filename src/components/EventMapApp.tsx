@@ -10,12 +10,14 @@ import {
   INITIAL_YEAR,
   PLAYBACK_PREFETCH_SECONDS,
   MIN_ZOOM_BY_IMPORTANCE,
-  TIMELINE_HALF_SPAN,
+  TIMELINE_HALF_SPAN_INITIAL,
+  TIMELINE_HALF_SPAN_LEVELS,
   YEAR_MAX,
   YEAR_MIN,
   densityLevel,
   eventMarkers,
   promotedThresholds,
+  timelineLoadMargin,
 } from "@/lib/timeline";
 import { useBorders } from "@/lib/useBorders";
 import { useEvents } from "@/lib/useEvents";
@@ -30,7 +32,7 @@ import { YearSlider } from "./YearSlider";
 const reducer = appReducer({
   min: YEAR_MIN,
   max: YEAR_MAX,
-  halfSpan: TIMELINE_HALF_SPAN,
+  halfSpanLevels: TIMELINE_HALF_SPAN_LEVELS,
 });
 
 const isTextInput = (target: EventTarget | null): boolean =>
@@ -69,18 +71,18 @@ const commandFromKey = (event: KeyboardEvent, state: AppState): KeyCommand | nul
 export function EventMapApp() {
   const [state, dispatch] = useReducer(
     reducer,
-    { year: INITIAL_YEAR, timelineHalfSpan: TIMELINE_HALF_SPAN.initial },
+    { year: INITIAL_YEAR, timelineHalfSpan: TIMELINE_HALF_SPAN_INITIAL },
     initialAppState,
   );
   const [hoveredDomain, setHoveredDomain] = useState<Domain | null>(null);
   // 再生。年を進めるのは年スライダーと同じ setYear
   const onPlaybackYear = useCallback((year: number) => dispatch({ type: "setYear", year }), []);
   const playback = usePlayback(state.year, YEAR_MAX, onPlaybackYear);
-  // イベントは public/data/events/ から、現在年の前後（地図の窓と年表の窓の広いほう）の区間だけを読む。読み込み中は直前のものが返る。
+  // イベントは public/data/events/ から、現在年の前後（地図の窓と、年表の窓＋その端に掛かる区画の広いほう）の区間だけを読む。読み込み中は直前のものが返る。
   // 再生中は、窓の先の区間も先読みする
   const { events, eventsById } = useEvents(
     state.year,
-    Math.max(EVENT_WINDOW_YEARS, state.timelineHalfSpan),
+    Math.max(EVENT_WINDOW_YEARS, timelineLoadMargin(state.timelineHalfSpan)),
     playback.playing ? playback.speed * PLAYBACK_PREFETCH_SECONDS : 0,
   );
   // 国境（1500 年以降）。現在年の世紀のファイルだけを読み、再生中は先の世紀も先読みする。非表示のときは読まない

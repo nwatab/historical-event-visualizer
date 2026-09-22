@@ -8,6 +8,7 @@
     "dev": "pnpm copy-maplibre-worker && next dev",
     "build": "pnpm copy-maplibre-worker && next build",
     "lint": "eslint .",
+    "test": "node --test \"tests/*.test.mjs\"",
     "wikidata:fetch": "node scripts/wikidata/fetch.mjs",
     "wikidata:fetch-lists": "node scripts/wikidata/fetch-lists.mjs",
     "wikidata:fetch-app-extras": "node scripts/wikidata/fetch-app-extras.mjs",
@@ -16,6 +17,7 @@
     "wikidata:build-app-data": "node scripts/wikidata/build-app-data.mjs",
     "wikidata:place-overrides-draft": "node scripts/wikidata/build-place-overrides-draft.mjs",
     "wikidata:diffusion-draft": "node scripts/wikidata/build-diffusion-draft.mjs",
+    "wikidata:initial-year-candidates": "node scripts/wikidata/initial-year-candidates.mjs",
     "ohm:fetch": "node scripts/ohm/fetch-borders.mjs",
     "ohm:build": "node scripts/ohm/build-borders.mjs"
   },
