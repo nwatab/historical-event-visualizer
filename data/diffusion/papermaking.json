@@ -1,0 +1,201 @@
+{
+  "status": "draft",
+  "id": "papermaking",
+  "title": {
+    "ja": "製紙法の伝播",
+    "en": "Spread of papermaking"
+  },
+  "description": {
+    "ja": "後漢の蔡倫が105年に洛陽で改良した製紙法が、東アジアとイスラーム世界を経てヨーロッパに入り、17世紀末には北米に達した。"
+  },
+  "domain": "technology",
+  "tags": [
+    "technology",
+    "culture"
+  ],
+  "importance": 2,
+  "note": "到達の定義: その場所で紙の製造（製紙）が始まった年。輸入した紙を使い始めた年ではない（例: マルセイユの公証人記録の紙 1248 年、カイロの市場の包装紙 1035 年、インドの輸入紙などは入れていない）。全 stage でこの定義を通し、出典が「使用」なのか「製造」なのか曖昧なものは needsCheck に書いた。 ／ 起点と start: 105 年の洛陽（蔡倫が宮廷の工房の長として製法を改良し和帝に献上した年と、仕えていた宮廷の所在地。en-cai-lun.txt:2-3,12; ja-sairin.txt:5-6; ja-kami.txt:78）。蔡倫より古い紙は出土している（放馬灘の地図の紙は紀元前179〜141年頃、敦煌・玉門関の紙片は紀元前65年・紀元前8年。en-history-of-paper.txt:11,14; ja-kami.txt:77; fr-histoire-du-papier.txt:9）ので、105 年は「紙の発明」ではなく、伝統的に製法の確立とされる年として使う。出土紙はどこで作られたかが分からず、伝播の起点の 1 点として置けないため。蔡倫の生地は桂陽郡（現在の耒陽）で、工房があったのは洛陽の宮廷（en-cai-lun.txt:10,12）。起点の QID は現在の洛陽市（地級市）の項目で、後漢の洛陽城の位置そのものではない。 ／ 中国国内（敦煌 150、楼蘭 200、トルファン 399 など。en-history-of-paper.txt:32）、ベトナム（3世紀）、朝鮮半島（4世紀、または 3〜6世紀末。en-history-of-paper.txt:34; en-korean-paper.txt:5）、ギルギット（6世紀）は、年が 1 つに決まらないか使用の記録なので入れていない。ダマスカスは、第1回十字軍（1096）で製造が中断したとあるだけで開始年が無い（en-history-of-paper.txt:68）ので入れていない。トレド 1085（en-history-of-paper.txt:79）は、同じ記事がシャティバを 1056 年とするのと食い違い、製造の記録か不明なので入れていない。フランスのエロー 1189（ja-kami.txt:90）は、他の出典がフランス最初の製紙をトロワ付近 1348 年頃とする（fr-histoire-du-papier.txt:17）のと食い違い、場所も県の単位なので入れていない（トロワの needsCheck に記録）。メキシコ 1575、ロシア 1576、スイス 1432 / バーゼル 1453、シレジア 1490、ダートフォード 1588 などは、件数を絞るため、または場所が国の単位なので入れていない。 ／ Wikidata に「製紙法の伝播」の出来事の項目は見つからなかった（wbsearchentities で history of paper / papermaking / spread of papermaking を検索。papermaking は Q335415 で、P31 は産業部門（Q268592）で出来事ではない）。そのため slug の id にした。手書きのサンプルに cai-lun-papermaking（105年、洛陽、instant、importance 2）があり、起点と同じ地点・年なので、id をそちらに合わせて 1 項目にまとめるかは人が決める（活版印刷の gutenberg-printing-press と同じ扱いの候補）。 ／ 調査: 2026-09-22、サブエージェントが Wikipedia の本文を API（prop=extracts）で取得して調べた。使った記事は en: History of paper, Papermaking, Paper, Paper mill, Cai Lun, Battle of Talas, Xàtiva, Fabriano, Ulman Stromer, Damjing, Korean paper, Washi, John Tate (papermaker), William Rittenhouse, Historic RittenhouseTown, Cairo; ja: 紙, 蔡倫, 曇徴, 和紙; fr: Histoire du papier。summary の (ファイル名:行) は、そのとき保存した本文（空行を除いた 1 段落 1 行）の行番号。QID は wbgetentities でラベル・P625・P31 を確認した。",
+  "start": 105,
+  "end": 1690,
+  "source": "https://ja.wikipedia.org/wiki/紙",
+  "origin": {
+    "qid": "Q187136",
+    "label": "洛陽",
+    "labelEn": "Luoyang",
+    "source": "en: Cai Lun § Early imperial court service / § Palace intrigue and workshop; en: History of paper § Paper in China; ja: 蔡倫 § 生涯; ja: 紙 § 中国での紙の発明と改良",
+    "summary": "蔡倫は洛陽の宮廷で工房（尚方）の長を務め、105年に樹皮・麻くず・ぼろ・漁網を使う製法を和帝に献上した (en-cai-lun.txt:2-3,12; ja-sairin.txt:5-6; ja-kami.txt:78)。これより古い紙の出土例がある (en-history-of-paper.txt:11)"
+  },
+  "stages": [
+    {
+      "year": 610,
+      "qid": "Q907495",
+      "label": "大和",
+      "labelEn": "Yamato Province",
+      "from": -1,
+      "source": "ja: 和紙 § 紙づくりの伝来; ja: 曇徴 § 概要; en: Damjing; en: History of paper § Eastern Asia",
+      "summary": "『日本書紀』推古天皇18年（610年）、高句麗から来た僧曇徴が紙と墨を作れたと記す。これが日本の製紙の文献上の初見で、公式の伝来の年とされることが多い (ja-washi.txt:24-25; ja-doncho.txt:1,5; en-history-of-paper.txt:34)",
+      "fromBasis": "推測（年代と地理から）",
+      "fromNote": "出典は中国から高句麗（朝鮮半島）を経て伝わったとする (ja-washi.txt:24; en-washi.txt:4)。朝鮮半島は開始年が 1 つに決まらないので stage にしておらず、起点（洛陽）から直接とした",
+      "needsCheck": "年と場所が確かでない。ja: 曇徴 (ja-doncho.txt:5) と en: Damjing (en-damjing.txt:4) は、書紀の記事は曇徴が最初に紙を漉いたとは書いておらず、技術はすでに伝わっていたとする。ja: 和紙 は 540年・538年頃の伝来の説も挙げる (ja-washi.txt:23)。en: History of paper は 5世紀 (en-history-of-paper.txt:34)。書紀に日本のどこで作ったかは無く、大和国（当時の朝廷の所在地の国）とするのは調査時の推測。本格的な国内生産は 737年の美作・出雲など (ja-washi.txt:28)"
+    },
+    {
+      "year": 751,
+      "qid": "Q5753",
+      "label": "サマルカンド",
+      "labelEn": "Samarkand",
+      "from": -1,
+      "source": "en: History of paper § Origin / § Shift from parchment to paper; en: Battle of Talas § Papermaking; ja: 紙 § イスラム世界への伝播; fr: Histoire du papier § Du VIIIe siècle à la Renaissance",
+      "summary": "タラス河畔の戦い（751年）の唐の捕虜がサマルカンドに製紙を伝えたという伝承がある (en-history-of-paper.txt:37; ja-kami.txt:86; fr-histoire-du-papier.txt:13)。サマルカンドで紙が作られた記録は751年まで (en-history-of-paper.txt:42)",
+      "fromBasis": "推測（年代と地理から）",
+      "fromNote": "「中国の捕虜・職人が伝えた」とは出典にあるが、その伝承自体が疑われている（needsCheck）。中国のどこから来たかも無いので、起点から直接とした",
+      "needsCheck": "捕虜が伝えたという話は11世紀のサアーリビーの記述で、同時代のアラブ・中国の史料に無く、捕虜だった杜環も製紙工を挙げていない。ブルームは「事実である可能性は低い」とし、サマルカンドでは751年より数十年前から紙が使われ、おそらく作られていたとする (en-history-of-paper.txt:37,39; en-talas.txt:2,45-46; en-paper.txt:11)。年も不一致: ja: 紙 は757年に製紙工場 (ja-kami.txt:86)。751 は伝承の年",
+      "granularity": "fine",
+      "granularityNote": "Wikidata の Q5753 は P31 に「行政区画」（Q56061）を併せ持ち、規則だと region になる。都市として扱う。"
+    },
+    {
+      "year": 793,
+      "qid": "Q1530",
+      "label": "バグダード",
+      "labelEn": "Baghdad",
+      "from": 1,
+      "source": "en: History of paper § Shift from parchment to paper / § Paper mills; en: Paper mill § History; en: Battle of Talas § Papermaking; fr: Histoire du papier § Du VIIIe siècle à la Renaissance",
+      "summary": "バグダードで紙が作られた記録は793年まで (en-history-of-paper.txt:42; fr-histoire-du-papier.txt:14)。794–795年の製紙場（人力か畜力とみられる）が確認されている (en-history-of-paper.txt:65,92; en-paper-mill.txt:6)",
+      "fromBasis": "推測（年代と地理から）",
+      "fromNote": "出典は「サマルカンド、バグダード、ダマスカス、カイロ、モロッコ、スペイン」の順に製造が始まったと並べるだけで、サマルカンドから伝わったとは書いていない (en-papermaking.txt:8)。ホラーサーンで中国の職人が作ったという記述もある (en-history-of-paper.txt:38)",
+      "needsCheck": "年が 793（使用・製造の記録）と 794–795（製紙場）で分かれる。en: Battle of Talas は、794–795年にバグダードに最初の製紙場ができてからイスラーム世界に製紙が広まったとする (en-talas.txt:46)"
+    },
+    {
+      "year": 900,
+      "qid": "Q79",
+      "label": "エジプト",
+      "labelEn": "Egypt",
+      "from": 2,
+      "source": "en: History of paper § Shift from parchment to paper; fr: Histoire du papier § Du VIIIe siècle à la Renaissance",
+      "summary": "エジプトで紙が作られた記録は900年まで (en-history-of-paper.txt:42)。fr はカイロで900年とする (fr-histoire-du-papier.txt:14)",
+      "fromBasis": "推測（年代と地理から）",
+      "fromNote": "イスラーム世界の広がりに伴って伝わったという一般的な記述のみ (fr-histoire-du-papier.txt:14)。en: Papermaking の列挙の順 (en-papermaking.txt:8) では、バグダードとカイロの間にダマスカスがある（ダマスカスは開始年が無いので stage にしていない）",
+      "needsCheck": "en は「エジプト」とだけ書く。fr はカイロとする。カイロの建設は969年で、それ以前の中心はフスタート (en-cairo.txt:2) なので、900年のカイロは時代が合わない。fr の «on le retrouve» は製造か使用か曖昧",
+      "note": "親エージェントがカイロ（Q85）から国の項目に変えた（2026-09-22）。en は都市名を書かず、fr のカイロは 969 年の建設より前で時代が合わない。国単位しか無い到達点を首都（や後の都市）で代用しないため。粒度は country になり、zoom 4 以上で消える。フスタート（Q839456）にするかは人が決める"
+    },
+    {
+      "year": 1056,
+      "qid": "Q738013",
+      "label": "シャティバ",
+      "labelEn": "Xàtiva",
+      "from": 3,
+      "source": "en: History of paper § Paper in Europe; fr: Histoire du papier § Du VIIIe siècle à la Renaissance; ja: 紙 § イスラム世界への伝播; en: Xàtiva",
+      "summary": "イベリア半島で記録上最初の製紙場はシャティバの1056年 (en-history-of-paper.txt:78; fr-histoire-du-papier.txt:14)。アラブ人が製紙の技術をもたらした (en-xativa.txt:6)",
+      "fromBasis": "推測（年代と地理から）",
+      "fromNote": "en: Papermaking はモロッコの後にイスラーム・スペインと並べる (en-papermaking.txt:8) が、フェズ（1100年頃）はこの年より後なので from にできない。北アフリカ経由の起点として、年の分かっている最も近い stage のカイロとした",
+      "needsCheck": "年が大きく食い違う: 1056（en-history-of-paper.txt:78、fr-histoire-du-papier.txt:14）、1144（ヨーロッパ初の製紙工場。ja-kami.txt:87）、1150年までに確立・1150年頃（en-history-of-paper.txt:79、fr-histoire-du-papier.txt:15）、12世紀（en-xativa.txt:1,6）。1056 は「記録上最初の製紙場」の年で、到達の定義（製造の開始）に最も近いものとして採った"
+    },
+    {
+      "year": 1100,
+      "qid": "Q80985",
+      "label": "フェズ",
+      "labelEn": "Fez",
+      "from": 3,
+      "source": "en: History of paper § Shift from parchment to paper; ja: 紙 § イスラム世界への伝播",
+      "summary": "モロッコのフェズで紙が作られた記録は1100年頃 (en-history-of-paper.txt:42)。ja は製紙の技術が1100年にはモロッコまで伝わったとする (ja-kami.txt:87)",
+      "fromBasis": "推測（年代と地理から）",
+      "fromNote": "en: Papermaking の列挙の順（カイロ → モロッコ。en-papermaking.txt:8）と地理から、カイロとした",
+      "needsCheck": "年は「1100年頃」。ja はモロッコとだけ書き、都市名はフェズとする en による",
+      "granularity": "fine",
+      "granularityNote": "Wikidata の Q80985 は P31 に「行政区画」（Q56061）を併せ持ち、規則だと region になる。都市として扱う。"
+    },
+    {
+      "year": 1102,
+      "qid": "Q1460",
+      "label": "シチリア",
+      "labelEn": "Sicily",
+      "from": 3,
+      "source": "ja: 紙 § ヨーロッパへの伝播; fr: Histoire du papier § Du VIIIe siècle à la Renaissance",
+      "summary": "1102年、ノルマン人によるシチリア征服の直後に、シチリアに製紙工場が造られた (ja-kami.txt:90)。fr も1102年にシチリアに達したとする (fr-histoire-du-papier.txt:14)",
+      "fromBasis": "推測（年代と地理から）",
+      "fromNote": "イスラーム世界から西へ広がったという一般的な記述のみで、どこから来たかは出典に無い。北アフリカのイスラーム世界の stage としてカイロとした",
+      "needsCheck": "製造の記録かどうかが出典で分かれる: ja は製紙工場、fr の «arrive» は紙の到来で製造かは不明。1145年にルッジェーロ2世が紙の文書を羊皮紙に写させた (fr-histoire-du-papier.txt:16) のは使用の話。都市が無く、島（州）の単位"
+    },
+    {
+      "year": 1276,
+      "qid": "Q13145",
+      "label": "ファブリアーノ",
+      "labelEn": "Fabriano",
+      "from": 6,
+      "source": "en: Fabriano; en: History of paper § Paper in Europe; ja: 紙 § ヨーロッパへの伝播; fr: Histoire du papier § Du VIIIe siècle à la Renaissance",
+      "summary": "1276年、ファブリアーノはヨーロッパで最も早く紙を作った場所の一つになった (en-fabriano.txt:4; ja-kami.txt:90; fr-histoire-du-papier.txt:14)。13世紀にアマルフィ、ファブリアーノ、トレヴィーゾに製紙場 (en-history-of-paper.txt:79)",
+      "fromBasis": "推測（年代と地理から）",
+      "fromNote": "en: History of paper は、フェラーラ県のボルゴ・サラチェーノに住んだアラブ人の捕虜がファブリアーノの職人に手漉きの技術を伝えたとする (en-history-of-paper.txt:80) が、捕虜がどこから来たかは無い。イタリアで先に年の分かっているシチリアとした"
+    },
+    {
+      "year": 1348,
+      "qid": "Q5489",
+      "label": "トロワ",
+      "labelEn": "Troyes",
+      "from": 7,
+      "source": "en: History of paper § Paper in Europe; fr: Histoire du papier § Du VIIIe siècle à la Renaissance",
+      "summary": "フランスでは1348年までにトロワで紙が作られていた (en-history-of-paper.txt:79)。fr は、最初の製紙場が1348年頃トロワ近郊のトルヴォワに造られたとする (fr-histoire-du-papier.txt:17)",
+      "fromBasis": "出典に明記",
+      "fromNote": "fr は、イタリアの商人が職人を呼んで現地の人を育てたと書き (fr-histoire-du-papier.txt:17)、ファブリアーノから製紙がイタリアとヨーロッパに広がったとする (fr-histoire-du-papier.txt:15)。トロワの製紙がファブリアーノから来たと特定はしていない",
+      "needsCheck": "ja: 紙 は、1189年にフランスのエローで製紙工場が造られたとする (ja-kami.txt:90)。fr・en の「14世紀半ばにトロワ付近が最初」と食い違う。場所はトロワ市ではなく近郊のトルヴォワ（fr）"
+    },
+    {
+      "year": 1390,
+      "qid": "Q2090",
+      "label": "ニュルンベルク",
+      "labelEn": "Nuremberg",
+      "from": 7,
+      "source": "en: Ulman Stromer; en: History of paper § Paper mills; en: Paper mill § History",
+      "summary": "1390年、ウルマン・シュトローマーがニュルンベルク近郊のペグニッツ川に、アルプス以北で最初の恒久的な製紙場を開いた (en-ulman-stromer.txt:2-3; en-history-of-paper.txt:96; en-paper-mill.txt:13)",
+      "fromBasis": "出典に明記",
+      "fromNote": "シュトローマーはイタリアでの成功を見て、技術を得るためにイタリア人の兄弟（マルコとフランチェスコ・ディ・マルキア）を雇った (en-ulman-stromer.txt:4)。出典はイタリアとだけ書き、ファブリアーノとするのは推測"
+    },
+    {
+      "year": 1490,
+      "qid": "Q9681",
+      "label": "ハートフォード",
+      "labelEn": "Hertford",
+      "from": 8,
+      "source": "en: History of paper § Paper in Europe; en: John Tate (papermaker) § Papermaking; en: Paper mill § History",
+      "summary": "イングランド最初の製紙場は、ジョン・テイトが1490年頃ハートフォード近くに開いた (en-history-of-paper.txt:82)。セール・ミルという水車小屋を製紙場に改めた (en-john-tate.txt:5)",
+      "fromBasis": "推測（年代と地理から）",
+      "fromNote": "テイトがどこから技術を得たかは出典に無い。年の分かっている stage のうち地理的に近いトロワとした",
+      "needsCheck": "年が「1490年頃」(en-history-of-paper.txt:82)、「1490年代、それより前の可能性も」(en-john-tate.txt:5)、「最初の言及は1495年頃の本」(en-paper-mill.txt:18) で分かれる。短命で、商業的に成功した最初の製紙場は1588年のダートフォード (en-history-of-paper.txt:82)"
+    },
+    {
+      "year": 1491,
+      "qid": "Q31487",
+      "label": "クラクフ",
+      "labelEn": "Kraków",
+      "from": 9,
+      "source": "en: Paper mill § History; en: History of paper § Paper in Europe",
+      "summary": "ポーランド最初の製紙場は1491年、クラクフ近くに造られた (en-paper-mill.txt:18; en-history-of-paper.txt:82)",
+      "fromBasis": "推測（年代と地理から）",
+      "fromNote": "どこから伝わったかは出典に無い。15世紀末にドイツ語圏に製紙場が約50あった (en-paper-mill.txt:18) ことと地理から、ニュルンベルクとした",
+      "needsCheck": "場所は「クラクフ近く」で、市内ではない"
+    },
+    {
+      "year": 1586,
+      "qid": "Q26421",
+      "label": "ドルトレヒト",
+      "labelEn": "Dordrecht",
+      "from": 8,
+      "source": "en: Paper mill § History; en: History of paper § Paper in Europe",
+      "summary": "オランダ最初の製紙場は1586年、アントウェルペンからの亡命者ハンス・ファン・アールストがドルトレヒトに建てた (en-paper-mill.txt:20; en-history-of-paper.txt:82)",
+      "fromBasis": "推測（年代と地理から）",
+      "fromNote": "ファン・アールストはアントウェルペンから来た (en-paper-mill.txt:20) が、アントウェルペンの製紙は stage に無い。地理的に近いトロワとした（トロワの紙はオランダに輸出されていた。fr-histoire-du-papier.txt:35。ただし輸出は製紙の伝播ではない）",
+      "needsCheck": "en: History of paper は、オランダ（Holland）で1340–1350年頃に紙が作られていた形跡があるとも書く (en-history-of-paper.txt:79)。同じ記事の「オランダに1586年」(:82) と食い違う"
+    },
+    {
+      "year": 1690,
+      "qid": "Q1345",
+      "label": "フィラデルフィア",
+      "labelEn": "Philadelphia",
+      "from": 12,
+      "source": "en: History of paper § United States; en: Paper mill § History; en: William Rittenhouse; en: Historic RittenhouseTown; ja: 紙 § ヨーロッパへの伝播",
+      "summary": "1690年、ウィリアム・リッテンハウスがフィラデルフィア近郊（現在は市内）に英領北米で最初の製紙場を建てた (en-history-of-paper.txt:87-88; en-paper-mill.txt:23; en-rittenhouse-town.txt:1; ja-kami.txt:91)",
+      "fromBasis": "出典に明記",
+      "fromNote": "リッテンハウスはオランダで製紙の見習いをしてからペンシルベニアに移った (en-william-rittenhouse.txt:1)。出典はオランダとだけ書き、ドルトレヒトとするのは推測",
+      "needsCheck": "場所は当時のジャーマンタウン近く、モノション川沿い（en-paper-mill.txt:23; en-rittenhouse-town.txt:1）。アメリカ大陸で最初の製紙はメキシコの1575年まで (en-history-of-paper.txt:87) で、国の単位でしか分からないので stage にしていない"
+    }
+  ]
+}

@@ -1,0 +1,223 @@
+{
+  "status": "draft",
+  "id": "lutheran-reformation",
+  "title": {
+    "ja": "ルター派宗教改革の広がり",
+    "en": "Spread of the Lutheran Reformation"
+  },
+  "description": {
+    "ja": "ヴィッテンベルクで始まったルターの改革運動が、北ドイツの諸都市・諸領邦と北欧の王国に、教会規則や議会の決定によって公式に採り入れられていった。"
+  },
+  "domain": "culture",
+  "tags": [
+    "culture",
+    "polity"
+  ],
+  "importance": 2,
+  "note": "到達の定義: その都市・領邦・王国が、ルター派の宗教改革を公式に導入した年（議会・市参事会・君主の決定、または教会規則（Kirchenordnung）の採択。両方あれば早いほう）。説教者が活動を始めた年や、民衆のあいだに広まった年ではない。地点は、決定・採択が行われた都市（出典に無ければ領邦・王国の首都）で、どちらを使ったかを各 stage の summary に書いた。起点はヴィッテンベルク、1517年（95か条の論題）。ルター派だけを扱い、改革派（ツヴィングリのチューリヒ、カルヴァンのジュネーヴなど）とイングランド国教会は別の系統なので入れない。ヴュルテンベルク（1534年）は、en: Ulrich, Duke of Württemberg がルターとツヴィングリの両方の教えを進めたと書くので、ルター派だけの到達とは言えず入れなかった。フィンランドは当時スウェーデンの一部で、別の公式導入の決定が出典に無いので入れなかった（スウェーデンの到達に含まれる）。ヴィッテンベルクのあるザクセン選帝侯領（1525/1527年、de: Heinrich (Sachsen)）は起点の領邦なので stage にしなかった。end 1550 は、この表で最後の到達点（アイスランド）の年。Wikidata には「ルター派宗教改革の伝播」にあたる項目が見つからず（wbsearchentities で Lutheran Reformation / spread of Lutheranism は 0 件）、Q12562（Protestant Reformation、P31 は Q1128340 と Q126288065）は改革派なども含む宗教改革全体の項目なので、同じ概念ではないとして slug の id にした。調査は、サブエージェントが Wikipedia（en / de / ja）の本文を API で取得して行った（2026-09-22）。summary の (ファイル名:行) は、その時に保存した本文の行番号。",
+  "start": 1517,
+  "end": 1550,
+  "source": "https://ja.wikipedia.org/wiki/宗教改革",
+  "origin": {
+    "qid": "Q6837",
+    "label": "ヴィッテンベルク",
+    "labelEn": "Wittenberg",
+    "source": "en: Ninety-five Theses 冒頭; ja: 宗教改革 § ルターの宗教改革",
+    "summary": "1517年、ヴィッテンベルク大学の教授だったルターが95か条の論題を書き、一般にこれが宗教改革の始まりとされる (en-95-theses.txt:1; ja-reformation.txt:31)"
+  },
+  "stages": [
+    {
+      "year": 1525,
+      "qid": "Q1829",
+      "label": "ケーニヒスベルク",
+      "labelEn": "Königsberg",
+      "from": -1,
+      "source": "en: Duchy of Prussia § Establishment; de: Reformation § Evangelische Kirchentümer und konfessionelle Lagerbildung",
+      "summary": "ドイツ騎士団総長アルブレヒトが1525年に世俗のプロイセン公となり、同年12月、ケーニヒスベルクの身分制議会が教会規則を決めてルター派教会を立てた。最初のプロテスタント国家とされる (en-duchy-prussia.txt:5,21-22; de-reformation.txt:206)。地点は決定の行われた都市",
+      "fromBasis": "出典に明記",
+      "fromNote": "ルターは1522年にヴィッテンベルクで（1524年にはニュルンベルクで）アルブレヒトに領国の世俗化を勧め、この取り決めの一部を仲介した (en-duchy-prussia.txt:16,21)。ニュルンベルクのオジアンダーも改宗に関わった (en-osiander.txt:5) が、ここでは導入を勧めた本人（ルター）の側をとった",
+      "granularity": "fine",
+      "granularityNote": "Wikidata の Q1829（カリーニングラード）は P31 に「ドイツの旧東部領土」（Q138411346、表では region）を持ち、規則だと region になる。ここでは都市として扱う。"
+    },
+    {
+      "year": 1525,
+      "qid": "Q2090",
+      "label": "ニュルンベルク",
+      "labelEn": "Nuremberg",
+      "from": -1,
+      "source": "de: Nürnberger Religionsgespräch § Verlauf; de: Reichsstadt Nürnberg § Im Zeitalter der Reformation",
+      "summary": "1525年3月の宗教討論の後、市参事会が改革に加わる決議を重ね、4月21日にカトリックのミサを禁じた (de-nuernberg-religionsgespraech.txt:1,13)。市民は1524年に新しい教えを公に信奉していた (de-reichsstadt-nuernberg.txt:31)。地点は決定の行われた都市",
+      "fromBasis": "推測（年代と地理から）",
+      "fromNote": "ルター派の側で討論したのはオジアンダーら (de-nuernberg-religionsgespraech.txt:11) だが、保存した本文に、彼らがヴィッテンベルクから教えを持ち込んだという記述は無い。de: Reichsstadt Nürnberg は、ルターが起こした改革が早くから支持された、とだけ書く",
+      "needsCheck": "de: Reformation は帝国都市ニュルンベルクの導入を 1524/25 とする (de-reformation.txt:206)。ここでは市参事会がミサを禁じた 1525 を採った",
+      "month": "1525-04"
+    },
+    {
+      "year": 1526,
+      "qid": "Q558616",
+      "label": "ホムベルク",
+      "labelEn": "Homberg (Efze)",
+      "from": -1,
+      "source": "de: Homberger Synode 冒頭・§ Ergebnisse・§ Umsetzung; de: Reformation § Evangelische Kirchentümer und konfessionelle Lagerbildung",
+      "summary": "1526年10月、ヘッセン方伯フィリップが招いた教会会議がホムベルクで開かれ、出席者の多数が改革を支持して方伯領はプロテスタントになった (de-homberg.txt:1,24; de-reformation.txt:207)。地点は決定の行われた都市",
+      "fromBasis": "推測（年代と地理から）",
+      "fromNote": "会議の論題を書いたのはアヴィニョン出身のフランツ・ランベルト (de-homberg.txt:11) で、保存した本文には彼とヴィッテンベルクの関係は書かれていない。ルターは会議の後の教会規則案を退けた (de-homberg.txt:38-42) が、これは持ち込んだ人の記述ではない",
+      "needsCheck": "会議の後に作られた教会規則（Reformatio ecclesiarum Hassiae）は、ルターの反対で施行されなかった (de-homberg.txt:1,33-42)。教会規則の採択を到達とするなら年が変わる（1531 年の Kirchendienerordnung など）。de: Reformation は 1526/27 とする"
+    },
+    {
+      "year": 1527,
+      "qid": "Q25412",
+      "label": "ヴェステロース",
+      "labelEn": "Västerås",
+      "from": -1,
+      "source": "en: Swedish Reformation § 1526–1536; en: Olaus Petri § Early life・§ Career; de: Reformation § Skandinavien",
+      "summary": "1527年のヴェステロース議会（宗教改革議会）で、身分制議会が教会財産の没収や、教会を国王の統制下に置くことなどを認めた (en-swedish-reformation.txt:20; de-reformation.txt:285)。地点は決定の行われた都市（首都ストックホルムではない）",
+      "fromBasis": "出典に明記",
+      "fromNote": "オラウス・ペトリは1518年にヴィッテンベルク大学で学位を取り、ドイツの改革者たちの影響を受けた。ペトリ兄弟の働きかけが、翌年のヴェステロース議会で実を結んだとされる (en-olaus-petri.txt:5,14)",
+      "needsCheck": "en: Swedish Reformation は、1536年まではカトリックの改革に近く、決着は1593年のウプサラ宗教会議とする (en-swedish-reformation.txt:1,28)。公式導入の年としては 1527 を採った"
+    },
+    {
+      "year": 1528,
+      "qid": "Q2773",
+      "label": "ブラウンシュヴァイク",
+      "labelEn": "Braunschweig",
+      "from": -1,
+      "source": "de: Johannes Bugenhagen § Braunschweig; en: Johannes Bugenhagen § Reformatory work",
+      "summary": "1528年9月5日、市参事会とギルドの代表などがブーゲンハーゲンの教会規則を正式に採択し、翌日、改革の導入が市内の説教壇から告げられた (de-bugenhagen.txt:56)。地点は採択の行われた都市",
+      "fromBasis": "出典に明記",
+      "fromNote": "市とヴィッテンベルク大学の交渉の結果、ブーゲンハーゲンがヴィッテンベルクから派遣された (de-bugenhagen.txt:37,44)",
+      "month": "1528-09"
+    },
+    {
+      "year": 1528,
+      "qid": "Q14859",
+      "label": "アンスバッハ",
+      "labelEn": "Ansbach",
+      "from": -1,
+      "source": "en: George, Margrave of Brandenburg-Ansbach § Reformation in Franconia",
+      "summary": "兄の死後に単独の君主となったゲオルクが、1528年の領邦議会の新しい決議によってフランケンの領地に改革を実施した (en-george-ansbach.txt:23)。地点は領邦（ブランデンブルク＝アンスバッハ）の首都で、議会の開催地は出典に無い",
+      "fromBasis": "出典に明記",
+      "fromNote": "ゲオルクは「ヴィッテンベルクから出た新しい信仰」にいち早く心を寄せ、ルターと文通していた (en-george-ansbach.txt:13,17,23)。1522年のニュルンベルクでの説教にも影響を受けたと書かれている",
+      "needsCheck": "領邦議会の決議の年（1528）は出典どおりだが、開催地と、決議の内容（教会規則か）は保存した本文で確かめられなかった。1526年10月の議会の決議は「中途半端」とされる"
+    },
+    {
+      "year": 1529,
+      "qid": "Q1055",
+      "label": "ハンブルク",
+      "labelEn": "Hamburg",
+      "from": -1,
+      "source": "de: Johannes Bugenhagen § Hamburg; en: Johannes Bugenhagen § Reformatory work",
+      "summary": "ブーゲンハーゲンが起草した教会規則が1529年5月15日に正式に採択され、23日に市内の説教壇で告げられた (de-bugenhagen.txt:80)。en は Hamburg (1528/29) と書く (en-bugenhagen.txt:26)。地点は採択の行われた都市",
+      "fromBasis": "出典に明記",
+      "fromNote": "ブーゲンハーゲンはブラウンシュヴァイクの後にハンブルクへ招かれ、仕事を終えてヴィッテンベルクへ戻った (de-bugenhagen.txt:68,99)。ブラウンシュヴァイク経由とも読めるが、彼の拠点はヴィッテンベルクなので起点からとした",
+      "granularity": "fine",
+      "granularityNote": "Wikidata の Q1055 は P31 に「ドイツの州」（Q1221156、表では region）を持ち、規則だと region になる。ここでは都市として扱う。",
+      "month": "1529-05"
+    },
+    {
+      "year": 1529,
+      "qid": "Q1773",
+      "label": "リガ",
+      "labelEn": "Riga",
+      "from": 0,
+      "source": "de: Andreas Knöpken § Leben; en: Timeline of Riga § 16th century",
+      "summary": "リガの最初の改革者クネプケンは1522年に討論を行い、1529年春にプロイセンの改革者ブリースマンと「教会奉仕の短い規則」を作った。この規則は1533年にレヴァルとドルパトでも拘束力を持った (de-knoepken.txt:1,8,10; en-timeline-riga.txt:149)。地点は都市",
+      "fromBasis": "出典に明記",
+      "fromNote": "規則の共著者ブリースマンは「プロイセンの改革者」と書かれている (de-knoepken.txt:10)。クネプケン本人はトレプトウでブーゲンハーゲンの後任だった人で、リガへはポンメルンから来た (de-knoepken.txt:6-7; en-timeline-riga.txt:149)。教会規則の由来としてケーニヒスベルク（プロイセン）をとった",
+      "needsCheck": "1529 は規則を作った年で、リガの市当局が採択した年とは書かれていない。1522 年の討論の後にクネプケンが聖ペトロ教会の助祭長に選ばれたことを到達とする読み方もある。リガ市の公式な導入の年は、保存した本文では確かめられなかった"
+    },
+    {
+      "year": 1531,
+      "qid": "Q2843",
+      "label": "リューベック",
+      "labelEn": "Lübeck",
+      "from": -1,
+      "source": "de: Johannes Bugenhagen § Lübeck; en: Johannes Bugenhagen § Reformatory work",
+      "summary": "保守的な市参事会の抵抗があったが、ブーゲンハーゲンの教会規則が1531年5月27日に法的に決議・導入された (de-bugenhagen.txt:113)。en は Lübeck (1530–1532) と書く (en-bugenhagen.txt:26)。地点は決議の行われた都市",
+      "fromBasis": "出典に明記",
+      "fromNote": "ブーゲンハーゲンは1530年10月28日にヴィッテンベルクから家族とともにリューベックに着いた (de-bugenhagen.txt:112)",
+      "granularity": "fine",
+      "granularityNote": "Wikidata の Q2843 は P31 に「ドイツの州」（Q1221156、表では region）を持ち、規則だと region になる。ここでは都市として扱う。",
+      "month": "1531-05"
+    },
+    {
+      "year": 1534,
+      "qid": "Q326142",
+      "label": "トレプトウ",
+      "labelEn": "Treptow an der Rega",
+      "from": -1,
+      "source": "de: Johannes Bugenhagen § Pommern; en: Johannes Bugenhagen § Reformatory work",
+      "summary": "1534年12月13日、トレプトウで開かれたポンメルンの領邦議会で、合意は得られなかったが、公たちが決議案を有効なものとして押し通した。教会規則は翌1535年に完成して刊行された (de-bugenhagen.txt:154-155; en-bugenhagen.txt:26 は 1534/5)。地点は議会の開催地（ポンメルン公領の首都ではない）",
+      "fromBasis": "出典に明記",
+      "fromNote": "議会にはブーゲンハーゲンが招かれ、公領の教会規則の起草を頼まれた。完成した規則は刊行のためヴィッテンベルクへ送られた (de-bugenhagen.txt:154-155)",
+      "needsCheck": "議会の決議（1534）と教会規則の完成・刊行（1535）のどちらを到達とするか。定義（早いほう）に従って 1534 にした",
+      "month": "1534-12"
+    },
+    {
+      "year": 1536,
+      "qid": "Q1748",
+      "label": "コペンハーゲン",
+      "labelEn": "Copenhagen",
+      "from": -1,
+      "source": "en: Reformation in Denmark–Norway and Holstein § The Reformation in Denmark; en: Icelandic Reformation § Background",
+      "summary": "伯爵戦争の後、コペンハーゲンに入ったクリスチャン3世が司教たちを逮捕し、1536年10月のコペンハーゲンの諸侯会議で司教の廃止と所領の没収が決まった。10月30日に国王はルター派のデンマーク教会を正式に立てた (en-reformation-denmark.txt:12,34; en-reformation-iceland.txt:9)。地点は決定の行われた都市",
+      "fromBasis": "出典に明記",
+      "fromNote": "国王は1537年に教会規則の草案をヴィッテンベルクに送って承認を求め、選帝侯はブーゲンハーゲンのデンマーク行きを許した。ブーゲンハーゲンが草案を直し、国王が1537年9月2日に署名した (en-reformation-denmark.txt:37-40)。ヴィッテンベルクとのつながりが明記されているのは、1536年の決定ではなく1537年の教会規則",
+      "needsCheck": "en: Reformation in Denmark–Norway and Holstein の諸侯会議の日付は 10月20日 (line 12)、en: Icelandic Reformation の国王の宣言は 10月30日 (line 9)。年はどちらも 1536。クリスチャン3世は公だった1528年に、自領のハーザスレウに教会規則を入れている (en-reformation-denmark.txt:35)。これを別の到達点にするかは人が決める",
+      "month": "1536-10"
+    },
+    {
+      "year": 1537,
+      "qid": "Q26793",
+      "label": "ベルゲン",
+      "labelEn": "Bergen",
+      "from": 10,
+      "source": "en: Reformation in Denmark–Norway and Holstein § The Reformation in Norway",
+      "summary": "ノルウェーの宗教改革は1537年に力ずくで行われ、クリスチャン3世がルター派を国の宗教と宣言し、大司教を追放した。最初の監督（司教）はベルゲン（ビョルグヴィン）の監督で、1537年から務めた (en-reformation-denmark.txt:49-50)。地点は、決定の地（コペンハーゲン）ではなく、1537年に最初の監督が置かれた都市",
+      "fromBasis": "出典に明記",
+      "fromNote": "デンマーク王クリスチャン3世がノルウェーに導入した (en-reformation-denmark.txt:49; en-reformation-iceland.txt:9)",
+      "needsCheck": "ノルウェーの公式導入の決定はデンマーク側でなされ、ノルウェー内の決定の地は出典に無い。地点をベルゲンにしたのは、1537年という年がある地名がここだけだったため。大司教座のあったトロンハイム（最初の監督は1546年）も候補"
+    },
+    {
+      "year": 1539,
+      "qid": "Q2079",
+      "label": "ライプツィヒ",
+      "labelEn": "Leipzig",
+      "from": -1,
+      "source": "de: Heinrich (Sachsen) 冒頭・§ Herzog von Sachsen; de: Justus Jonas der Ältere § Jonas als Wittenberger Reformator",
+      "summary": "兄ゲオルクの後を継いだハインリヒのもとで、アルベルティン家のザクセン公領はプロテスタントを国の宗教とした。1539年5月25日、ルターの臨席のもと、ライプツィヒで改革の導入の式典が行われた (de-heinrich-sachsen.txt:1,29)。地点は式典の行われた都市（公領の首都ドレスデンではない）",
+      "fromBasis": "出典に明記",
+      "fromNote": "ヴィッテンベルクのルターとユストゥス・ヨナスが聖霊降臨祭にライプツィヒのニコライ教会で説教し、ヨナスは導入の実務と巡察を任された (de-justus-jonas.txt:54; de-heinrich-sachsen.txt:29)",
+      "needsCheck": "ハインリヒは1537年に、自分が治めていた地域にすでに改革を入れていた (de-heinrich-sachsen.txt:1)",
+      "month": "1539-05"
+    },
+    {
+      "year": 1539,
+      "qid": "Q64",
+      "label": "ベルリン",
+      "labelEn": "Berlin",
+      "from": -1,
+      "source": "de: Reformation § Schmalkaldischer Bund und lutherische Konfessionalisierung; en: Joachim II Hector, Elector of Brandenburg § Biography",
+      "summary": "選帝侯ヨアヒム2世は1539年末まで待ち、それから教義はルター派だが伝統的な制度を多く残した教会規則を施行した。1539年11月1日、シュパンダウの聖ニコライ教会で両種陪餐を受けた (de-reformation.txt:218; en-joachim2.txt:12)。地点は選帝侯領（ブランデンブルク）の首都で、教会規則が施行された場所は出典に無い（シュパンダウはいまのベルリン市内）",
+      "fromBasis": "推測（年代と地理から）",
+      "fromNote": "保存した本文には、ブランデンブルクの教会規則を誰がどこから持ち込んだかの記述は無い。隣接するザクセン選帝侯領のヴィッテンベルクからとした",
+      "needsCheck": "en: Joachim II は、ルター派を明示的に採ったのは 1555 年とする (en-joachim2.txt:12)。弟のヨハン（ブランデンブルク＝キュストリン）は 1535 年にすでに導入している (de-reformation.txt:218)",
+      "granularity": "fine",
+      "granularityNote": "Wikidata の Q64 は P31 に「ドイツの州」（Q1221156、表では region）を持ち、規則だと region になる。ここでは都市として扱う。",
+      "month": "1539-11"
+    },
+    {
+      "year": 1550,
+      "qid": "Q831538",
+      "label": "スカウルホルト",
+      "labelEn": "Skálholt",
+      "from": 10,
+      "source": "en: Icelandic Reformation 冒頭・§ Danish efforts at Reform・§ Jón Arason and his sons beheaded; en: Reformation in Denmark–Norway and Holstein § The Reformation in Iceland",
+      "summary": "アイスランドにはデンマーク王が改革を押しつけた。抵抗はホーラルのカトリック司教ヨーン・アラソンと2人の息子が1550年11月にスカウルホルトで処刑されて終わり、その後アイスランドはルター派を採った (en-reformation-iceland.txt:1,53; en-reformation-denmark.txt:56)。地点はルター派の司教座で、処刑の行われた場所",
+      "fromBasis": "出典に明記",
+      "fromNote": "デンマーク王クリスチャン3世がアイスランドに改革を押しつけた。1537年の教会規則は1538年にアイスランドに届いた (en-reformation-iceland.txt:1,28)",
+      "needsCheck": "年が一つに決まらない: 教会規則が届いたのは 1538、スカウルホルト司教区では 1541 年以降にルター派の司教ギスルが改革を進めた (en-reformation-iceland.txt:28,40)、教会規則の施行は 1552 (en-reformation-denmark.txt:44)。ここでは抵抗が終わった 1550 を採ったが、「公式な導入」の定義に合うのはどれか、人が決める",
+      "month": "1550-11"
+    }
+  ]
+}

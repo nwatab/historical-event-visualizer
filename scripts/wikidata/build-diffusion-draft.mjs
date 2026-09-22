@@ -25,7 +25,7 @@ export const diffusionDraftSection = ({ file, data }, resolved, placeClasses) =>
   const wikidataOf = (ref, year) => {
     const row = pickResolved(resolved[placeKey({ from: ref.qid, fromLabel: ref.label, path: "P625" })] ?? [], year);
     return row
-      ? { label: `${row.labelJa ?? "（ja なし）"} / ${row.labelEn ?? "（en なし）"}`, coord: `${row.lat.toFixed(2)}, ${row.lon.toFixed(2)}`, granularity: ref.granularity ? `${ref.granularity}（人が指定。P31 からは ${granularityOf(placeClasses[ref.qid]?.p31 ?? [])}）` : granularityOf(placeClasses[ref.qid]?.p31 ?? []) }
+      ? { label: `${row.labelJa ?? "（ja なし）"} / ${row.labelEn ?? "（en なし）"}`, coord: `${row.lat.toFixed(2)}, ${row.lon.toFixed(2)}`, granularity: ref.granularity ? `${ref.granularity}（表で指定。P31 からは ${granularityOf(placeClasses[ref.qid]?.p31 ?? [])}）` : granularityOf(placeClasses[ref.qid]?.p31 ?? []) }
       : { label: "未取得", coord: "未取得", granularity: "" };
   };
   const nameOf = (/** @type {number} */ from) => (from === -1 ? "起点" : `${from}: ${data.stages[from]?.label ?? "?"}`);
@@ -65,13 +65,13 @@ const markdown = [
   "",
   "人が確認するための表。確認が済んだファイルは `status` を `\"confirmed\"` にする（`\"draft\"` のままだと `pnpm wikidata:build-app-data` はデータに入れない）。",
   "",
-  "- **年・経路・from の出所**: 「出典」の列の Wikipedia の記事（と節）の本文を、2026-09-21 に API で取得して読んだもの（取得と読み取りは、調査用のサブエージェントが行った）。",
+  "- **年・経路・from の出所**: 「出典」の列の Wikipedia の記事（と節）の本文を、API で取得して読んだもの（R6b の 6 件は 2026-09-21、R6d の紙・仏教・ルター派の 3 件は 2026-09-22）（取得と読み取りは、調査用のサブエージェントが行った）。",
   "  「要旨」は、取得した本文の該当箇所の要約で、引用ではない。要旨の中の `ファイル名:行番号` は、調査時に保存した本文（セッションの作業用ディレクトリ。リポジトリには無い）の位置。",
-  "  要旨と本文の突き合わせは、数か所を抜き取りで確かめただけで（黒死病のジェノヴァ／マルセイユ、モスクワ、スペインかぜのボストン／フリータウン）、全部は確かめていない。人が出典の記事で確認する前提の下書き。",
+  "  要旨と本文の突き合わせは、数か所を抜き取りで確かめただけで（R6b: 黒死病のジェノヴァ／マルセイユ、モスクワ、スペインかぜのボストン／フリータウン。R6d: 製紙のファブリアーノ、ルター派のハンブルク、仏教の高句麗）、全部は確かめていない。人が出典の記事で確認する前提の下書き。",
   "  「from の根拠」が「出典に明記」でないものは、年代と地理からの推測で、出典で確かめたものではない。",
   "- **QID と座標の出所**: QID は Wikidata の API（wbsearchentities、または記事名からの sitelink）で探し、wbgetentities のラベル・説明で照合したもの（サブエージェントの報告による）。",
   "  「Wikidata のラベル」と「緯度, 経度」の列は、その QID から `pnpm wikidata:fetch-app-extras` が取得した値（SPARQL、P625）で、報告とは独立に取り直している。座標は JSON には書いていない。",
-  "  「粒度」は、その QID の P31 から `place-granularity.mjs` で決めたもの。`country` の到達点は、zoom 4 以上で地図から消える。",
+  "  「粒度」は、その QID の P31 から `place-granularity.mjs` で決めたもの（「表で指定」は JSON の `granularity`。理由は `granularityNote`。R6d の 3 件の指定は、調査用のサブエージェントの提案で、人はまだ確認していない）。`country` の到達点は、zoom 4 以上で地図から消える。",
   "- **要確認** の列が空でない行は、出典に当たれなかったか、出典どうしが食い違っているもの。",
   "- 年は天文年の整数。このアプリの時間の分解能は 1 年なので、同じ年の到達点は同時に出る（月が分かるものは出典の列に書いてある）。",
   "",
