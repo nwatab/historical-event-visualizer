@@ -47,9 +47,7 @@
       "source": "en: Duchy of Prussia § Establishment; de: Reformation § Evangelische Kirchentümer und konfessionelle Lagerbildung",
       "summary": "ドイツ騎士団総長アルブレヒトが1525年に世俗のプロイセン公となり、同年12月、ケーニヒスベルクの身分制議会が教会規則を決めてルター派教会を立てた。最初のプロテスタント国家とされる (en-duchy-prussia.txt:5,21-22; de-reformation.txt:206)。地点は決定の行われた都市",
       "fromBasis": "出典に明記",
-      "fromNote": "ルターは1522年にヴィッテンベルクで（1524年にはニュルンベルクで）アルブレヒトに領国の世俗化を勧め、この取り決めの一部を仲介した (en-duchy-prussia.txt:16,21)。ニュルンベルクのオジアンダーも改宗に関わった (en-osiander.txt:5) が、ここでは導入を勧めた本人（ルター）の側をとった",
-      "granularity": "fine",
-      "granularityNote": "Wikidata の Q1829（カリーニングラード）は P31 に「ドイツの旧東部領土」（Q138411346、表では region）を持ち、規則だと region になる。ここでは都市として扱う。"
+      "fromNote": "ルターは1522年にヴィッテンベルクで（1524年にはニュルンベルクで）アルブレヒトに領国の世俗化を勧め、この取り決めの一部を仲介した (en-duchy-prussia.txt:16,21)。ニュルンベルクのオジアンダーも改宗に関わった (en-osiander.txt:5) が、ここでは導入を勧めた本人（ルター）の側をとった"
     },
     {
       "year": 1525,
@@ -110,8 +108,6 @@
       "summary": "ブーゲンハーゲンが起草した教会規則が1529年5月15日に正式に採択され、23日に市内の説教壇で告げられた (de-bugenhagen.txt:80)。en は Hamburg (1528/29) と書く (en-bugenhagen.txt:26)。地点は採択の行われた都市",
       "fromBasis": "出典に明記",
       "fromNote": "ブーゲンハーゲンはブラウンシュヴァイクの後にハンブルクへ招かれ、仕事を終えてヴィッテンベルクへ戻った (de-bugenhagen.txt:68,99)。ブラウンシュヴァイク経由とも読めるが、彼の拠点はヴィッテンベルクなので起点からとした",
-      "granularity": "fine",
-      "granularityNote": "Wikidata の Q1055 は P31 に「ドイツの州」（Q1221156、表では region）を持ち、規則だと region になる。ここでは都市として扱う。",
       "month": "1529-05"
     },
     {
@@ -124,8 +120,6 @@
       "summary": "保守的な市参事会の抵抗があったが、ブーゲンハーゲンの教会規則が1531年5月27日に法的に決議・導入された (de-bugenhagen.txt:113)。en は Lübeck (1530–1532) と書く (en-bugenhagen.txt:26)。地点は決議の行われた都市",
       "fromBasis": "出典に明記",
       "fromNote": "ブーゲンハーゲンは1530年10月28日にヴィッテンベルクから家族とともにリューベックに着いた (de-bugenhagen.txt:112)",
-      "granularity": "fine",
-      "granularityNote": "Wikidata の Q2843 は P31 に「ドイツの州」（Q1221156、表では region）を持ち、規則だと region になる。ここでは都市として扱う。",
       "month": "1531-05"
     },
     {
@@ -190,8 +184,6 @@
       "fromBasis": "推測（年代と地理から）",
       "fromNote": "保存した本文には、ブランデンブルクの教会規則を誰がどこから持ち込んだかの記述は無い。隣接するザクセン選帝侯領のヴィッテンベルクからとした",
       "needsCheck": "en: Joachim II は、ルター派を明示的に採ったのは 1555 年とする (en-joachim2.txt:12)。弟のヨハン（ブランデンブルク＝キュストリン）は 1535 年にすでに導入している (de-reformation.txt:218)",
-      "granularity": "fine",
-      "granularityNote": "Wikidata の Q64 は P31 に「ドイツの州」（Q1221156、表では region）を持ち、規則だと region になる。ここでは都市として扱う。",
       "month": "1539-11"
     },
     {
