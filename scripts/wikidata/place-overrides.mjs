@@ -4,7 +4,10 @@
 /**
  * @typedef {{ from: string, fromLabel: string, path: "P625" | "P159>P625", label?: string }} OverridePlace
  * @typedef {{ qid: string, title: string, placeKind: "point" | "origin" | "none", places?: OverridePlace[],
- *   kind?: "instant" | "period", start?: number, end?: number, note?: string }} PlaceOverride
+ *   kind?: "instant" | "period", start?: number, end?: number, note?: string,
+ *   status?: "draft", source?: string, summary?: string, needsCheck?: string }} PlaceOverride
+ *   status: "draft" は人が確認する前の下書き（build-app-data は --with-drafts のときだけ使う。確認が済んだら status を消す）。
+ *   source: 地点の出典（Wikipedia の記事名と節名）。summary: 出典の該当箇所の要旨（引用ではない）。needsCheck: 要確認の理由
  * @typedef {{ overrides: PlaceOverride[], exclude: { qid: string, title: string, reason: string }[] }} PlaceOverrides
  */
 

@@ -2,7 +2,7 @@
 //
 //   pnpm wikidata:build-app-data
 //
-//   pnpm wikidata:build-app-data --with-drafts   … data/diffusion/ の下書き（status: "draft"）も入れる。動作確認用で、出力はコミットしない
+//   pnpm wikidata:build-app-data --with-drafts   … 下書き（data/diffusion/ と place-overrides.json の status: "draft"）も入れる。動作確認用で、出力はコミットしない
 //
 // ネットワークには出ない（要るものは fetch.mjs / fetch-lists.mjs / fetch-app-extras.mjs が data/raw/ に保存済み）。
 // 出力した JSON はコミットする（取得に1時間かかるので、CI では生成しない）。
@@ -225,7 +225,14 @@ const [articles, placeLabels, resolved, mulLabels, sample] = await Promise.all([
 ]);
 if (!articles || !placeLabels || !resolved) throw new Error("data/raw/app/ がありません。先に pnpm wikidata:fetch-app-extras を実行してください。");
 
-const overrideByQid = new Map(placeOverrides.overrides.map((o) => [o.qid, o]));
+// 人が確認する前の下書き（place-overrides.json の status: "draft"、data/diffusion の status が "confirmed" でないもの）は、--with-drafts を付けたときだけ入れる
+const withDrafts = process.argv.includes("--with-drafts");
+const activeOverrides = placeOverrides.overrides.filter((o) => o.status !== "draft" || withDrafts);
+const draftOverrides = placeOverrides.overrides.filter((o) => o.status === "draft");
+if (draftOverrides.length > 0) {
+  console.warn(`place-overrides の下書き（status: "draft"）${draftOverrides.length} 件は${withDrafts ? "入れている（--with-drafts。この出力はコミットしない）" : "入れない"}`);
+}
+const overrideByQid = new Map(activeOverrides.map((o) => [o.qid, o]));
 
 const generated = population.flatMap((item) => {
   const event = toHistEvent(item, articles, placeLabels, overrideByQid.get(item.qid), resolved, mulLabels[item.qid], placeClasses);
@@ -234,13 +241,12 @@ const generated = population.flatMap((item) => {
 const noLabel = population.length - generated.length;
 // 表に書いたのにデータに入らなかった項目は、黙って落とさずに知らせる
 const generatedIds = new Set(generated.map((e) => e.id));
-const unusedOverrides = placeOverrides.overrides.filter((o) => !generatedIds.has(o.qid));
+const unusedOverrides = activeOverrides.filter((o) => !generatedIds.has(o.qid));
 if (unusedOverrides.length > 0) {
   console.warn(`place-overrides にあるがデータに入らなかった項目: ${unusedOverrides.map((o) => `${o.qid} ${o.title}`).join("、")}`);
 }
 
 // 広がる出来事（data/diffusion/*.json。人が書いた起点と到達点）。人が確認する前の下書き（status: "draft"）は、--with-drafts を付けたときだけ入れる
-const withDrafts = process.argv.includes("--with-drafts");
 const diffusionFiles = await loadDiffusionFiles();
 const skippedDrafts = diffusionFiles.filter(({ data }) => data.status !== "confirmed" && !withDrafts);
 const diffusion = diffusionFiles
@@ -316,7 +322,7 @@ const manifest = {
       pages: listPages.map((p) => ({ page: p.page, revid: p.revid })),
     },
     handwritten: { file: "src/data/events.sample.ts", count: sample.length },
-    placeOverrides: { file: "scripts/wikidata/place-overrides.json", applied: placeOverrides.overrides.length - unusedOverrides.length },
+    placeOverrides: { file: "scripts/wikidata/place-overrides.json", applied: activeOverrides.length - unusedOverrides.length, ...(withDrafts ? { withDrafts: true } : {}) },
     diffusion: { dir: "data/diffusion", count: diffusion.length, ...(withDrafts ? { withDrafts: true } : {}) },
   },
   // period は重なる区間すべてに入るので、files の count の合計は total より大きい

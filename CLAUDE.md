@@ -255,6 +255,16 @@ Wikidata には伝播の経路のデータが無いので、diffusion のデー�
      - 座標はこのファイルに書かない。根拠にする Wikidata の項目の QID（と経路: その項目の P625、または P159 本部所在地の先の P625）を書き、座標は取得して反映する。**記憶や推測で座標を書かない。** QID は API の出力でラベルを照合してから書く。
      - 機関が導入年より後に移転している場合は、移転前の所在地を使う。P159 に始点・終点の修飾子があれば、導入年に該当するものを選ぶ（ユーロ → 2014 年までの所在地）。該当する所在地が Wikidata に無ければ、その旨を `note` に書いて、所在していた都市の項目を使う（スイス・フラン → ベルン）。
      - `start` / `end` / `kind` を Wikidata の値から変えるときも、このファイルに理由つきで書く（印象派の start、文化大革命と世界恐慌の period 化、人民幣の start、セルジューク朝の period 化、メキシコ独立革命の start）。
+     - **下書き**（R4h から）: 人が確認する前の項目は `"status": "draft"` を付けて書く。`pnpm wikidata:build-app-data` は使わない（`--with-drafts` のときだけ使う。その出力はコミットしない）。
+       確認の表は `pnpm wikidata:place-overrides-review` が `scripts/wikidata/place-overrides.review.md` に作る（QID から取得したラベル・座標・粒度を並べる）。確認が済んだら `status` を消す。
+       下書きには、地点の出典（`source`: Wikipedia の記事名と節名）、要旨（`summary`）、要確認の理由（`needsCheck`）を書く。地点が 1 つに決まらない・出典に無いと判断した項目は、`placeKind: "none"` の下書きにして、理由を `note` に書く。
+       - R4h: 科学・技術で場所が無い 75 件と国だけの 29 件（importance 3 が 3 件、2 が 101 件）。2026-09-22 に下書き（point 91、none 13）、2026-09-23 に人が確認して確定（point 67、none 37）。確認の規則:
+         - 推定の場所は、その年にその機関・施設にいた（その行為がそこで行われた）ことが出典で言えるものだけ採る。住まい・本社・現在の所在地から推定しただけのものは none。
+         - 場所は、データの年（start）の出来事と同じ行為を指す。承認の年に打ち上げ地を付けるような、年と場所がずれるものは none（年を直す仕組みは作っていない）。
+         - 概念の項目で、その最初の実例が別の項目としてあるもの（高速鉄道 → 新幹線）は none。
+         - none にした項目の note に、理由と調査時の場所の案を残した。
+     - **場所のラベル**: `label` は地名にする。人名にしない。1 つの出来事に複数の行為者の地点があるときだけ、括弧で人名を添えてよい（手書きのサンプルの微積分の「ケンブリッジ（ニュートン）」「パリ（ライプニッツ）」。
+       同じ出来事の 2 地点が別の人物を表すので、括弧の人名が区別に役立つ）。R4h の確認で、電話機（Q11035）の「ベル」「グレイ」を外し、地名の「ボストン」「シカゴ」にした（2026-09-23、人の判断）。
    - **それ以外**（地図に置ける場所が無い項目）は `placeKind: "none"`・`places: []` でデータに残す。地図には出ない。R5 で年表に出す（地図の外の一覧 UI は R4b-2 では作らない）。
    - 次に人が確認する候補を出すには `pnpm wikidata:place-overrides-draft`（sitelinks 上位100件の下書き。2026-09-20 に確認した版が `place-overrides.draft.md`）。
 3. **年表形式の記事（Timeline of …）は出典にしない。** Vital articles だけにする。年表の行から主題の記事を当てる方法は、主題の記事が無い行で組織名や言語名を拾った。
@@ -283,6 +293,7 @@ pnpm wikidata:fetch-places      # 約5分。場所の項目の P31（wbgetentiti
 pnpm wikidata:fetch-app-extras  # 20〜40分（Wikidata 側の混雑による）
 pnpm wikidata:report            # REPORT.md を作り直して、分布に大きな変化が無いか見る
 pnpm wikidata:build-app-data    # public/data/events/ を作り直す。件数とファイルの大きさが出る
+pnpm wikidata:place-overrides-review   # place-overrides.json の下書きを変えたとき。人が確認する表 place-overrides.review.md を作り直す（取得済みの座標を読むだけ）
 pnpm wikidata:diffusion-draft   # data/diffusion/ を変えたとき。人が確認する表 diffusion.draft.md を作り直す（取得済みの座標を読むだけ）
 node scripts/wikidata/count-markers.mjs 1500 1800 1950   # 世界全体の表示でのマーカー数（500 を超えたら MIN_ZOOM_BY_IMPORTANCE を見直す）
 ```

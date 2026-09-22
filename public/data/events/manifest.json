@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-09-22T15:44:30.032Z",
+ "generatedAt": "2026-09-22T15:56:06.538Z",
  "sources": {
   "wikidata": {
    "license": "CC0",
@@ -91,7 +91,7 @@
   },
   "placeOverrides": {
    "file": "scripts/wikidata/place-overrides.json",
-   "applied": 36
+   "applied": 140
   },
   "diffusion": {
    "dir": "data/diffusion",
@@ -114,9 +114,9 @@
   "3": 829
  },
  "byPlaceKind": {
-  "none": 463,
+  "none": 425,
   "origin": 12,
-  "point": 19315
+  "point": 19353
  },
  "byTitlePredicate": {
   "completion": 254,
@@ -131,11 +131,11 @@
   "region": 1410
  },
  "placesByGranularity": {
-  "country": 1081,
-  "fine": 18266,
-  "region": 1396
+  "country": 1054,
+  "fine": 18340,
+  "region": 1398
  },
- "countryOnlyEvents": 820,
+ "countryOnlyEvents": 793,
  "files": [
   {
    "file": "-3000.json",
@@ -282,14 +282,14 @@
    "from": 1400,
    "to": 1500,
    "count": 544,
-   "bytes": 157498
+   "bytes": 157625
   },
   {
    "file": "1500.json",
    "from": 1500,
    "to": 1600,
    "count": 938,
-   "bytes": 269357
+   "bytes": 269389
   },
   {
    "file": "1600.json",
@@ -303,28 +303,28 @@
    "from": 1700,
    "to": 1800,
    "count": 1686,
-   "bytes": 465725
+   "bytes": 465500
   },
   {
    "file": "1800.json",
    "from": 1800,
    "to": 1900,
    "count": 3397,
-   "bytes": 935084
+   "bytes": 935173
   },
   {
    "file": "1900.json",
    "from": 1900,
    "to": 2000,
    "count": 5993,
-   "bytes": 1662396
+   "bytes": 1664428
   },
   {
    "file": "2000.json",
    "from": 2000,
    "to": 2100,
    "count": 3338,
-   "bytes": 923262
+   "bytes": 923401
   }
  ],
  "density": {
@@ -388,7 +388,7 @@
     1
    ],
    [
-    1514,
+    1511,
     0
    ],
    [
