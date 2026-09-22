@@ -2,7 +2,7 @@
   "status": "confirmed",
   "id": "Q275918",
   "title": {
-    "ja": "イスラームの拡大",
+    "ja": "初期イスラームの征服",
     "en": "Early Muslim conquests"
   },
   "description": {
@@ -15,7 +15,7 @@
     "culture"
   ],
   "importance": 3,
-  "note": "Wikidata 由来の Q275918（instant、start 622、場所は P625 のシリア付近の 1 点）を置き換える。Wikidata の P580 は 622、P582 は 750（調査時の wbgetentities の出力、2026-09-21）。start を 632（ムハンマドの死後、アラビアの外への征服が始まる）にしたのは依頼の指定で、Wikidata の値から変えている。title.ja は依頼の表記（Wikidata の日本語ラベルは「アラブ・イスラミック・コンクエスト」）。分類は既存データの conflict のまま（要確認。「宗教の伝播」と見るなら culture）。日本語版に該当する単独の記事は無く、出典は英語版。",
+  "note": "Wikidata 由来の Q275918（instant、start 622、場所は P625 のシリア付近の 1 点）を置き換える。Wikidata の P580 は 622、P582 は 750（調査時の wbgetentities の出力、2026-09-21）。start を 632（ムハンマドの死後、アラビアの外への征服が始まる）にしたのは依頼の指定で、Wikidata の値から変えている。title.ja は「初期イスラームの征服」（R6d で「イスラームの拡大」から変えた。Wikidata の日本語ラベルは「アラブ・イスラミック・コンクエスト」）。分類は conflict に決めた（R6d、2026-09-22 の依頼の指定）。理由: 到達点の年は軍事的な征服（都市の陥落・降伏）の年で、住民の改宗は数世紀かけて進んだ別の現象だから。「イスラームの拡大」という書き方は宗教の広がりに読めるので、タイトルを征服に合わせた。日本語版に該当する単独の記事は無く、出典は英語版。",
   "start": 632,
   "end": 750,
   "source": "https://en.wikipedia.org/wiki/Early_Muslim_conquests",

@@ -18,7 +18,7 @@
 - 年表の左の再生ボタン（またはスペースキー）で、年が自動で進みます。速度は 5 / 20 / 100 年/秒で、ボタンの下で切り替えます。年スライダーや年表を動かすと止まります。
 - 年スライダーのトラックの下には、100年ごとの時間軸の目盛りがあります（紀元元年だけ太い線）。
 
-データは約 19,800 件です（2026-09-21 生成。正確な件数と内訳は `public/data/events/manifest.json`）。Wikidata と英語版 Wikipedia の Vital articles から取得した項目に、手書きのサンプル35件と、人が書いた広がる出来事4件を統合しています。年代ごとのファイルに分けてあり、表示中の年の前後だけを読み込みます。分類は「戦争・紛争」が約7割を占め、地域はヨーロッパと北アメリカに偏っています（偏りの分析は `scripts/wikidata/FINDINGS-R4a.md`・`FINDINGS-R4b1.md`）。疫病の伝播のように地理的に広がる出来事は、Wikidata に経路のデータが無いため、出典（Wikipedia の記事）を確認しながら人が書いています（`data/diffusion/`）。現在は、黒死病、ユスティニアヌスのペスト、活版印刷の発明と伝播、イスラームの拡大の 4 件です。スペインかぜと COVID-19 は、年の分解能が 1 年だと数か月の伝播を描けないため、見送っています。
+データは約 19,800 件です（2026-09-21 生成。正確な件数と内訳は `public/data/events/manifest.json`）。Wikidata と英語版 Wikipedia の Vital articles から取得した項目に、手書きのサンプル34件と、人が書いた広がる出来事6件を統合しています。年代ごとのファイルに分けてあり、表示中の年の前後だけを読み込みます。分類は「戦争・紛争」が約7割を占め、地域はヨーロッパと北アメリカに偏っています（偏りの分析は `scripts/wikidata/FINDINGS-R4a.md`・`FINDINGS-R4b1.md`）。疫病の伝播のように地理的に広がる出来事は、Wikidata に経路のデータが無いため、出典（Wikipedia の記事）を確認しながら人が書いています（`data/diffusion/`）。現在は、黒死病、ユスティニアヌスのペスト、活版印刷の発明と伝播、初期イスラームの征服、製紙法の伝播、ルター派宗教改革の広がりの 6 件です。スペインかぜと COVID-19 は、年の分解能が 1 年だと数か月の伝播を描けないため、見送っています。
 
 分類・スキーマ・年の扱い・データの生成手順などの規約は [CLAUDE.md](CLAUDE.md) にまとめています。
 
@@ -76,7 +76,7 @@ MapLibre GL JS v6 は、ワーカーを別ファイル（`maplibre-gl-worker.mjs
 - **[英語版 Wikipedia の Vital articles（Level 5）](https://en.wikipedia.org/wiki/Wikipedia:Vital_articles/Level_5)** — 科学・技術・経済・文化の項目の選抜と、その分類（リストの節）に使用。ライセンス: [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)。使ったページは `scripts/wikidata/lists.mjs`、取得した版は manifest.json にあります。
 - **[OpenHistoricalMap](https://www.openhistoricalmap.org/)** — 1500 年以降の国境の線（`public/data/borders/`）。© OpenHistoricalMap contributors（[CC0](https://creativecommons.org/publicdomain/zero/1.0/) / [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)。[Copyright and Acknowledgements](https://www.openhistoricalmap.org/copyright)）。一部の国境線は [HDX](https://data.humdata.org/)（CC BY-IGO）および National Library of Scotland（CC BY）に由来します。海岸線と海上の線は使っていません（海岸線は下の Natural Earth）。取得と生成は `scripts/ohm/`、取得日と license 別の線の本数は `public/data/borders/manifest.json`、license の判断の根拠は `scripts/ohm/licenses.mjs` にあります。
 - 各イベントの `source` は、日本語版 Wikipedia の記事（無ければ英語版、それも無ければ Wikidata の項目）への URL です。記事の本文は取得・転載していません。詳細パネルでは、Wikipedia へのリンクに CC BY-SA 4.0 の表記を添えています。
-- **手書きのサンプル — `src/data/events.sample.ts`**（35件）。各イベントの `source` に参照した Wikipedia の URL を付けています（年や期間はその記事で確認しています）。`id` は Wikidata の QID です（該当する項目が無いものは slug）。生成時に統合し、QID が同じ項目は手書きを優先します。
+- **手書きのサンプル — `src/data/events.sample.ts`**（34件）。各イベントの `source` に参照した Wikipedia の URL を付けています（年や期間はその記事で確認しています）。`id` は Wikidata の QID です（該当する項目が無いものは slug）。生成時に統合し、QID が同じ項目は手書きを優先します。
 
 ### 陸地形状 — `public/geo/ne_110m_land.geojson`
 

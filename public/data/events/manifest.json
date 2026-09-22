@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-09-21T06:34:20.969Z",
+ "generatedAt": "2026-09-22T12:26:23.333Z",
  "sources": {
   "wikidata": {
    "license": "CC0",
@@ -87,7 +87,7 @@
   },
   "handwritten": {
    "file": "src/data/events.sample.ts",
-   "count": 35
+   "count": 34
   },
   "placeOverrides": {
    "file": "scripts/wikidata/place-overrides.json",
@@ -95,13 +95,13 @@
   },
   "diffusion": {
    "dir": "data/diffusion",
-   "count": 4
+   "count": 6
   }
  },
- "total": 19789,
+ "total": 19790,
  "byDomain": {
   "conflict": 14818,
-  "culture": 957,
+  "culture": 958,
   "economy": 320,
   "polity": 990,
   "population": 2180,
@@ -110,13 +110,13 @@
  },
  "byImportance": {
   "1": 13457,
-  "2": 5503,
+  "2": 5504,
   "3": 829
  },
  "byPlaceKind": {
   "none": 463,
   "origin": 12,
-  "point": 19314
+  "point": 19315
  },
  "byTitlePredicate": {
   "completion": 254,
@@ -132,7 +132,7 @@
  },
  "placesByGranularity": {
   "country": 1116,
-  "fine": 18082,
+  "fine": 18083,
   "region": 1544
  },
  "countryOnlyEvents": 851,
@@ -191,112 +191,112 @@
    "from": 100,
    "to": 200,
    "count": 40,
-   "bytes": 12093
+   "bytes": 15450
   },
   {
    "file": "200.json",
    "from": 200,
    "to": 300,
-   "count": 74,
-   "bytes": 21169
+   "count": 75,
+   "bytes": 24954
   },
   {
    "file": "300.json",
    "from": 300,
    "to": 400,
-   "count": 80,
-   "bytes": 24014
+   "count": 81,
+   "bytes": 27799
   },
   {
    "file": "400.json",
    "from": 400,
    "to": 500,
-   "count": 90,
-   "bytes": 27076
+   "count": 91,
+   "bytes": 30861
   },
   {
    "file": "500.json",
    "from": 500,
    "to": 600,
-   "count": 110,
-   "bytes": 33467
+   "count": 111,
+   "bytes": 37252
   },
   {
    "file": "600.json",
    "from": 600,
    "to": 700,
-   "count": 166,
-   "bytes": 50922
+   "count": 167,
+   "bytes": 54713
   },
   {
    "file": "700.json",
    "from": 700,
    "to": 800,
-   "count": 121,
-   "bytes": 37625
+   "count": 122,
+   "bytes": 41416
   },
   {
    "file": "800.json",
    "from": 800,
    "to": 900,
-   "count": 151,
-   "bytes": 41783
+   "count": 152,
+   "bytes": 45568
   },
   {
    "file": "900.json",
    "from": 900,
    "to": 1000,
-   "count": 122,
-   "bytes": 34494
+   "count": 123,
+   "bytes": 38279
   },
   {
    "file": "1000.json",
    "from": 1000,
    "to": 1100,
-   "count": 216,
-   "bytes": 59478
+   "count": 217,
+   "bytes": 63263
   },
   {
    "file": "1100.json",
    "from": 1100,
    "to": 1200,
-   "count": 282,
-   "bytes": 76773
+   "count": 283,
+   "bytes": 80558
   },
   {
    "file": "1200.json",
    "from": 1200,
    "to": 1300,
-   "count": 410,
-   "bytes": 111758
+   "count": 411,
+   "bytes": 115543
   },
   {
    "file": "1300.json",
    "from": 1300,
    "to": 1400,
-   "count": 468,
-   "bytes": 131816
+   "count": 469,
+   "bytes": 135601
   },
   {
    "file": "1400.json",
    "from": 1400,
    "to": 1500,
-   "count": 543,
-   "bytes": 153877
+   "count": 544,
+   "bytes": 157662
   },
   {
    "file": "1500.json",
    "from": 1500,
    "to": 1600,
-   "count": 936,
-   "bytes": 261683
+   "count": 938,
+   "bytes": 269472
   },
   {
    "file": "1600.json",
    "from": 1600,
    "to": 1700,
-   "count": 1118,
-   "bytes": 309197
+   "count": 1119,
+   "bytes": 312982
   },
   {
    "file": "1700.json",
