@@ -178,28 +178,119 @@ export const MIN_ZOOM_BY_IMPORTANCE: Readonly<Record<HistEvent["importance"], nu
 };
 
 /**
- * 密度による調整の下限。現在年に地図に出る importance 3 のマーカーがこの数に満たない年は、importance 2 も 3 と同じ扱い（常時表示）にする。
- * 3 と 2 を合わせても満たなければ、importance 1 も同じ扱いにする。
+ * 密度による調整の下限。現在年の前後 ±DENSITY_WINDOW_YEARS 年で平均した「地図に出る importance 3 のイベント数」がこの数に満たない年は、
+ * importance 2 も 3 と同じ扱い（常時表示）にする。importance 3 と 2 を合わせた平均でも満たなければ、importance 1 も同じ扱いにする。
  * 理由: 古代は importance 3 の項目が無い年が多く（importance は年代の区分ごとの sitelinks の上位 5% で、区分「〜499 年」は 3500 年ぶんある）、
  * 固定の閾値だと、世界全体の表示で地図が空になる。
+ *
+ * R6c ではマーカーの数に対する下限だった。R6e で数える単位をイベントに変えたときに、10 / 12 / 15 / 20 を比べて、15 のままにした
+ * （2026-09-22 の生成データ。±10 年の平均で、全期間の繰り上げの有無の切り替わりは 10 → 9 回、12 → 5 回、15 → 3 回、20 → 3 回）。
+ * 15 未満にすると、1500〜1750 年の importance 3 のイベント数の平均（10〜14）の付近に下限が来て、切り替わりが増える。
+ * 20 にすると、1830〜1854 年も importance 2 が繰り上がり（世界全体の表示のマーカーが 400 を超える）、中世の一部で importance 1 まで繰り上がる。
+ * 15 にすると、1500〜1750 年はおおむね importance 2 も常時表示になる（世界全体の表示のマーカーは 1500 年 147、1687 年 164。上限の目安 500 は下回る）。
  */
 export const DENSITY_FLOOR = 15;
+
+/**
+ * 密度を平均する窓（現在年の前後 ±この年数）。その年だけの値で決めると、importance 3 のイベント数が下限の前後で上下する時代に、
+ * 1 年ごとに繰り上げが入ったり外れたりする（R6c の方式では、全期間で繰り上げの有無が 37 回切り替わり、1583 年のように 1 年だけ外れる年もあった）。
+ * 5 / 10 / 20 を比べて 10 にした（2026-09-22 の生成データ、下限 15。全期間の切り替わりは 5 → 5 回、10 → 3 回、20 → 3 回。
+ * 製紙法の伝播の期間 105〜1710 年の中では 4 / 2 / 2 回）。10 と 20 で回数は同じなので、変化に早く追従する狭いほうを採った。
+ * ヒステリシス（前の状態で閾値を変える方式）は使わない。表示が年だけで決まらなくなり、URL に年を載せたとき（R7）、開き方で表示が変わるため。
+ */
+export const DENSITY_WINDOW_YEARS = 10;
 
 /** 密度による繰り上げの段階。0: しない、1: importance 2 を 3 と同じ扱いに、2: importance 1 も。 */
 export type DensityLevel = 0 | 1 | 2;
 
 /**
- * 現在年のマーカー（eventMarkers の結果。instant は ±EVENT_WINDOW_YEARS の窓、period は期間中、diffusion は起点と到達点）から、繰り上げの段階を決める。
- * 数えるのはマーカー（places の各点）で、イベントの数ではない。地図に出ない項目（placeKind が "none"）は数えない。
+ * そのイベントが地図に出る年の範囲（両端を含む）。markerFade が null でない年と同じ（instant は ±EVENT_WINDOW_YEARS、period は期間中、
+ * diffusion は start から end の後 EVENT_WINDOW_YEARS 年まで）。地図に出ない項目（places が空、placeKind が "none"）は null。
  */
-export const densityLevel = (markers: EventMarkerCollection, floor: number = DENSITY_FLOOR): DensityLevel => {
-  const onMap = markers.features.filter((f) => f.properties.placeKind !== "none");
-  const count = (importance: HistEvent["importance"]): number =>
-    onMap.filter((f) => f.properties.importance === importance).length;
-  if (count(3) >= floor) return 0;
-  return count(3) + count(2) >= floor ? 1 : 2;
+export const mapSpan = (event: HistEvent): readonly [Year, Year] | null => {
+  if (event.places.length === 0 || event.placeKind === "none") return null;
+  switch (event.kind) {
+    case "instant":
+      return [event.start - EVENT_WINDOW_YEARS, event.start + EVENT_WINDOW_YEARS];
+    case "period":
+      return event.end === undefined ? null : [event.start, event.end];
+    case "diffusion":
+      return event.end === undefined ? null : [event.start, event.end + EVENT_WINDOW_YEARS];
+  }
 };
 
+/**
+ * yearMin〜yearMax の各年に地図に出るイベントの数（指定した importance のもの）。数えるのはイベント（id ごとに 1）で、マーカーの数ではない
+ * （diffusion は到達点の数だけマーカーを持ち、1 件で下限を押し上げるため）。分類の非表示は見ない（R6c と同じ。表示を切り替えても繰り上げは変わらない）。
+ * 差分配列で数える（イベントごとに範囲の始まりで +1、終わりの翌年で −1 を置き、累積する）。
+ */
+export const eventCountsByYear = (
+  events: readonly HistEvent[],
+  importance: HistEvent["importance"],
+  yearMin: Year,
+  yearMax: Year,
+): readonly number[] => {
+  const length = yearMax - yearMin + 1;
+  const deltas = new Array<number>(length + 1).fill(0);
+  events
+    .filter((event) => event.importance === importance)
+    .map(mapSpan)
+    .forEach((span) => {
+      if (span === null || span[1] < yearMin || span[0] > yearMax) return;
+      deltas[Math.max(span[0], yearMin) - yearMin] += 1;
+      deltas[Math.min(span[1], yearMax) - yearMin + 1] -= 1;
+    });
+  return prefixSums(deltas).slice(1, length + 1);
+};
+
+/** 累積和。先頭に 0 を置く（結果の長さは values より 1 長い。区間 [i, j) の和は sums[j] − sums[i]）。 */
+const prefixSums = (values: readonly number[]): readonly number[] =>
+  values.reduce<number[]>((sums, value) => {
+    sums.push(sums[sums.length - 1] + value);
+    return sums;
+  }, [0]);
+
+/** 各位置の前後 ±windowYears の平均。端では、範囲の中にある値だけで平均する。 */
+export const movingAverage = (values: readonly number[], windowYears: number): readonly number[] => {
+  const sums = prefixSums(values);
+  return values.map((_, i) => {
+    const lo = Math.max(0, i - windowYears);
+    const hi = Math.min(values.length - 1, i + windowYears);
+    return (sums[hi + 1] - sums[lo]) / (hi - lo + 1);
+  });
+};
+
+/** importance 3 と 2 のイベント数（平均）から、繰り上げの段階を決める。 */
+export const densityLevelOf = (count3: number, count2: number, floor: number = DENSITY_FLOOR): DensityLevel =>
+  count3 >= floor ? 0 : count3 + count2 >= floor ? 1 : 2;
+
+/** 繰り上げの段階の表。from 年から次の要素の from 年の前年まで、level が続く（年の昇順。連続する同じ level はまとめる）。 */
+export type DensityRuns = readonly (readonly [from: Year, level: DensityLevel])[];
+
+/**
+ * 全データから、yearMin〜yearMax の各年の繰り上げの段階を決め、同じ段階の続く区間にまとめる。
+ * 生成時（scripts/wikidata/build-app-data.mjs）に 1 回だけ計算し、manifest.json に出す。アプリで計算しないのは、
+ * 平均に要る前後の年のイベントが、アプリの読み込んだファイルに揃っているとは限らないため（読むのは現在年の ±20 年から。
+ * ±DENSITY_WINDOW_YEARS 年先のイベントを数えるには ±30 年が要る）。揃っていないと、同じ年でも、年表の窓の幅や直前の操作で段階が変わる。
+ * 計算の速さは理由ではない（全データ・全期間で数十 ms。R5c の実測でも、描画の時間に比べて計算は数 ms だった）。
+ */
+export const densityRuns = (
+  events: readonly HistEvent[],
+  yearMin: Year,
+  yearMax: Year,
+  windowYears: number = DENSITY_WINDOW_YEARS,
+  floor: number = DENSITY_FLOOR,
+): DensityRuns => {
+  const average3 = movingAverage(eventCountsByYear(events, 3, yearMin, yearMax), windowYears);
+  const average2 = movingAverage(eventCountsByYear(events, 2, yearMin, yearMax), windowYears);
+  return average3
+    .map((count3, i) => densityLevelOf(count3, average2[i], floor))
+    .flatMap((level, i, levels) => (i > 0 && levels[i - 1] === level ? [] : [[yearMin + i, level] as const]));
+};
+
+/** 表から、その年の段階を引く。表より前の年や、表が空なら 0（繰り上げない）。 */
+export const densityLevelAt = (runs: DensityRuns, year: Year): DensityLevel =>
+  runs.reduce<DensityLevel>((level, [from, runLevel]) => (from <= year ? runLevel : level), 0);
 /**
  * 繰り上げた後の閾値。繰り上げた importance には、importance 3 の閾値をそのまま使う（マーカーの MIN_ZOOM_BY_IMPORTANCE にも、
  * ラベルの LABEL_MIN_ZOOM_BY_IMPORTANCE にも同じ関数を使うので、ラベルも同じだけ下がる）。

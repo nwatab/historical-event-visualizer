@@ -9,7 +9,7 @@ import { join } from "node:path";
 import { APP_DATA_DIR } from "./config.mjs";
 import { importFromSrc } from "./load-ts.mjs";
 
-const [{ eventMarkers, EVENT_WINDOW_YEARS, MIN_ZOOM_BY_IMPORTANCE, DENSITY_FLOOR, densityLevel, promotedThresholds }, { importancesVisibleAt, granularityVisibleAt }, { filesForYear, mergeEventFiles }] =
+const [{ eventMarkers, EVENT_WINDOW_YEARS, MIN_ZOOM_BY_IMPORTANCE, densityLevelAt, promotedThresholds }, { importancesVisibleAt, granularityVisibleAt }, { filesForYear, mergeEventFiles }] =
   await Promise.all([importFromSrc("lib/timeline.ts"), importFromSrc("lib/mapFilters.ts"), importFromSrc("lib/eventData.ts")]);
 
 /** 世界全体の初期表示のズーム（幅の広い画面 1.3、縦長の画面 -0.6）と、閾値の前後。 */
@@ -24,8 +24,9 @@ const rows = await Promise.all(
     const events = mergeEventFiles(chunks);
     const markers = eventMarkers(events, year);
     const features = markers.features.filter((/** @type {any} */ f) => f.properties.placeKind !== "none");
-    // 密度による調整（timeline.ts）: マーカーが少ない年は、importance 2（さらに 1）を 3 と同じ扱いにする
-    const level = densityLevel(markers);
+    // 密度による調整（timeline.ts の densityRuns）: 前後の年に地図に出るイベントが少ない年は、importance 2（さらに 1）を 3 と同じ扱いにする。
+    // 段階は、生成時に全データから計算した manifest の表を引く（アプリと同じ）
+    const level = densityLevelAt(manifest.density.runs, year);
     const thresholds = promotedThresholds(MIN_ZOOM_BY_IMPORTANCE, level);
     const byImportance = [3, 2, 1].map((i) => `${i}: ${features.filter((/** @type {any} */ f) => f.properties.importance === i).length}`).join("、");
     const counts = ZOOMS.map((zoom) => {
@@ -36,7 +37,7 @@ const rows = await Promise.all(
     const shownThresholds = [3, 2, 1].map((i) => `${i} → ${Number.isFinite(thresholds[i]) ? `zoom ${thresholds[i]} 以上` : "常時"}`).join("、");
     return (
       `${year}年  読むファイル ${files.map((/** @type {{ file: string }} */ f) => f.file).join(", ")}（${events.length} 件）\n` +
-      `  窓の中のマーカー（importance 別）${byImportance}。下限 ${DENSITY_FLOOR} → 繰り上げの段階 ${level}（有効な閾値: ${shownThresholds}）\n  ${counts.join("\n  ")}`
+      `  窓の中のマーカー（importance 別）${byImportance}。繰り上げの段階 ${level}（manifest の表。±${manifest.density.windowYears} 年のイベント数の平均、下限 ${manifest.density.floor}）（有効な閾値: ${shownThresholds}）\n  ${counts.join("\n  ")}`
     );
   }),
 );
