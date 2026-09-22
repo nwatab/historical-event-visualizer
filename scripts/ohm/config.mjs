@@ -17,7 +17,7 @@ export const CLIENT_TIMEOUT_MS = 300_000;
 
 /**
  * 国境を出す期間（天文年）。1500 年より前は OHM の穴が大きすぎるので扱わない（scripts/research/borders.md）。
- * BORDER_YEAR_MAX は src/lib/timeline.ts の YEAR_MAX と同じ値（2026-09-21 に目視で転記）。
+ * BORDER_YEAR_MAX は src/lib/timeline.ts の YEAR_MAX と同じ値（2026-09-21 に目視で転記）。BORDER_YEAR_MIN も src/lib/timeline.ts に同じ値がある（初期表示の年に使う）。
  */
 export const BORDER_YEAR_MIN = 1500;
 export const BORDER_YEAR_MAX = 2025;

@@ -325,6 +325,11 @@ export const TIMELINE = {
   dragThreshold: SPACE[4],
   /** ホバーの吹き出しに出す件数の上限（混んだレーンでは何十件も重なるため） */
   tooltipMaxItems: 8,
+  /**
+   * 現在年を含む項目の強調（R5d）。ラベルは太字・濃い灰色、帯は輪郭を太くする。どのラベルを出すかは変えない。
+   * 太字は幅の見積もり（estimateTextWidth）より少し広がるが、ラベルの間の gap に収まる程度（和文はほぼ同じ幅）。
+   */
+  current: { labelWeight: FONT_WEIGHT.bold, labelColor: GRAY.strong, bandStrokeWidth: 2 },
 } as const;
 
 /** 再生ボタン（年表の左）。アイコンは絵文字ではなく SVG で描く。 */

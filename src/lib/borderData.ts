@@ -1,13 +1,11 @@
 import type { FeatureCollection, MultiLineString } from "geojson";
 import type { Year } from "@/types/event";
+import { BORDER_YEAR_MIN } from "./timeline";
 
 /**
  * public/data/borders/ のデータの読み方（純粋関数）。
  * データは scripts/ohm/build-borders.mjs が OpenHistoricalMap から生成する（CLAUDE.md「国境」）。世紀ごとのファイルと、その一覧（manifest.json）から成る。
  */
-
-/** 国境を出す最初の年。これより前は OpenHistoricalMap の穴が大きすぎるので、データを作っていない（scripts/ohm/config.mjs の BORDER_YEAR_MIN と同じ値）。 */
-export const BORDER_YEAR_MIN: Year = 1500;
 
 export interface BorderProperties {
   /** その線を国境に持つ国の名前（英語）。隣り合う 2 国の国境なら " / " でつないである */

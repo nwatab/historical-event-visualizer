@@ -1,4 +1,5 @@
 import type { Domain, Year } from "@/types/event";
+import { quantizeHalfSpan } from "./timeline";
 import { clampYear } from "./year";
 
 /**
@@ -7,7 +8,7 @@ import { clampYear } from "./year";
  */
 export interface AppState {
   readonly year: Year;
-  /** 年表の窓の片側の幅（年）。窓は year を中心に ± この値 */
+  /** 年表の窓の片側の幅（年）。窓は year を中心に ± この値。timeline.ts の TIMELINE_HALF_SPAN_LEVELS のどれか */
   readonly timelineHalfSpan: number;
   /** 非表示にしている分類 */
   readonly hiddenDomains: readonly Domain[];
@@ -41,8 +42,8 @@ export type AppAction =
 export interface YearBounds {
   readonly min: Year;
   readonly max: Year;
-  /** 年表の窓の片側の幅の範囲 */
-  readonly halfSpan: { readonly min: number; readonly max: number };
+  /** 年表の窓の片側の幅の段階。setTimelineHalfSpan の値は、いちばん近い段階に丸める */
+  readonly halfSpanLevels: readonly number[];
 }
 
 export const initialAppState = ({ year, timelineHalfSpan }: Pick<AppState, "year" | "timelineHalfSpan">): AppState => ({
@@ -71,7 +72,7 @@ export const appReducer =
       case "setTimelineHalfSpan":
         return {
           ...state,
-          timelineHalfSpan: Math.min(bounds.halfSpan.max, Math.max(bounds.halfSpan.min, action.halfSpan)),
+          timelineHalfSpan: quantizeHalfSpan(action.halfSpan, bounds.halfSpanLevels),
         };
       case "toggleDomain":
         return {

@@ -8,6 +8,7 @@
     "dev": "pnpm copy-maplibre-worker && next dev",
     "build": "pnpm copy-maplibre-worker && next build",
     "lint": "eslint .",
+    "test": "node --test \"tests/*.test.mjs\"",
     "wikidata:fetch": "node scripts/wikidata/fetch.mjs",
     "wikidata:fetch-lists": "node scripts/wikidata/fetch-lists.mjs",
     "wikidata:fetch-app-extras": "node scripts/wikidata/fetch-app-extras.mjs",
