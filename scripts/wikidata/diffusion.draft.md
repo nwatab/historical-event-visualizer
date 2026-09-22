@@ -1,6 +1,6 @@
 # 広がる出来事（diffusion）の下書き
 
-`pnpm wikidata:diffusion-draft` が `data/diffusion/*.json` から作り直す（2026-09-21 生成）。手で編集しない。直すのは JSON のほう。
+`pnpm wikidata:diffusion-draft` が `data/diffusion/*.json` から作り直す（2026-09-22 生成）。手で編集しない。直すのは JSON のほう。
 
 人が確認するための表。確認が済んだファイルは `status` を `"confirmed"` にする（`"draft"` のままだと `pnpm wikidata:build-app-data` はデータに入れない）。
 
@@ -60,12 +60,12 @@
 | 8 | 2020 | サンパウロ | Q174 | サンパウロ / São Paulo | -23.55, -46.63 | fine | 7: コドーニョ | 出典に明記。2月9〜21日にロンバルディアに滞在。南アメリカで最初 | en: Timeline … February 2020 § 25 February; en: COVID-19 pandemic in Brazil § 2020; en: COVID-19 pandemic § South America （2020-02） 要旨: イタリアのロンバルディアに渡航した、サンパウロの61歳の男性 | 日付が割れている: Brazil の記事・Timeline・ja は2月25日、en: COVID-19 pandemic § South America と en: … in South America は2月26日 |
 | 9 | 2020 | ラゴス | Q8673 | ラゴス / Lagos | 6.46, 3.39 | region | 7: コドーニョ | 出典に明記。2月27日。サハラ以南のアフリカで最初。出典はミラノ発とするが、ミラノは stage に無い。ミラノをロンバルディアの集団感染（stage 7）に結び付けたのは調査時の推測で、取得した本文にその記述は無い | en: Timeline … February 2020 § 27 February; en: COVID-19 pandemic in Nigeria 冒頭 （2020-02） 要旨: ナイジェリアで働くイタリア人で、ミラノから戻った | from の「出典に明記」は「イタリア（ミラノ）から」まで。コドーニョとのつながりは推測 |
 
-## イスラームの拡大（632〜750）
+## 初期イスラームの征服（632〜750）
 
 - ファイル: `data/diffusion/early-muslim-conquests.json`　状態: **confirmed**
 - id: Q275918　分類: conflict（tags: conflict, polity, culture）　importance: 3
 - 出典: https://en.wikipedia.org/wiki/Early_Muslim_conquests
-- 補足: Wikidata 由来の Q275918（instant、start 622、場所は P625 のシリア付近の 1 点）を置き換える。Wikidata の P580 は 622、P582 は 750（調査時の wbgetentities の出力、2026-09-21）。start を 632（ムハンマドの死後、アラビアの外への征服が始まる）にしたのは依頼の指定で、Wikidata の値から変えている。title.ja は依頼の表記（Wikidata の日本語ラベルは「アラブ・イスラミック・コンクエスト」）。分類は既存データの conflict のまま（要確認。「宗教の伝播」と見るなら culture）。日本語版に該当する単独の記事は無く、出典は英語版。
+- 補足: Wikidata 由来の Q275918（instant、start 622、場所は P625 のシリア付近の 1 点）を置き換える。Wikidata の P580 は 622、P582 は 750（調査時の wbgetentities の出力、2026-09-21）。start を 632（ムハンマドの死後、アラビアの外への征服が始まる）にしたのは依頼の指定で、Wikidata の値から変えている。title.ja は「初期イスラームの征服」（R6d で「イスラームの拡大」から変えた。Wikidata の日本語ラベルは「アラブ・イスラミック・コンクエスト」）。分類は conflict に決めた（R6d、2026-09-22 の依頼の指定）。理由: 到達点の年は軍事的な征服（都市の陥落・降伏）の年で、住民の改宗は数世紀かけて進んだ別の現象だから。「イスラームの拡大」という書き方は宗教の広がりに読めるので、タイトルを征服に合わせた。日本語版に該当する単独の記事は無く、出典は英語版。
 
 | # | 年 | 地名 | QID | Wikidata のラベル（ja / en） | 緯度, 経度（P625） | 粒度 | from | from の根拠 | 出典 | 要確認 |
 |---:|---:|---|---|---|---|---|---|---|---|---|

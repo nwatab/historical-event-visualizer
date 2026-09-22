@@ -1,6 +1,6 @@
 # 場所が大陸・海洋だけの項目
 
-`pnpm wikidata:build-app-data` が作り直す（2026-09-21 生成）。手で編集しない。
+`pnpm wikidata:build-app-data` が作り直す（2026-09-22 生成）。手で編集しない。
 
 Wikidata の場所（戦争の P276 など）が大陸・海洋（粒度 coarse。`place-granularity.mjs`）しか無く、`placeKind: "none"` で地図に出ていない項目。
 `place-overrides.json` で人が場所を決めた項目は、ここから消える。P495 / P17 だけで none の項目は含まない（`pnpm wikidata:place-overrides-draft` のほう）。
