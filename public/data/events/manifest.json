@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-09-22T12:26:23.333Z",
+ "generatedAt": "2026-09-22T13:50:29.507Z",
  "sources": {
   "wikidata": {
    "license": "CC0",
@@ -126,16 +126,16 @@
  },
  "placeGranularity": {
   "coarse": 120,
-  "country": 1707,
-  "fine": 1105,
-  "region": 1554
+  "country": 1671,
+  "fine": 1285,
+  "region": 1410
  },
  "placesByGranularity": {
-  "country": 1116,
-  "fine": 18083,
-  "region": 1544
+  "country": 1081,
+  "fine": 18266,
+  "region": 1396
  },
- "countryOnlyEvents": 851,
+ "countryOnlyEvents": 820,
  "files": [
   {
    "file": "-3000.json",
@@ -177,7 +177,7 @@
    "from": -500,
    "to": 0,
    "count": 594,
-   "bytes": 169678
+   "bytes": 169632
   },
   {
    "file": "0.json",
@@ -198,7 +198,7 @@
    "from": 200,
    "to": 300,
    "count": 75,
-   "bytes": 24954
+   "bytes": 24931
   },
   {
    "file": "300.json",
@@ -219,42 +219,42 @@
    "from": 500,
    "to": 600,
    "count": 111,
-   "bytes": 37252
+   "bytes": 37206
   },
   {
    "file": "600.json",
    "from": 600,
    "to": 700,
    "count": 167,
-   "bytes": 54713
+   "bytes": 54644
   },
   {
    "file": "700.json",
    "from": 700,
    "to": 800,
    "count": 122,
-   "bytes": 41416
+   "bytes": 41370
   },
   {
    "file": "800.json",
    "from": 800,
    "to": 900,
    "count": 152,
-   "bytes": 45568
+   "bytes": 45545
   },
   {
    "file": "900.json",
    "from": 900,
    "to": 1000,
    "count": 123,
-   "bytes": 38279
+   "bytes": 38210
   },
   {
    "file": "1000.json",
    "from": 1000,
    "to": 1100,
    "count": 217,
-   "bytes": 63263
+   "bytes": 63240
   },
   {
    "file": "1100.json",
@@ -275,56 +275,56 @@
    "from": 1300,
    "to": 1400,
    "count": 469,
-   "bytes": 135601
+   "bytes": 135462
   },
   {
    "file": "1400.json",
    "from": 1400,
    "to": 1500,
    "count": 544,
-   "bytes": 157662
+   "bytes": 157498
   },
   {
    "file": "1500.json",
    "from": 1500,
    "to": 1600,
    "count": 938,
-   "bytes": 269472
+   "bytes": 269357
   },
   {
    "file": "1600.json",
    "from": 1600,
    "to": 1700,
    "count": 1119,
-   "bytes": 312982
+   "bytes": 312819
   },
   {
    "file": "1700.json",
    "from": 1700,
    "to": 1800,
    "count": 1686,
-   "bytes": 465913
+   "bytes": 465725
   },
   {
    "file": "1800.json",
    "from": 1800,
    "to": 1900,
    "count": 3397,
-   "bytes": 935902
+   "bytes": 935084
   },
   {
    "file": "1900.json",
    "from": 1900,
    "to": 2000,
    "count": 5993,
-   "bytes": 1664478
+   "bytes": 1662396
   },
   {
    "file": "2000.json",
    "from": 2000,
    "to": 2100,
    "count": 3338,
-   "bytes": 923745
+   "bytes": 923262
   }
  ]
 }
