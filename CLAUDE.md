@@ -216,6 +216,10 @@ Wikidata には伝播の経路のデータが無いので、diffusion のデー�
 - 人が編集する表は `roots.mjs`（取得の入口のクラス）、`p31-domain-map.mjs`（P31 → 7分類）、`title-predicates.mjs`（P31 → タイトルに足す述語）、`place-granularity.mjs`（場所の P31 → 粒度）、`lists.mjs`（Vital articles のページと分類、作品類の P31）、`place-overrides.json`（人が決めた地点・起点）。QID を足すときは、ラベルを API の出力で照合する（記憶で書いた QID は R4a で 55 件中 3 件が別物だった）。
 - Wikidata・Wikipedia への問い合わせは直列で、間隔を空け、User-Agent にリポジトリの URL を入れ、429 / 5xx は Retry-After に従って再試行する。取得済みの分はキャッシュから読む。
 - 各時点の分析結果と、そこから下した判断の根拠は `scripts/wikidata/FINDINGS-R4a.md`・`FINDINGS-R4b1.md` にある（対応するレポートは `REPORT-R4a.md`・`REPORT-R4b1.md` として凍結してある）。
+- **科学・技術・経済の欠落**（R4g、調査のみ）: 独立した基準のリスト（Vital articles Level 4、地域別の発明・発見の一覧）の各項目が、パイプラインのどの段階で落ちたかを測った。
+  所見と数値は `scripts/wikidata/FINDINGS-R4g.md`・`REPORT-R4g.md`（`node scripts/wikidata/fetch-r4g.mjs` → `report-r4g.mjs`。取得は data/raw/r4g/）。
+  欠落の主因は Wikidata に年（時間のプロパティ）が無いことで、パイプラインの規則ではない（Level 4 の 65.7% が、入口を通っても時間のプロパティを 1 つも持たない。2026-09-22 の取得）。
+  規則を直しても、場所（R4h）を補っても、Level 4 と地域別の一覧の再現率の上限は 1 割前後。落ちた項目の全一覧はコミットせず、年が範囲内にあるものだけを `REPORT-R4g-dropped-dated.md` に出す。
 
 ### 母集団と importance の決定事項（R4b-2）
 
