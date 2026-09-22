@@ -6,10 +6,11 @@
     "path: \"P625\" は from の項目自身の座標。\"P159>P625\" は from の P159（本部所在地）の先の項目の座標で、P159 に始点・終点の修飾子があれば、その出来事の年（start の上書きがあればその年）に該当するものを選ぶ。",
     "from の QID と fromLabel の対応は、2026-09-20 に wbgetentities / wbsearchentities の出力で照合した（戦争など 14 件ぶんは 2026-09-21）。QID を足すときも照合すること。",
     "places は先頭が primary（ラベルの付く点）。Wikidata 由来の places は全部置き換わる。note に代表点の選び方を書く。",
-    "label は地図に出す地名。省略すると from の日本語ラベルを使う。",
+    "label は地図に出す地名（人名にしない。1 つの出来事に複数の行為者の地点があるときだけ、括弧で人名を添えてよい。CLAUDE.md）。省略すると from の日本語ラベルを使う。",
     "場所の粒度（fine / region / country）は書かない。path が P625 なら from の項目の P31 から決まり（place-granularity.mjs。P31 は pnpm wikidata:fetch-places が取得）、P159>P625 なら fine。",
     "start / end / kind は、Wikidata から導いた値の上書き。理由を note に書く。",
-    "status: \"draft\" は、人が確認する前の下書き（R4h、2026-09-22。科学・技術で場所が無い・国だけの項目 104 件。調査用のサブエージェントが Wikipedia の本文を API で取得して調べた）。pnpm wikidata:build-app-data は --with-drafts のときだけ使う。確認の表は place-overrides.review.md（pnpm wikidata:place-overrides-review）。確認が済んだら status を消す。source は地点の出典、summary は要旨（引用ではない）、needsCheck は要確認の理由。placeKind: \"none\" の下書きは、地点が 1 つに決まらない・出典に無いと判断したもので、理由は note。"
+    "status: \"draft\" は、人が確認する前の下書き。pnpm wikidata:build-app-data は --with-drafts のときだけ使う。確認の表は place-overrides.review.md（pnpm wikidata:place-overrides-review）。確認が済んだら status を消す。source は地点の出典、summary は要旨（引用ではない）、needsCheck は要確認の理由。placeKind: \"none\" の項目は、地点が 1 つに決まらない・出典に無い・年と場所がずれると判断したもので、理由は note。",
+    "R4h の 104 件（科学・技術で場所が無い・国だけの項目。2026-09-22 に調査用のサブエージェントが Wikipedia の本文を API で取得して下書きし、2026-09-23 に人が確認した）は、確認済み（status なし）。point 67 件、none 37 件。"
   ],
   "overrides": [
     { "qid": "Q10693", "title": "周期表", "placeKind": "point", "places": [{ "from": "Q656", "fromLabel": "サンクトペテルブルク", "path": "P625" }] },
@@ -28,9 +29,10 @@
       "title": "電話機",
       "placeKind": "point",
       "places": [
-        { "from": "Q100", "fromLabel": "ボストン", "path": "P625", "label": "ベル" },
-        { "from": "Q1297", "fromLabel": "シカゴ", "path": "P625", "label": "グレイ" }
-      ]
+        { "from": "Q100", "fromLabel": "ボストン", "path": "P625" },
+        { "from": "Q1297", "fromLabel": "シカゴ", "path": "P625" }
+      ],
+      "note": "R4h の確認（2026-09-23、人の判断）: 場所のラベルを人名（ベル、グレイ）から地名（ボストン、シカゴ）にした。ラベルは地名にする（CLAUDE.md）"
     },
     {
       "qid": "Q2763",
@@ -301,7 +303,6 @@
     {
       "qid": "Q11633",
       "title": "撮影",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q19297902", "fromLabel": "Palais de l'Institut de France（ja ラベル無し）", "path": "P625", "label": "フランス学士院" }
@@ -314,7 +315,6 @@
     {
       "qid": "Q17517",
       "title": "携帯電話",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q60", "fromLabel": "ニューヨーク", "path": "P625" }
@@ -326,7 +326,6 @@
     {
       "qid": "Q1225170",
       "title": "Magellan-Elcano expedition",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q8717", "fromLabel": "セビリア", "path": "P625" }
@@ -339,7 +338,6 @@
     {
       "qid": "Q556",
       "title": "水素の発見",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q84", "fromLabel": "ロンドン", "path": "P625" }
@@ -352,7 +350,6 @@
     {
       "qid": "Q629",
       "title": "酸素の発見",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q1235307", "fromLabel": "キャルネ", "path": "P625" }
@@ -365,7 +362,6 @@
     {
       "qid": "Q627",
       "title": "窒素の発見",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q160302", "fromLabel": "エディンバラ大学", "path": "P625" }
@@ -378,7 +374,6 @@
     {
       "qid": "Q568",
       "title": "リチウムの発見",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q1754", "fromLabel": "ストックホルム", "path": "P625" }
@@ -390,7 +385,6 @@
     {
       "qid": "Q658",
       "title": "ナトリウムの発見",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q2171086", "fromLabel": "王立研究所", "path": "P625" }
@@ -402,7 +396,6 @@
     {
       "qid": "Q569",
       "title": "ベリリウムの発見",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q90", "fromLabel": "パリ", "path": "P625" }
@@ -415,7 +408,6 @@
     {
       "qid": "Q654",
       "title": "ネオンの発見",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q193196", "fromLabel": "ユニヴァーシティ・カレッジ・ロンドン", "path": "P625" }
@@ -427,7 +419,6 @@
     {
       "qid": "Q660",
       "title": "マグネシウムの発見",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q160302", "fromLabel": "エディンバラ大学", "path": "P625" }
@@ -440,7 +431,6 @@
     {
       "qid": "Q650",
       "title": "フッ素の発見",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q90", "fromLabel": "パリ", "path": "P625" }
@@ -453,7 +443,6 @@
     {
       "qid": "Q888",
       "title": "クリプトンの発見",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q193196", "fromLabel": "ユニヴァーシティ・カレッジ・ロンドン", "path": "P625" }
@@ -465,7 +454,6 @@
     {
       "qid": "Q879",
       "title": "臭素の発見",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q7047", "fromLabel": "バート・クロイツナハ", "path": "P625" }
@@ -478,7 +466,6 @@
     {
       "qid": "Q671",
       "title": "フランシウムの発見",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q2451973", "fromLabel": "キュリー研究所", "path": "P625" }
@@ -491,20 +478,15 @@
     {
       "qid": "Q938",
       "title": "ストロンチウムの発見",
-      "status": "draft",
-      "placeKind": "point",
-      "places": [
-        { "from": "Q1573631", "fromLabel": "王立陸軍士官学校", "path": "P625" }
-      ],
+      "placeKind": "none",
       "source": "en: Strontium § History; en: Adair Crawford § Discovery of strontium; ja: ストロンチウム",
       "summary": "1790年、クロフォードとクルックシャンクが新しい土の可能性を認めた（texts-A/en-strontium.txt:24）。場所はロンドンのウーリッジの王立陸軍士官学校（texts-A/en-adair_crawford.txt:18）。",
-      "note": "新元素と認めた研究の場所。",
+      "note": "R4h の確認（2026-09-23、人の判断）で none にした: 年と場所がずれる（start 1787 は鉱物の発見、場所は 1790 年に元素と認めた研究の場所）。調査時の案: 王立陸軍士官学校（Q1573631） ／ 新元素と認めた研究の場所。",
       "needsCheck": "start 1787 は鉱物（ストロンチアン石）が見つかった年で、場所はストロンチアン村（ja-ストロンチウム.txt:5）。元素と認めたのは1790年。王立陸軍士官学校（Q1573631）の P625 は現存しない施設の位置で、未検証。"
     },
     {
       "qid": "Q895",
       "title": "ルビジウムの発見",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q2966", "fromLabel": "ハイデルベルク", "path": "P625" }
@@ -516,7 +498,6 @@
     {
       "qid": "Q867",
       "title": "ゲルマニウムの発見",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q689854", "fromLabel": "フライベルク工科大学", "path": "P625" }
@@ -528,7 +509,6 @@
     {
       "qid": "Q743",
       "title": "タングステンの発見",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q1382252", "fromLabel": "ベルガラ", "path": "P625" }
@@ -540,7 +520,6 @@
     {
       "qid": "Q1046",
       "title": "ニオブの発見",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q84", "fromLabel": "ロンドン", "path": "P625" }
@@ -553,7 +532,6 @@
     {
       "qid": "Q877",
       "title": "イリジウムの発見",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q84", "fromLabel": "ロンドン", "path": "P625" }
@@ -566,46 +544,33 @@
     {
       "qid": "Q1053",
       "title": "モリブデンの発見",
-      "status": "draft",
-      "placeKind": "point",
-      "places": [
-        { "from": "Q174126", "fromLabel": "Köping", "path": "P625", "label": "シェーピング" }
-      ],
+      "placeKind": "none",
       "source": "en: Molybdenum § History; en: Carl Wilhelm Scheele",
       "summary": "シェーレが1778年に輝水鉛鉱を新元素の鉱石と見抜いた（texts-A/en-molybdenum.txt:54）。シェーレは1775年からシェーピング（Köping）の薬局に移り、戻った後に研究を続けた（texts-A/en-carl_wilhelm_scheele.txt:10, :11）。",
-      "note": "1778年当時のシェーレの居所。",
+      "note": "R4h の確認（2026-09-23、人の判断）で none にした: 推定の場所で採らない（1778 年の研究の場所が出典に無く、居所（シェーピング）からの推定）。調査時の案: シェーピング（Q174126） ／ 1778年当時のシェーレの居所。",
       "needsCheck": "1778年の研究の場所は本文に無い（居所からの推定）。Q174126 に日本語ラベルが無いので label を付けた（表記「シェーピング」は要確認）。1781年のイェルムの単離の場所は不明。"
     },
     {
       "qid": "Q941",
       "title": "イットリウムの発見",
-      "status": "draft",
-      "placeKind": "point",
-      "places": [
-        { "from": "Q38511", "fromLabel": "トゥルク", "path": "P625" }
-      ],
+      "placeKind": "none",
       "source": "en: Yttrium § History; ja: イットリウム § 歴史; en: Johan Gadolin",
       "summary": "1789年、トゥルク（オーボ）の王立アカデミーのガドリンがアレニウスの試料から新しい酸化物を見つけた（texts-A/en-yttrium.txt:50; ja-イットリウム.txt:48）。",
-      "note": "元素（の酸化物）を見つけた場所。",
+      "note": "R4h の確認（2026-09-23、人の判断）で none にした: 年と場所がずれる（start 1787 は鉱物の発見、場所は 1789 年の酸化物の発見の場所）。調査時の案: トゥルク（Q38511） ／ 元素（の酸化物）を見つけた場所。",
       "needsCheck": "start 1787 はアレニウスがイッテルビー村で鉱物を見つけた年（en-yttrium.txt:48）。元素の発見は1789年（発表1794年）。1787年に合わせるならイッテルビー。"
     },
     {
       "qid": "Q1119",
       "title": "ハフニウムの発見",
-      "status": "draft",
-      "placeKind": "point",
-      "places": [
-        { "from": "Q263761", "fromLabel": "ニールス・ボーア研究所", "path": "P625" }
-      ],
+      "placeKind": "none",
       "source": "en: Hafnium § History; ja: ハフニウム",
       "summary": "ボーアの予言を受けて、ニールス・ボーア研究所のコスターとヘヴェシーがジルコンを X 線で分析（texts-A/ja-ハフニウム.txt:24）。コペンハーゲンでの発見で、名もその古名から（texts-A/en-hafnium.txt:1, :218）。",
-      "note": "発見した研究所。",
+      "note": "R4h の確認（2026-09-23、人の判断）で none にした: 年と場所がずれる（start 1922 はボーアの提唱の年、場所は 1923 年の発見の研究所）。調査時の案: ニールス・ボーア研究所（Q263761） ／ 発見した研究所。",
       "needsCheck": "en は発見を1923年とし（en-hafnium.txt:218）、1922年はボーアの提唱の年（ja-ハフニウム.txt:24）。"
     },
     {
       "qid": "Q999",
       "title": "アスタチンの発見",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q168756", "fromLabel": "カリフォルニア大学バークレー校", "path": "P625" }
@@ -617,7 +582,6 @@
     {
       "qid": "Q1054",
       "title": "テクネチウムの発見",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q1641504", "fromLabel": "パレルモ大学", "path": "P625" }
@@ -629,7 +593,6 @@
     {
       "qid": "Q1038",
       "title": "ジルコニウムの発見",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q64", "fromLabel": "ベルリン", "path": "P625" }
@@ -642,7 +605,6 @@
     {
       "qid": "Q38433",
       "title": "ニュートンの運動3法則",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q84", "fromLabel": "ロンドン", "path": "P625" }
@@ -655,7 +617,6 @@
     {
       "qid": "Q36642",
       "title": "二名法",
-      "status": "draft",
       "placeKind": "none",
       "source": "en: Binomial nomenclature; en: Systema Naturae; en: Species Plantarum; en: Carl Linnaeus",
       "summary": "二名法の一貫した使用は1753年の『植物の種』から（texts-A/en-binomial_nomenclature.txt:2, :23）。同書はストックホルムで刊行（texts-A/en-species_plantarum.txt:5）。1735年は『自然の体系』初版の年で、オランダ滞在中の刊行（texts-A/en-systema_naturae.txt:6; en-carl_linnaeus.txt:63）。",
@@ -665,7 +626,6 @@
     {
       "qid": "Q46611",
       "title": "アポロ計画",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q1034347", "fromLabel": "ケープカナベラル空軍基地第34複合発射施設", "path": "P625", "label": "第34発射施設" }
@@ -678,7 +638,6 @@
     {
       "qid": "Q402",
       "title": "ヒッグス粒子",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q42944", "fromLabel": "欧州原子核研究機構", "path": "P625" }
@@ -690,7 +649,6 @@
     {
       "qid": "Q207316",
       "title": "Lua",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q1857293", "fromLabel": "リオデジャネイロ・カトリック大学", "path": "P625" }
@@ -703,7 +661,6 @@
     {
       "qid": "Q121713",
       "title": "鍼",
-      "status": "draft",
       "placeKind": "none",
       "source": "en: Acupuncture § History › Origins",
       "summary": "起源は中国とされるが時期も諸説ある（texts-B/en-acupuncture.txt:143）。紀元前100年頃の根拠は『黄帝内経』『史記』の記述と劉勝の墓の金銀の針で、針が鍼に使われたかは不明（同:145）。",
@@ -712,7 +669,6 @@
     {
       "qid": "Q10135",
       "title": "リブレオフィス",
-      "status": "draft",
       "placeKind": "none",
       "source": "en: LibreOffice § History (The Document Foundation and LibreOffice)",
       "summary": "2010年9月28日に OpenOffice.org のコミュニティがドキュメントファンデーションの設立と LibreOffice のフォークを発表した（texts-B/en-libreoffice.txt:51）。最初の安定版は2011年1月（同:4）。",
@@ -721,7 +677,6 @@
     {
       "qid": "Q48604",
       "title": "ミール",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q177477", "fromLabel": "バイコヌール宇宙基地", "path": "P625" }
@@ -734,7 +689,6 @@
     {
       "qid": "Q1647694",
       "title": "USBフラッシュドライブ",
-      "status": "draft",
       "placeKind": "none",
       "source": "en: USB flash drive § History",
       "summary": "M-Systems（イスラエル）、IBM の技術者、Netac（中国）、Trek 2000（シンガポール）がそれぞれ発明を主張し、誰が最初かは決着していない（texts-B/en-usb-flash-drive.txt:10-12）。",
@@ -744,20 +698,15 @@
     {
       "qid": "Q12203",
       "title": "QRコード",
-      "status": "draft",
-      "placeKind": "point",
-      "places": [
-        { "from": "Q389515", "fromLabel": "刈谷市", "path": "P625" }
-      ],
+      "placeKind": "none",
       "source": "ja: QRコード（冒頭）; ja: デンソーウェーブ § 沿革; en: Denso（冒頭。en の \"Denso Wave\" はこの記事へ転送）",
       "summary": "1994年、愛知県のデンソーの開発部門（現デンソーウェーブ）のチームが発明した（texts-B/ja-qr-code.txt:3, texts-B/ja-denso-wave.txt:6）。デンソーの本社は刈谷市（texts-B/en-denso-wave.txt:1）。",
-      "note": "開発した組織（デンソー）の本社所在地を代表点にした。",
+      "note": "R4h の確認（2026-09-23、人の判断）で none にした: 推定の場所で採らない（出典は「愛知県の開発部門」までで、刈谷市は本社の所在地からの推定）。調査時の案: 刈谷市（Q389515） ／ 開発した組織（デンソー）の本社所在地を代表点にした。",
       "needsCheck": "推測を含む: 出典は開発部門がどの事業所にあったかを書いていない。刈谷はデンソー本社の所在地（現在の記述）。デンソーウェーブの現本社は阿久比町、刈谷にも事業所がある（texts-B/ja-denso-wave.txt:1,13,15）。人が採否を決めること。"
     },
     {
       "qid": "Q131140",
       "title": "COBOL",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q11208", "fromLabel": "ペンタゴン", "path": "P625" }
@@ -770,7 +719,6 @@
     {
       "qid": "Q182496",
       "title": "Microsoft Bing",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q16552", "fromLabel": "サン・ディエゴ", "path": "P625" }
@@ -783,7 +731,6 @@
     {
       "qid": "Q164338",
       "title": "新幹線",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q283196", "fromLabel": "東京駅", "path": "P625" },
@@ -797,7 +744,6 @@
     {
       "qid": "Q14530",
       "title": "メシエ天体",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q3145813", "fromLabel": "クリュニー館", "path": "P625" }
@@ -809,20 +755,15 @@
     {
       "qid": "Q150609",
       "title": "MiG-21",
-      "status": "draft",
-      "placeKind": "point",
-      "places": [
-        { "from": "Q649", "fromLabel": "モスクワ", "path": "P625" }
-      ],
+      "placeKind": "none",
       "source": "en: Mikoyan-Gurevich MiG-21 § Development / Production; en: Mikoyan",
       "summary": "ミコヤン設計局（OKB-155）が試作機を設計し、1955 年に初飛行、モスクワのトゥシノで公開（texts-C/en-Q150609.txt:10）。量産はモスクワの第30工場・ゴーリキー・トビリシの 3 工場（texts-C/en-Q150609.txt:24）。設計局は後にモスクワの MAPO-MiG に統合（texts-C/en-mikoyan.txt:2,9）。Wikidata の MiG（Q188508）の P159 もモスクワ。",
-      "note": "設計局と最初の量産工場の一つがあった都市。",
+      "note": "R4h の確認（2026-09-23、人の判断）で none にした: 年と場所がずれる（start 1959 は就役、場所は設計局）。調査時の案: モスクワ（Q649） ／ 設計局と最初の量産工場の一つがあった都市。",
       "needsCheck": "モスクワ（Q649）の P31 に『ロシアの連邦市』『連邦構成主体』があり、country 扱いで拡大時に消えるおそれ（London と同種の問題）。設計局の所在地がモスクワだと明記した本文は無く、Wikidata の P159 による。生産数最多はゴーリキー（第21工場）。start 1959 は就役年とみられ、初飛行は 1955 年。"
     },
     {
       "qid": "Q625107",
       "title": "水素爆弾",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q263899", "fromLabel": "エルゲラブ島", "path": "P625" },
@@ -836,20 +777,15 @@
     {
       "qid": "Q184393",
       "title": "カタパルト",
-      "status": "draft",
-      "placeKind": "point",
-      "places": [
-        { "from": "Q13670", "fromLabel": "シラクサ", "path": "P625" }
-      ],
+      "placeKind": "none",
       "source": "en: Catapult § Greek and Roman catapults; en: Siege of Motya (lead); ja: カタパルト (投石機)",
       "summary": "ディオドロスによれば、機械式の矢を射るカタパルトは前 399 年にギリシアの一団が発明し、直後にモティア攻略で使われた（texts-C/en-Q184393.txt:12）。シュラクサイのディオニュシオスが初めてカタパルトを用いたとされる（texts-C/en-motya.txt:1）。ja 版もシチリアで前 4 世紀初頭に開発とする（texts-C/ja-catapult.txt:11）。",
-      "note": "ギリシア式カタパルトを最初に用いたディオニュシオス 1 世の本拠地。Wikidata の P495 もシラクサ。",
+      "note": "R4h の確認（2026-09-23、人の判断）で none にした: 年と場所がずれる（start と出典の年が 2 年ずれ、発明地も推定）。調査時の案: シラクサ（Q13670） ／ ギリシア式カタパルトを最初に用いたディオニュシオス 1 世の本拠地。Wikidata の P495 もシラクサ。",
       "needsCheck": "en の本文は発明地を『シュラクサイ』と明記しておらず、ディオニュシオスの軍備（Motya の記事）からの推定。前 7 世紀のエルサレム、前 5 世紀のインド（アジャータシャトル）・中国の例も同じ記事にある（en-Q184393.txt:3,7）ので、独立の発明が複数ある。start -400（前 401 年）は前 399 年（天文年 -398）と 2 年ずれる。"
     },
     {
       "qid": "Q131382",
       "title": "Vim",
-      "status": "draft",
       "placeKind": "none",
       "source": "en: Vim (text editor) § History; en: Bram Moolenaar § Vim",
       "summary": "ムーレナールが Amiga 用に1988年から作り、1991年11月の版が最初の公開版で、Fish Disk で配布された（texts-B/en-vim.txt:8, texts-B/en-bram-moolenaar.txt:11）。",
@@ -858,7 +794,6 @@
     {
       "qid": "Q483318",
       "title": "Symbian OS",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q5273898", "fromLabel": "サザーク", "path": "P625" }
@@ -871,61 +806,49 @@
     {
       "qid": "Q245",
       "title": "Raspberry Pi",
-      "status": "draft",
-      "placeKind": "point",
-      "places": [
-        { "from": "Q7895212", "fromLabel": "ケンブリッジ大学コンピュータ研究所", "path": "P625", "label": "ケンブリッジ" }
-      ],
+      "placeKind": "none",
       "source": "en: Raspberry Pi § History › Origins and launch (2008–2012), › Post-launch production (2012–2014); en: Raspberry Pi Foundation",
       "summary": "財団は2008年、ケンブリッジ大学コンピュータ研究所に関わる人々らが、同研究所の志願者の減少を受けて作り、2009年にケルデコートで慈善団体として登録された（texts-B/en-raspberry-pi-foundation.txt:5, texts-B/en-raspberry-pi.txt:11）。最初の製品は2012年2月29日に発売（texts-B/en-raspberry-pi.txt:15）。",
-      "note": "開発した財団の出自（ケンブリッジ大学の研究所）を代表点にした。",
+      "note": "R4h の確認（2026-09-23、人の判断）で none にした: 推定の場所で採らない（設計した場所が出典に無く、財団の出自からの推定）。調査時の案: ケンブリッジ（Q7895212） ／ 開発した財団の出自（ケンブリッジ大学の研究所）を代表点にした。",
       "needsCheck": "推測を含む: 出典は設計した場所を明記しない。財団の登録地はケルデコート（Q2457720, P31 village / civil parish）。最初の1万台は台湾と中国の工場で作られた（texts-B/en-raspberry-pi.txt:24。工場の特定なし）。none も含めて人が判断すること。"
     },
     {
       "qid": "Q129337",
       "title": "TGV",
-      "status": "draft",
       "placeKind": "point",
       "places": [
-        { "from": "Q747541", "fromLabel": "リヨン駅", "path": "P625", "label": "パリ（リヨン駅）" },
+        { "from": "Q90", "fromLabel": "パリ", "path": "P625" },
         { "from": "Q456", "fromLabel": "リヨン", "path": "P625" }
       ],
       "source": "en: TGV (lead, § History); en: LGV Sud-Est (lead, § Timeline); ja: TGV（歴史、パリのターミナル）",
       "summary": "1981年9月27日にLGV南東線でパリ–リヨン間の営業が始まった（texts-D/en-tgv.txt:21、texts-D/ja-tgv.txt:19、texts-D/en-lgv-sud-est.txt:9,22）。南東線系統のパリの発着駅はリヨン駅（texts-D/ja-tgv.txt:135。現在の記述）。",
-      "note": "最初の営業区間の両端。パリ側は南東線系統の発着駅のリヨン駅、リヨン側は1981年の発着駅が出典に無いので都市の項目。",
+      "note": "R4h の確認（2026-09-23、人の判断）: パリ側を、出典に無い発着駅（リヨン駅）から都市のパリに変えた ／ 最初の営業区間の両端。パリ側は南東線系統の発着駅のリヨン駅、リヨン側は1981年の発着駅が出典に無いので都市の項目。",
       "needsCheck": "1981年の発着駅が出典に明記されていない（パリのリヨン駅は現在の系統の記述からの推測）。パリ Q90 は P31 に territorial collectivity を持つので駅を使った。LGV南東線の最初の区間はサン＝フロランタン–サトネ（リード）とモンシャナン（年表）で記事内が食い違う。"
     },
     {
       "qid": "Q211382",
       "title": "高速鉄道",
-      "status": "draft",
-      "placeKind": "point",
-      "places": [
-        { "from": "Q283196", "fromLabel": "東京駅", "path": "P625" },
-        { "from": "Q801438", "fromLabel": "新大阪駅", "path": "P625" }
-      ],
+      "placeKind": "none",
       "source": "en: High-speed rail (lead, § Japan); en: Tōkaidō Shinkansen (lead)",
       "summary": "最初の高速鉄道は1964年10月に東京–大阪間で開業した東海道新幹線（texts-D/en-high-speed-rail.txt:2,139、texts-D/en-tokaido-shinkansen.txt:2）。",
-      "note": "世界最初の高速鉄道の路線の両端。",
+      "note": "R4h の確認（2026-09-23、人の判断）で none にした: 高速鉄道は概念で、その最初の実例は新幹線（Q164338）としてすでにある。調査時の案: 東京駅（Q283196）、新大阪駅（Q801438） ／ 世界最初の高速鉄道の路線の両端。",
       "needsCheck": "新幹線（Q164338）と同じ地点・同じ年。概念の項目なので none にする判断もありうる。"
     },
     {
       "qid": "Q191985",
       "title": "オリエント急行",
-      "status": "draft",
       "placeKind": "point",
       "places": [
-        { "from": "Q757180", "fromLabel": "パリ東駅", "path": "P625" }
+        { "from": "Q90", "fromLabel": "パリ", "path": "P625" }
       ],
       "source": "en: Orient Express (lead, § History)",
       "summary": "1883年6月5日に最初の列車がパリからミュンヘン経由でウィーンへ出発した（texts-D/en-orient-express.txt:2,28）。1882年の試運転と1889年の直通列車はパリ東駅発（texts-D/en-orient-express.txt:9,29）。",
-      "note": "最初の運行の出発地。",
+      "note": "R4h の確認（2026-09-23、人の判断）: 出典は 1883 年の出発地を「パリ」とだけ書くので、推定の東駅から都市のパリに変えた ／ 最初の運行の出発地。",
       "needsCheck": "1883年の出発駅は本文では「パリ」とだけあり、パリ東駅は前年の試運転と1889年の記述からの推測。終点側（ウィーン Q1741 は州でもあるので国扱いになりうる）は入れていない。"
     },
     {
       "qid": "Q182323",
       "title": "フォード・モデルT",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q7197543", "fromLabel": "ピケットロード工場", "path": "P625" }
@@ -937,20 +860,15 @@
     {
       "qid": "Q155651",
       "title": "Mi-24",
-      "status": "draft",
-      "placeKind": "point",
-      "places": [
-        { "from": "Q1025836", "fromLabel": "トミリノ", "path": "P625" }
-      ],
+      "placeKind": "none",
       "source": "en: Mil Mi-24 § Development; en: Mil Moscow Helicopter Plant",
       "summary": "Mi-24 はミル・モスクワヘリコプター工場（設計局と試作工場を持つ）が生み出し、1969 年に試作機が初飛行、1972 年に制式採用（texts-C/en-Q155651.txt:1,11,12）。同社の本拠はモスクワ州トミリノ（texts-C/en-mil-plant.txt:1-2）。",
-      "note": "設計・試作を担ったミル設計局（現ミル・モスクワヘリコプター工場）の所在地。",
+      "note": "R4h の確認（2026-09-23、人の判断）で none にした: 年と場所がずれる（start 1972 は制式採用、場所は設計局の現在の所在地）。調査時の案: トミリノ（Q1025836） ／ 設計・試作を担ったミル設計局（現ミル・モスクワヘリコプター工場）の所在地。",
       "needsCheck": "1960〜70 年代の設計局がトミリノにあったとは本文に書かれていない（現在の本社所在地。創設は TsAGI 内、ジューコフスキー: en-mil-plant.txt:7）。量産工場（アルセーニエフ、ロストフ）は本文で確認していない。start 1972 は制式採用の年、初飛行は 1969 年。"
     },
     {
       "qid": "Q155311",
       "title": "ボイジャー計画",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q1034348", "fromLabel": "ケープカナベラル空軍基地第41複合発射施設", "path": "P625", "label": "第41発射施設" }
@@ -963,7 +881,6 @@
     {
       "qid": "Q152946",
       "title": "フォルクスワーゲン・タイプ1",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q878315", "fromLabel": "ヴォルフスブルク（Wolfsburg Volkswagen Plant）", "path": "P625" }
@@ -976,33 +893,24 @@
     {
       "qid": "Q150758",
       "title": "エニグマ",
-      "status": "draft",
-      "placeKind": "point",
-      "places": [
-        { "from": "Q1949", "fromLabel": "ベルリン＝ヴァンゼー", "path": "P625" }
-      ],
+      "placeKind": "none",
       "source": "de: Arthur Scherbius; de: Enigma (Maschine) § Geschichte; en: Enigma machine § History",
       "summary": "シェルビウスは 1918 年2月に回転子式暗号機の特許を出願（texts-C/en-enigma-machine.txt:8,490）。当時は兵器弾薬調達局に勤務（texts-C/de-Arthur_Scherbius.txt:10）。1920 年にリッターとベルリン＝ヴァンゼーで会社を設立（texts-C/de-Arthur_Scherbius.txt:11）、製造会社は 1923 年ベルリンで設立（texts-C/de-Enigma__Maschine_.txt:10）。",
-      "note": "エニグマを開発・販売したシェルビウス&リッター社の所在地。",
+      "note": "R4h の確認（2026-09-23、人の判断）で none にした: 推定の場所で採らない（1918 年の特許出願の場所が出典に無く、ヴァンゼーは 1920 年の会社設立地）。調査時の案: ベルリン＝ヴァンゼー（Q1949） ／ エニグマを開発・販売したシェルビウス&リッター社の所在地。",
       "needsCheck": "1918 年の特許出願の場所は出典に無い。ヴァンゼーは 1920 年の会社設立地（en は 1918 年設立とし食い違う: en-scherbius.txt:14）。ベルリン市（Q64）にする案もあるが、州扱いになるおそれがあるので地区を選んだ。グループの en テキスト en-Q150758.txt は曖昧さ回避の『Enigma』で、エニグマ機の本文は en-enigma-machine.txt。"
     },
     {
       "qid": "Q182008",
       "title": "ガリレオ",
-      "status": "draft",
-      "placeKind": "point",
-      "places": [
-        { "from": "Q48821", "fromLabel": "ケネディ宇宙センター", "path": "P625" }
-      ],
+      "placeKind": "none",
       "source": "en: Galileo project § Launch",
       "summary": "探査機はジェット推進研究所からケネディ宇宙センターへ運ばれ、1989 年10月にスペースシャトル・アトランティス（STS-34）で打ち上げられた（texts-C/en-Q182008.txt:67,69）。",
-      "note": "打ち上げ地。",
+      "note": "R4h の確認（2026-09-23、人の判断）で none にした: 年と場所がずれる（start 1977 は計画の承認、場所は 1989 年の打ち上げ地）。調査時の案: ケネディ宇宙センター（Q48821） ／ 打ち上げ地。",
       "needsCheck": "start 1977 は計画承認の頃（予算は 1978 会計年度: en-Q182008.txt:24）で、打ち上げは 1989 年。年に合わせるなら、計画を担った JPL（パサデナ）のほうが合う可能性がある。発射台（LC-39B）は本文に無い。"
     },
     {
       "qid": "Q188631",
       "title": "加硫",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q54174", "fromLabel": "ウーバン", "path": "P625" }
@@ -1015,7 +923,6 @@
     {
       "qid": "Q213669",
       "title": "ハーバー・ボッシュ法",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q309988", "fromLabel": "カールスルーエ工科大学", "path": "P625", "label": "カールスルーエ" }
@@ -1028,20 +935,15 @@
     {
       "qid": "Q214996",
       "title": "ジェミニ計画",
-      "status": "draft",
-      "placeKind": "point",
-      "places": [
-        { "from": "Q1034317", "fromLabel": "ケープカナベラル空軍基地第19複合発射施設", "path": "P625", "label": "第19発射施設" }
-      ],
+      "placeKind": "none",
       "source": "en: Project Gemini (lead)",
       "summary": "ジェミニ計画のすべての飛行は、ケープケネディの第19発射施設からタイタン II で打ち上げられた（texts-C/en-Q214996.txt:3）。",
-      "note": "全飛行の発射台。",
+      "note": "R4h の確認（2026-09-23、人の判断）で none にした: 年と場所がずれる（start 1961 は計画の開始、場所は 1964 年以降の打ち上げ地）。調査時の案: 第19発射施設（Q1034317） ／ 全飛行の発射台。",
       "needsCheck": "start 1961 は計画の開始（en-Q214996.txt:15,34）で、最初の打ち上げは 1964 年（本文の年は確認していない）。label は短縮案。"
     },
     {
       "qid": "Q171477",
       "title": "VLCメディアプレーヤー",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q273447", "fromLabel": "エコール・サントラル・パリ", "path": "P625" }
@@ -1053,33 +955,24 @@
     {
       "qid": "Q191643",
       "title": "M4中戦車",
-      "status": "draft",
-      "placeKind": "point",
-      "places": [
-        { "from": "Q983974", "fromLabel": "ライマ", "path": "P625" }
-      ],
+      "placeKind": "none",
       "source": "en: M4 Sherman § U.S. prototype / U.S. production history",
       "summary": "T6 試作車は 1941 年9月に完成し、M4 として制式化、最初の量産は 1942 年2月（texts-C/en-Q191643.txt:15）。最初の量産はライマ・ロコモティブ・ワークスで行われた（texts-C/en-Q191643.txt:29）。",
-      "note": "最初の量産車を造った工場の所在都市（工場の項目 Q143609 は P625 が無く、P159 がライマ）。",
+      "note": "R4h の確認（2026-09-23、人の判断）で none にした: 推定の場所で採らない（start 1940 に当たる場所が出典に無い（試作 1941、量産 1942 はライマ））。調査時の案: ライマ（Q983974） ／ 最初の量産車を造った工場の所在都市（工場の項目 Q143609 は P625 が無く、P159 がライマ）。",
       "needsCheck": "start 1940 は設計開始の頃とみられ、試作完成は 1941、量産は 1942。試作車 T6 の製作地は本文に無い。代わりに path P159>P625 で Q143609 を使う案もある。"
     },
     {
       "qid": "Q52162",
       "title": "マーキュリー計画",
-      "status": "draft",
-      "placeKind": "point",
-      "places": [
-        { "from": "Q334465", "fromLabel": "ケープカナベラル空軍基地", "path": "P625" }
-      ],
+      "placeKind": "none",
       "source": "en: Project Mercury (lead, § Background)",
       "summary": "マーキュリー計画は 1958 年10月に承認（texts-C/en-Q52162.txt:8）。飛行はすべてケープカナベラル空軍基地から打ち上げられた（texts-C/en-Q52162.txt:3）。",
-      "note": "計画の全飛行の打ち上げ地。個々の発射台は本文に無いので基地全体。",
+      "note": "R4h の確認（2026-09-23、人の判断）で none にした: 年と場所がずれる（start 1958 は承認、場所は 1959 年以降の打ち上げ地）。調査時の案: ケープカナベラル空軍基地（Q334465） ／ 計画の全飛行の打ち上げ地。個々の発射台は本文に無いので基地全体。",
       "needsCheck": "start 1958 は承認の年で、打ち上げは 1959 年以降（有人は 1961 年）。宇宙船はセントルイスのマクドネル社製（en-Q52162.txt:45）。"
     },
     {
       "qid": "Q156315",
       "title": "ボイジャーのゴールデンレコード",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q1034348", "fromLabel": "ケープカナベラル空軍基地第41複合発射施設", "path": "P625" }
@@ -1092,7 +985,6 @@
     {
       "qid": "Q207287",
       "title": "ヘルシンキ地下鉄",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q1800984", "fromLabel": "ラウタティエントリ駅", "path": "P625" },
@@ -1106,7 +998,6 @@
     {
       "qid": "Q192446",
       "title": "ヒトゲノム計画",
-      "status": "draft",
       "placeKind": "none",
       "source": "en: Human Genome Project (lead, § History); ja: ヒトゲノム計画（冒頭）",
       "summary": "1990年にエネルギー省と国立衛生研究所の2機関が合意して発足し、解読は6か国・約20の機関で分担した（texts-D/en-hgp.txt:2,11,12、texts-D/ja-hgp.txt:5）。",
@@ -1115,20 +1006,15 @@
     {
       "qid": "Q129172",
       "title": "ICE",
-      "status": "draft",
-      "placeKind": "point",
-      "places": [
-        { "from": "Q563272", "fromLabel": "カッセル＝ヴィルヘルムスヘーエ駅", "path": "P625" }
-      ],
+      "placeKind": "none",
       "source": "en: Intercity Express (§ History)",
       "summary": "1985年に試験車 ICE-V の試験が始まり、1991年5月29日に新駅カッセル＝ヴィルヘルムスヘーエに各方面から列車が集まって開業した（texts-D/en-ice.txt:7,10,22）。",
-      "note": "網の開業式典の場所。",
+      "note": "R4h の確認（2026-09-23、人の判断）で none にした: 年と場所がずれる（start 1985 は試験車の試験開始、場所は 1991 年の開業式典）。調査時の案: カッセル＝ヴィルヘルムスヘーエ駅（Q563272） ／ 網の開業式典の場所。",
       "needsCheck": "年が合わない。start 1985 は ICE-V の試験開始で、その場所は出典に無い。この地点は1991年の開業のもの。start を1991にするか、none にするか人が判断。最初の定期列車はハンブルク＝アルトナ–ミュンヘン（1991年6月2日）。"
     },
     {
       "qid": "Q623873",
       "title": "ボストーク",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q2580456", "fromLabel": "ガガーリン発射台", "path": "P625" }
@@ -1141,20 +1027,15 @@
     {
       "qid": "Q100047",
       "title": "Commodore Amiga",
-      "status": "draft",
-      "placeKind": "point",
-      "places": [
-        { "from": "Q159260", "fromLabel": "サンタ・クララ", "path": "P625" }
-      ],
+      "placeKind": "none",
       "source": "en: Amiga Corporation § History › 1982; en: Amiga 1000（導入の節）; en: Amiga § History",
       "summary": "開発元の Hi-Toro（のちの Amiga Corporation）は1982年にサンタクララで作られ、最初の本社もそこにあった（texts-B/en-amiga-corporation.txt:9）。1985年7月23日にニューヨークのリンカーン・センターのビビアン・ボーモント劇場で発表され、最初の3.5万台は日本の三洋電機が製造した（texts-B/en-amiga-1000.txt:23）。",
-      "note": "設計した会社の所在地を代表点にした（Java の override のサンタクララと同じ考え方）。",
+      "note": "R4h の確認（2026-09-23、人の判断）で none にした: 年と場所がずれる（start 1985 は発表・発売（ニューヨーク）、場所は開発元の所在地）。調査時の案: サンタ・クララ（Q159260） ／ 設計した会社の所在地を代表点にした（Java の override のサンタクララと同じ考え方）。",
       "needsCheck": "start=1985 は発表・発売の年で、その場所はニューヨークのビビアン・ボーモント劇場（Q176205, P31 performance hall / Broadway theatre）。発表の場所を採るならこちら。1985年時点で開発拠点がサンタクララのままだったかは、取得した本文では確認できていない。"
     },
     {
       "qid": "Q5100935",
       "title": "中国宇宙ステーション",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q1246624", "fromLabel": "文昌衛星発射センター", "path": "P625" }
@@ -1166,7 +1047,6 @@
     {
       "qid": "Q156013",
       "title": "ユーロスター",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q795678", "fromLabel": "ウォータールー国際駅", "path": "P625" },
@@ -1180,20 +1060,15 @@
     {
       "qid": "Q190108",
       "title": "パイオニア計画",
-      "status": "draft",
-      "placeKind": "point",
-      "places": [
-        { "from": "Q1034324", "fromLabel": "ケープカナベラル空軍基地第17複合発射施設", "path": "P625", "label": "第17発射施設" }
-      ],
+      "placeKind": "none",
       "source": "en: Pioneer 0 § Launch and failure; en: Cape Canaveral Space Launch Complex 17",
       "summary": "計画最初のパイオニア0号は 1958 年8月にソー・エイブルで打ち上げられ失敗（texts-C/en-pioneer-0.txt:1,14）。第17発射施設は 1958 年からソー系を打ち上げ、パイオニアの探査機も送り出した（texts-C/en-lc17.txt:1,9,22）。",
-      "note": "計画最初の打ち上げの発射施設。start 1958 と一致。",
+      "note": "R4h の確認（2026-09-23、人の判断）で none にした: 推定の場所で採らない（パイオニア0号の発射施設が出典に無く、第17発射施設の記事の一般的な記述からの推定）。調査時の案: 第17発射施設（Q1034324） ／ 計画最初の打ち上げの発射施設。start 1958 と一致。",
       "needsCheck": "パイオニア0号の記事には発射施設の名前が無い。LC-17 の記事の『パイオニアの探査機』とソー・エイブルの記述から推定した。17A か 17B かは不明。label は短縮案。"
     },
     {
       "qid": "Q94247",
       "title": "州間高速道路",
-      "status": "draft",
       "placeKind": "none",
       "source": "en: Interstate Highway System (§ Federal Aid Highway Act of 1956, § first Interstate)",
       "summary": "1956年の連邦法で始まり、「最初の州間高速道路」はミズーリ・カンザス・ペンシルベニアの3州が主張している（texts-D/en-interstate.txt:35,42-45）。",
@@ -1202,7 +1077,6 @@
     {
       "qid": "Q205234",
       "title": "サイレン",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q160302", "fromLabel": "エディンバラ大学", "path": "P625" }
@@ -1215,7 +1089,6 @@
     {
       "qid": "Q319432",
       "title": "バズーカ",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q319506", "fromLabel": "アバディーン性能試験場", "path": "P625" }
@@ -1228,20 +1101,15 @@
     {
       "qid": "Q207329",
       "title": "ソユーズ計画",
-      "status": "draft",
-      "placeKind": "point",
-      "places": [
-        { "from": "Q177477", "fromLabel": "バイコヌール宇宙基地", "path": "P625" }
-      ],
+      "placeKind": "none",
       "source": "en: Soyuz 1 § Mission",
       "summary": "ソユーズ宇宙船の最初の有人飛行ソユーズ1号は 1967 年4月にバイコヌールから打ち上げられた（texts-C/en-soyuz-1.txt:1,26）。",
-      "note": "計画最初の有人飛行の打ち上げ地。",
+      "note": "R4h の確認（2026-09-23、人の判断）で none にした: 年と場所がずれる（start 1963 は構想段階、場所は 1967 年の打ち上げ地）。調査時の案: バイコヌール宇宙基地（Q177477） ／ 計画最初の有人飛行の打ち上げ地。",
       "needsCheck": "start 1963 は構想段階（en-Q207329.txt:26,30）で、有人初飛行は 1967 年、それ以前の無人飛行は本文で確認していない。バイコヌールの P31 に condominium あり。"
     },
     {
       "qid": "Q223765",
       "title": "SECAMの設立",
-      "status": "draft",
       "placeKind": "none",
       "source": "en: SECAM (§ History); ja: SECAM",
       "summary": "1967年10月1日にフランスの第2チャンネルでカラー放送が始まり、同年ソ連でも採用された（texts-D/en-secam.txt:15,19、texts-D/ja-secam.txt:6）。開発はアンリ・ド・フランスのチームが1956年から行った（texts-D/en-secam.txt:9）。",
@@ -1250,7 +1118,6 @@
     {
       "qid": "Q216125",
       "title": "RER",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q800627", "fromLabel": "シャトレ-レ・アル駅", "path": "P625" }
@@ -1262,7 +1129,6 @@
     {
       "qid": "Q309336",
       "title": "ニミッツ級航空母艦",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q335017", "fromLabel": "ニューポート・ニューズ", "path": "P625" }
@@ -1275,7 +1141,6 @@
     {
       "qid": "Q864060",
       "title": "M134",
-      "status": "draft",
       "placeKind": "none",
       "source": "en: M134 Minigun § History; ja: M134 (機関銃); en: M61 Vulcan § Development",
       "summary": "ゼネラル・エレクトリックが M61 バルカンを 7.62mm に縮小して開発した（texts-C/en-Q864060.txt:2,16; texts-C/ja-m134.txt:1,5,10）。M61 の記事も『GE の兵装部門』とするだけ（texts-C/en-m61.txt:8）。",
@@ -1284,46 +1149,33 @@
     {
       "qid": "Q275141",
       "title": "Napster",
-      "status": "draft",
-      "placeKind": "point",
-      "places": [
-        { "from": "Q37548", "fromLabel": "ノースイースタン大学", "path": "P625" }
-      ],
+      "placeKind": "none",
       "source": "en: Shawn Fanning § Napster; en: Napster",
       "summary": "1999年6月1日にファニングがベータ版を出すと、すぐにノースイースタン大学の学生数百人が音楽を交換し始めた（texts-B/en-shawn-fanning.txt:9）。Napster の公開は1999年6月（texts-B/en-napster.txt:6）。",
-      "note": "最初に使われた場所（大学）を代表点にした。",
+      "note": "R4h の確認（2026-09-23、人の判断）で none にした: 推定の場所で採らない（開発した場所が出典に無く、最初に使われた大学からの推定）。調査時の案: ノースイースタン大学（Q37548） ／ 最初に使われた場所（大学）を代表点にした。",
       "needsCheck": "推測を含む: 出典は開発した場所を明記しない（ファニングが同大学にいたことも、取得した本文では映画の設定の説明にしか出てこない。texts-B/en-shawn-fanning.txt:36）。none も含めて人が判断すること。"
     },
     {
       "qid": "Q860037",
       "title": "嫦娥計画",
-      "status": "draft",
-      "placeKind": "point",
-      "places": [
-        { "from": "Q734306", "fromLabel": "西昌衛星発射センター", "path": "P625" }
-      ],
+      "placeKind": "none",
       "source": "en: Chinese Lunar Exploration Program § Chang'e 1; en: Chang'e 1",
       "summary": "計画最初の探査機・嫦娥1号は 2007 年10月に西昌衛星発射センターから打ち上げられた（texts-C/en-Q860037.txt:22; texts-C/en-change-1.txt:2）。",
-      "note": "計画最初の打ち上げ地。",
+      "note": "R4h の確認（2026-09-23、人の判断）で none にした: 年と場所がずれる（start 2003 は計画の開始、場所は 2007 年の打ち上げ地）。調査時の案: 西昌衛星発射センター（Q734306） ／ 計画最初の打ち上げ地。",
       "needsCheck": "start 2003 は計画開始の年とみられ（本文で確認していない）、最初の打ち上げは 2007 年。"
     },
     {
       "qid": "Q628007",
       "title": "階差機関",
-      "status": "draft",
-      "placeKind": "point",
-      "places": [
-        { "from": "Q123634", "fromLabel": "メリルボーン", "path": "P625" }
-      ],
+      "placeKind": "none",
       "source": "en: Difference engine § History › Charles Babbage's difference engines; en: Charles Babbage § After Cambridge",
       "summary": "バベッジは1819年頃から小型の階差機関を作り1822年までに完成させ、1822年6月14日に王立天文学会への論文で発表した（texts-B/en-difference-engine.txt:11）。当時バベッジはロンドンのメリルボーンに家を構えていた（texts-B/en-charles-babbage.txt:25）。",
-      "note": "制作者の住まい（ロンドン）を代表点にした。ロンドン Q84 は P31 に political territorial entity があり国扱いになる恐れがあるので、地区の項目を採った。",
+      "note": "R4h の確認（2026-09-23、人の判断）で none にした: 推定の場所で採らない（機械を作った場所が出典に無く、住まいからの推定）。調査時の案: メリルボーン（Q123634） ／ 制作者の住まい（ロンドン）を代表点にした。ロンドン Q84 は P31 に political territorial entity があり国扱いになる恐れがあるので、地区の項目を採った。",
       "needsCheck": "推測を含む: 出典は機械を作った場所を明記しない（発表先の王立天文学会はロンドンの学会。当時の会場は未確認）。Dorset Street 1番地に住んだのは亡くなるまでの40年余りで、1822年より後（texts-B/en-charles-babbage.txt:203）。"
     },
     {
       "qid": "Q770597",
       "title": "Colossus",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q7233690", "fromLabel": "英国中央郵便本局研究所", "path": "P625", "label": "ドリス・ヒル" },
@@ -1337,7 +1189,6 @@
     {
       "qid": "Q222419",
       "title": "Zuse Z3",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q308928", "fromLabel": "ベルリン＝クロイツベルク", "path": "P625" }
@@ -1350,7 +1201,6 @@
     {
       "qid": "Q674909",
       "title": "アーレイ・バーク級ミサイル駆逐艦",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q810783", "fromLabel": "バス鉄工所", "path": "P625" }
@@ -1362,7 +1212,6 @@
     {
       "qid": "Q389149",
       "title": "オハイオ級原子力潜水艦",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q10385027", "fromLabel": "グロトン", "path": "P625" }
@@ -1375,7 +1224,6 @@
     {
       "qid": "Q433671",
       "title": "AVE",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q23093", "fromLabel": "アトーチャ駅", "path": "P625" },
@@ -1389,7 +1237,6 @@
     {
       "qid": "Q554520",
       "title": "大和型戦艦",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q2688386", "fromLabel": "呉海軍工廠", "path": "P625" }
@@ -1401,7 +1248,6 @@
     {
       "qid": "Q752208",
       "title": "アイオワ級戦艦",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q524435", "fromLabel": "ブルックリン海軍工廠", "path": "P625" }
@@ -1413,7 +1259,6 @@
     {
       "qid": "Q640482",
       "title": "ボレイ型原子力潜水艦",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q190499", "fromLabel": "セヴェロドヴィンスク", "path": "P625" }
@@ -1425,7 +1270,6 @@
     {
       "qid": "Q39158",
       "title": "東清鉄道の設立",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q656", "fromLabel": "サンクトペテルブルク", "path": "P625" }
@@ -1438,7 +1282,6 @@
     {
       "qid": "Q876616",
       "title": "アクラ型原子力潜水艦",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q154801", "fromLabel": "コムソモリスク・ナ・アムーレ", "path": "P625" }
@@ -1451,7 +1294,6 @@
     {
       "qid": "Q699127",
       "title": "鄭和の大航海",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q16666", "fromLabel": "南京市", "path": "P625", "label": "南京" },
@@ -1466,7 +1308,6 @@
     {
       "qid": "Q938245",
       "title": "ヴァンガード級原子力潜水艦",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q5267856", "fromLabel": "デヴォンシャー・ドック・ホール", "path": "P625" }
@@ -1478,7 +1319,6 @@
     {
       "qid": "Q522906",
       "title": "アタナソフ&ベリー・コンピュータ",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q1136919", "fromLabel": "アイオワ州立大学", "path": "P625" }
@@ -1490,20 +1330,15 @@
     {
       "qid": "Q752099",
       "title": "天体物理データシステム",
-      "status": "draft",
-      "placeKind": "point",
-      "places": [
-        { "from": "Q1133697", "fromLabel": "ハーバード・スミソニアン天体物理学センター", "path": "P625" }
-      ],
+      "placeKind": "none",
       "source": "en: Astrophysics Data System（冒頭）, § History, § Software and hardware",
       "summary": "ADS はスミソニアン天体物理観測所が NASA のために運営している（texts-B/en-ads.txt:1）。1988年に試作、1993年4月に一般公開、1994年初めにウェブ版（同:13）。主サーバーはケンブリッジ（マサチューセッツ州）の天体物理学センターにある（同:29）。",
-      "note": "運営する機関（SAO。CfA と同じ座標）を代表点にした。",
+      "note": "R4h の確認（2026-09-23、人の判断）で none にした: 推定の場所で採らない（start 1992 に当たる出来事が出典に無く、場所はサーバーの現在の所在地）。調査時の案: ハーバード・スミソニアン天体物理学センター（Q1133697） ／ 運営する機関（SAO。CfA と同じ座標）を代表点にした。",
       "needsCheck": "start=1992 に当たる出来事が出典に無い（1988 試作、1993 公開）。サーバーの所在地の記述は現在形で、始めた場所としての記述ではない。スミソニアン天体物理観測所 Q1755255 も同じ座標。"
     },
     {
       "qid": "Q4106593",
       "title": "グレート・フィルター",
-      "status": "draft",
       "placeKind": "none",
       "source": "en: Great Filter（冒頭）",
       "summary": "ハンソンのオンラインの論考で、最初の版は1996年8月、最終更新は1998年9月（texts-B/en-great-filter.txt:2-3）。",
@@ -1512,7 +1347,6 @@
     {
       "qid": "Q765855",
       "title": "中国鉄路高速",
-      "status": "draft",
       "placeKind": "none",
       "source": "en: China Railway High-speed (lead, § history)",
       "summary": "2007年4月18日の第6次全国速度向上で、既存線を含む各地で一斉に CRH の運行が始まった（texts-D/en-crh.txt:2,10）。",
@@ -1521,7 +1355,6 @@
     {
       "qid": "Q16595959",
       "title": "広島電鉄の設立",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q34664", "fromLabel": "広島市", "path": "P625" }
@@ -1534,21 +1367,15 @@
     {
       "qid": "Q1671143",
       "title": "トランスジャカルタ",
-      "status": "draft",
-      "placeKind": "point",
-      "places": [
-        { "from": "Q12521002", "fromLabel": "ターミナル・ブロックM", "path": "P625", "label": "ブロックM" },
-        { "from": "Q1975437", "fromLabel": "ジャカルタコタ駅", "path": "P625", "label": "コタ" }
-      ],
+      "placeKind": "none",
       "source": "en: Transjakarta (lead, § History, § Timeline)",
       "summary": "2004年1月15日に第1回廊（ブロックM–コタ）で試験運行を始め、2月1日から営業運行した（texts-D/en-transjakarta.txt:1,16,31-32）。",
-      "note": "最初の回廊の両端。",
+      "note": "R4h の確認（2026-09-23、人の判断）で none にした: 年と場所がずれる（start 2014 は延伸の年、場所は 2004 年開業の回廊の両端）。調査時の案: ブロックM（Q12521002）、コタ（Q1975437） ／ 最初の回廊の両端。",
       "needsCheck": "年が合わない。start 2014 だが開業は2004年（2014年は第2回廊の延伸や夜間運行の開始）。コタ側は BRT の停留所の項目を見つけられず、隣接する鉄道駅の項目で代用した（推測）。"
     },
     {
       "qid": "Q984038",
       "title": "IBM 7030",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q379848", "fromLabel": "ロスアラモス国立研究所", "path": "P625" }
@@ -1561,7 +1388,6 @@
     {
       "qid": "Q3086760",
       "title": "Frecciarossa",
-      "status": "draft",
       "placeKind": "none",
       "source": "en: Frecciarossa (lead); ja: フレッチャロッサ（冒頭）",
       "summary": "名称は2008年12月に設けられ、2012年6月にユーロスター・イタリアを廃して全国の高速列車をこの種別などに振り分けた（texts-D/ja-frecciarossa.txt:1、texts-D/en-frecciarossa.txt:1）。",
@@ -1570,7 +1396,6 @@
     {
       "qid": "Q1361233",
       "title": "トランスオーストラリア鉄道",
-      "status": "draft",
       "placeKind": "point",
       "places": [
         { "from": "Q606288", "fromLabel": "ポート・オーガスタ", "path": "P625" },
@@ -1584,7 +1409,6 @@
     {
       "qid": "Q1815913",
       "title": "アストロノミカル・アルマナック",
-      "status": "draft",
       "placeKind": "none",
       "source": "en: Astronomical Almanac § Publication history",
       "summary": "イギリスの『天体暦』（1766年から）とアメリカの暦（1852年から）が、1981年に一つの刊行物に統合された（texts-B/en-astronomical-almanac.txt:35）。",
