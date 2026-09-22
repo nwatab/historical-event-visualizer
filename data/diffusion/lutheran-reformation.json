@@ -1,5 +1,5 @@
 {
-  "status": "draft",
+  "status": "confirmed",
   "id": "lutheran-reformation",
   "title": {
     "ja": "ルター派宗教改革の広がり",
@@ -14,9 +14,9 @@
     "polity"
   ],
   "importance": 2,
-  "note": "到達の定義: その都市・領邦・王国が、ルター派の宗教改革を公式に導入した年（議会・市参事会・君主の決定、または教会規則（Kirchenordnung）の採択。両方あれば早いほう）。説教者が活動を始めた年や、民衆のあいだに広まった年ではない。地点は、決定・採択が行われた都市（出典に無ければ領邦・王国の首都）で、どちらを使ったかを各 stage の summary に書いた。起点はヴィッテンベルク、1517年（95か条の論題）。ルター派だけを扱い、改革派（ツヴィングリのチューリヒ、カルヴァンのジュネーヴなど）とイングランド国教会は別の系統なので入れない。ヴュルテンベルク（1534年）は、en: Ulrich, Duke of Württemberg がルターとツヴィングリの両方の教えを進めたと書くので、ルター派だけの到達とは言えず入れなかった。フィンランドは当時スウェーデンの一部で、別の公式導入の決定が出典に無いので入れなかった（スウェーデンの到達に含まれる）。ヴィッテンベルクのあるザクセン選帝侯領（1525/1527年、de: Heinrich (Sachsen)）は起点の領邦なので stage にしなかった。end 1550 は、この表で最後の到達点（アイスランド）の年。Wikidata には「ルター派宗教改革の伝播」にあたる項目が見つからず（wbsearchentities で Lutheran Reformation / spread of Lutheranism は 0 件）、Q12562（Protestant Reformation、P31 は Q1128340 と Q126288065）は改革派なども含む宗教改革全体の項目なので、同じ概念ではないとして slug の id にした。調査は、サブエージェントが Wikipedia（en / de / ja）の本文を API で取得して行った（2026-09-22）。summary の (ファイル名:行) は、その時に保存した本文の行番号。",
+  "note": "到達の定義: その都市・領邦・王国が、ルター派の宗教改革を公式に導入した年（議会・市参事会・君主の決定、または教会規則（Kirchenordnung）の採択。両方あれば早いほう）。説教者が活動を始めた年や、民衆のあいだに広まった年ではない。地点は、決定・採択が行われた都市（出典に無ければ領邦・王国の首都）で、どちらを使ったかを各 stage の summary に書いた。起点はヴィッテンベルク、1517年（95か条の論題）。ルター派だけを扱い、改革派（ツヴィングリのチューリヒ、カルヴァンのジュネーヴなど）とイングランド国教会は別の系統なので入れない。ヴュルテンベルク（1534年）は、en: Ulrich, Duke of Württemberg がルターとツヴィングリの両方の教えを進めたと書くので、ルター派だけの到達とは言えず入れなかった。フィンランドは当時スウェーデンの一部で、別の公式導入の決定が出典に無いので入れなかった（スウェーデンの到達に含まれる）。ヴィッテンベルクのあるザクセン選帝侯領（1525/1527年、de: Heinrich (Sachsen)）は起点の領邦なので stage にしなかった。end 1552 は、この表で最後の到達点（ホーラル）の年。Wikidata には「ルター派宗教改革の伝播」にあたる項目が見つからず（wbsearchentities で Lutheran Reformation / spread of Lutheranism は 0 件）、Q12562（Protestant Reformation、P31 は Q1128340 と Q126288065）は改革派なども含む宗教改革全体の項目なので、同じ概念ではないとして slug の id にした。調査は、サブエージェントが Wikipedia（en / de / ja）の本文を API で取得して行った（2026-09-22）。summary の (ファイル名:行) は、その時に保存した本文の行番号。 ／ 修正（2026-09-22、人の依頼による修正。調査はサブエージェントが Wikipedia en / de / is を API で取得して行った）: (1) リガを 1529（クネプケンとブリースマンの教会規則を作った年）から 1522（市が宗教改革を受け入れた年）に移し、from をケーニヒスベルクから起点（推測）に変えた。1524 とする出典もあり、needsCheck に書いた。(2) アイスランドの 1550 年のスカウルホルト（ヨーン・アラソンの処刑はホーラル司教の抵抗の終わりで、スカウルホルト司教区の導入ではない）を、スカウルホルト 1541 とホーラル 1552 の 2 つに分けた。(3) ヘッセンのホムベルク（1526）を削除した。会議の後の教会規則（Reformatio ecclesiarum Hassiae）は施行されず (de-homberg.txt:1,42)、1532 年のヘッセン教会規則も施行されなかった (de-homberg.txt:43)。1531 年の教会奉仕者規則（Kirchendienerordnung）は監督職を置いたが、場所が出典に無い (de-homberg.txt:43)。マールブルク大学の創立（1527、de-uni-marburg.txt:1,9）は教会規則でも導入の決定でもない。また方伯フィリップはツヴィングリやブツァーの影響にも開かれており (de-philipp-hessen.txt:4)、ルター派だけの到達と言いにくい。定義に合う年と場所が出典に無いので入れなかった。(4) importance は 2（人の判断）。stage の並べ替えに合わせて from の添字を付け直した。 ／ status を confirmed にした（2026-09-22、人の判断。PR #27）。",
   "start": 1517,
-  "end": 1550,
+  "end": 1552,
   "source": "https://ja.wikipedia.org/wiki/宗教改革",
   "origin": {
     "qid": "Q6837",
@@ -26,6 +26,18 @@
     "summary": "1517年、ヴィッテンベルク大学の教授だったルターが95か条の論題を書き、一般にこれが宗教改革の始まりとされる (en-95-theses.txt:1; ja-reformation.txt:31)"
   },
   "stages": [
+    {
+      "year": 1522,
+      "qid": "Q1773",
+      "label": "リガ",
+      "labelEn": "Riga",
+      "from": -1,
+      "source": "en: History of Riga § Member of the Hanseatic League; de: Riga § Reformation, polnisch-litauische Herrschaft und Riga als zweitgrößte Stadt Schwedens; de: Sylvester Tegetmeier § Leben; de: Andreas Knöpken § Leben; de: Petrikirche (Riga) § Die Petrikirche seit der Reformation",
+      "summary": "リガは1522年に宗教改革を受け入れた (en-history-riga.txt:45; de-riga.txt:57)。同じ1522年、クネプケンは討論の後に聖ペトロ教会の助祭長に選ばれ (de-knoepken.txt:8)、市参事会はテーゲトマイアーをヤコブ教会の説教者に任じた (de-tegetmeier.txt:7)。1527年には市参事会がケーニヒスベルクの改革者ブリースマンを大聖堂の説教者に招いた (de-riga.txt:57)。地点は都市",
+      "fromBasis": "推測（年代と地理から）",
+      "fromNote": "クネプケンはルターの著作（『教会のバビロン捕囚』）の影響で改革に転じ、ポンメルンのトレプトウからリガへ来た (de-knoepken.txt:6-7; en-timeline-riga.txt:149)。ヴィッテンベルクの慎重な路線に従ったとされ、1524年には著作がメランヒトンの序文付きでヴィッテンベルクで刊行された (de-knoepken.txt:8-9) が、ヴィッテンベルクから直接持ち込んだという記述は無い。トレプトウ（ポンメルン）の到達は1534年でリガより後なので from にできない。テーゲトマイアーはロストックでスリューターを通じて福音に触れた (de-tegetmeier.txt:5)",
+      "needsCheck": "年が一つに決まらない: en: History of Riga と de: Riga は 1522 に受け入れたとする。de: Petrikirche (Riga) は「リガでの宗教改革の導入」を 1524 とする (de-petrikirche-riga.txt:14)。市参事会の導入の決定そのもの（年と内容）を書いた出典は見つからなかった。1522 の根拠は、受け入れの記述と、同年の市参事会による説教者の任命。旧版の 1529（クネプケンとブリースマンの教会規則）は規則を作った年で、市の導入の年ではないので採らなかった"
+    },
     {
       "year": 1525,
       "qid": "Q1829",
@@ -51,18 +63,6 @@
       "fromNote": "ルター派の側で討論したのはオジアンダーら (de-nuernberg-religionsgespraech.txt:11) だが、保存した本文に、彼らがヴィッテンベルクから教えを持ち込んだという記述は無い。de: Reichsstadt Nürnberg は、ルターが起こした改革が早くから支持された、とだけ書く",
       "needsCheck": "de: Reformation は帝国都市ニュルンベルクの導入を 1524/25 とする (de-reformation.txt:206)。ここでは市参事会がミサを禁じた 1525 を採った",
       "month": "1525-04"
-    },
-    {
-      "year": 1526,
-      "qid": "Q558616",
-      "label": "ホムベルク",
-      "labelEn": "Homberg (Efze)",
-      "from": -1,
-      "source": "de: Homberger Synode 冒頭・§ Ergebnisse・§ Umsetzung; de: Reformation § Evangelische Kirchentümer und konfessionelle Lagerbildung",
-      "summary": "1526年10月、ヘッセン方伯フィリップが招いた教会会議がホムベルクで開かれ、出席者の多数が改革を支持して方伯領はプロテスタントになった (de-homberg.txt:1,24; de-reformation.txt:207)。地点は決定の行われた都市",
-      "fromBasis": "推測（年代と地理から）",
-      "fromNote": "会議の論題を書いたのはアヴィニョン出身のフランツ・ランベルト (de-homberg.txt:11) で、保存した本文には彼とヴィッテンベルクの関係は書かれていない。ルターは会議の後の教会規則案を退けた (de-homberg.txt:38-42) が、これは持ち込んだ人の記述ではない",
-      "needsCheck": "会議の後に作られた教会規則（Reformatio ecclesiarum Hassiae）は、ルターの反対で施行されなかった (de-homberg.txt:1,33-42)。教会規則の採択を到達とするなら年が変わる（1531 年の Kirchendienerordnung など）。de: Reformation は 1526/27 とする"
     },
     {
       "year": 1527,
@@ -115,18 +115,6 @@
       "month": "1529-05"
     },
     {
-      "year": 1529,
-      "qid": "Q1773",
-      "label": "リガ",
-      "labelEn": "Riga",
-      "from": 0,
-      "source": "de: Andreas Knöpken § Leben; en: Timeline of Riga § 16th century",
-      "summary": "リガの最初の改革者クネプケンは1522年に討論を行い、1529年春にプロイセンの改革者ブリースマンと「教会奉仕の短い規則」を作った。この規則は1533年にレヴァルとドルパトでも拘束力を持った (de-knoepken.txt:1,8,10; en-timeline-riga.txt:149)。地点は都市",
-      "fromBasis": "出典に明記",
-      "fromNote": "規則の共著者ブリースマンは「プロイセンの改革者」と書かれている (de-knoepken.txt:10)。クネプケン本人はトレプトウでブーゲンハーゲンの後任だった人で、リガへはポンメルンから来た (de-knoepken.txt:6-7; en-timeline-riga.txt:149)。教会規則の由来としてケーニヒスベルク（プロイセン）をとった",
-      "needsCheck": "1529 は規則を作った年で、リガの市当局が採択した年とは書かれていない。1522 年の討論の後にクネプケンが聖ペトロ教会の助祭長に選ばれたことを到達とする読み方もある。リガ市の公式な導入の年は、保存した本文では確かめられなかった"
-    },
-    {
       "year": 1531,
       "qid": "Q2843",
       "label": "リューベック",
@@ -171,7 +159,7 @@
       "qid": "Q26793",
       "label": "ベルゲン",
       "labelEn": "Bergen",
-      "from": 10,
+      "from": 9,
       "source": "en: Reformation in Denmark–Norway and Holstein § The Reformation in Norway",
       "summary": "ノルウェーの宗教改革は1537年に力ずくで行われ、クリスチャン3世がルター派を国の宗教と宣言し、大司教を追放した。最初の監督（司教）はベルゲン（ビョルグヴィン）の監督で、1537年から務めた (en-reformation-denmark.txt:49-50)。地点は、決定の地（コペンハーゲン）ではなく、1537年に最初の監督が置かれた都市",
       "fromBasis": "出典に明記",
@@ -207,17 +195,28 @@
       "month": "1539-11"
     },
     {
-      "year": 1550,
+      "year": 1541,
       "qid": "Q831538",
       "label": "スカウルホルト",
       "labelEn": "Skálholt",
-      "from": 10,
-      "source": "en: Icelandic Reformation 冒頭・§ Danish efforts at Reform・§ Jón Arason and his sons beheaded; en: Reformation in Denmark–Norway and Holstein § The Reformation in Iceland",
-      "summary": "アイスランドにはデンマーク王が改革を押しつけた。抵抗はホーラルのカトリック司教ヨーン・アラソンと2人の息子が1550年11月にスカウルホルトで処刑されて終わり、その後アイスランドはルター派を採った (en-reformation-iceland.txt:1,53; en-reformation-denmark.txt:56)。地点はルター派の司教座で、処刑の行われた場所",
+      "from": 9,
+      "source": "en: Icelandic Reformation § Bishop Ögmundur seized; en: Gissur Einarsson 冒頭; is: 1541; is: Gissur Einarsson; is: Siðaskiptin á Íslandi",
+      "summary": "1541年春、デンマーク兵がスカウルホルトのカトリック司教エグムンドゥルを捕らえ、後任のギスル・エイナルソン（アイスランド最初のルター派司教、1540年に国王が承認）が改革を進められるようになった (en-reformation-iceland.txt:40; en-gissur.txt:1-2; is-1541.txt:7)。ギスルはクリスチャン3世の教会規則をアイスランド語に訳し、司教区にルター派を入れた (is-gissur.txt:3)。地点はスカウルホルト司教区（南アイスランド）の司教座",
       "fromBasis": "出典に明記",
-      "fromNote": "デンマーク王クリスチャン3世がアイスランドに改革を押しつけた。1537年の教会規則は1538年にアイスランドに届いた (en-reformation-iceland.txt:1,28)",
-      "needsCheck": "年が一つに決まらない: 教会規則が届いたのは 1538、スカウルホルト司教区では 1541 年以降にルター派の司教ギスルが改革を進めた (en-reformation-iceland.txt:28,40)、教会規則の施行は 1552 (en-reformation-denmark.txt:44)。ここでは抵抗が終わった 1550 を採ったが、「公式な導入」の定義に合うのはどれか、人が決める",
-      "month": "1550-11"
+      "fromNote": "デンマーク王クリスチャン3世がアイスランドに改革を押しつけた。1537年の教会規則は1538年にアイスランドに届いた (en-reformation-iceland.txt:1,28)。ギスルが訳して入れたのは国王の教会規則 (is-gissur.txt:3)。ギスル本人はハンブルクで学んでプロテスタントを知った (en-gissur.txt:2) が、制度として入ったのはコペンハーゲンの教会規則なのでそちらをとった",
+      "needsCheck": "年が 1541 と 1542 で割れる: is: Siðaskiptin á Íslandi は、スカウルホルト司教区では 1550年より「8年早く」改革が成ったとする（＝1542、is-sidaskiptin.txt:20）。is: Gissur Einarsson は 1542〜1550年のアイスランドを半ばルター派・半ばカトリックとする (is-gissur.txt:3)。ギスルが正式に司教に叙階されたのは 1542年、コペンハーゲン (en-gissur.txt:2)。司教区として教会規則を採択した年と場所を明記した出典は見つからなかった。1541 は、改革の妨げ（エグムンドゥル）が除かれ、ギスルが新しい教えを広めたとする年（is-1541.txt:7）"
+    },
+    {
+      "year": 1552,
+      "qid": "Q1019455",
+      "label": "ホーラル",
+      "labelEn": "Hólar",
+      "from": 9,
+      "source": "is: Ólafur Hjaltason 冒頭; is: Hólar í Hjaltadal; is: 1551; en: Reformation in Denmark–Norway and Holstein § The Reformation in Denmark; en: Jón Arason 冒頭・§ Struggle with the king",
+      "summary": "北アイスランドの司教座ホーラルでは、カトリック司教ヨーン・アラソンが1550年11月に処刑された (en-jon-arason.txt:1,12)。最初のルター派のホーラル司教オーラヴル・ヒャルタソンは1552年に着任した (is-olafur-hjaltason.txt:1; is-holar.txt:7)。アイスランドでの教会規則の施行は1552年 (en-reformation-denmark.txt:44)。地点はホーラル司教区の司教座",
+      "fromBasis": "出典に明記",
+      "fromNote": "デンマーク王が改革を押しつけた (en-reformation-iceland.txt:1)。オーラヴルは1542〜43年にデンマークとドイツに滞在した後、ルターの教えに傾いた (is-olafur-hjaltason.txt:7)",
+      "needsCheck": "オーラヴルが司教に任じられたのは 1551年10月16日 (is-1551.txt:9)、着任は 1552 (is-olafur-hjaltason.txt:1)。en: Skálholt は「1551年にプロテスタントが導入された」と書く (en-skalholt.txt:21)。en: Reformation in Denmark–Norway and Holstein の「1552年の施行」はアイスランド全体の話で、ホーラル司教区を名指ししていない。ここでは着任と施行が重なる 1552 を採った"
     }
   ]
 }

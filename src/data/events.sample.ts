@@ -117,20 +117,6 @@ export const sampleEvents: readonly HistEvent[] = [
     source: "https://ja.wikipedia.org/wiki/張騫",
   },
 
-  // ── 古代（紀元後） ──────────────────────────────────────
-  {
-    id: "cai-lun-papermaking",
-    title: { ja: "蔡倫による製紙法の改良", en: "Cai Lun improves papermaking" },
-    description: { ja: "後漢の宦官・蔡倫が製紙法を改良し、和帝に献上した（105年）。" },
-    domain: "technology",
-    tags: ["technology", "culture"],
-    kind: "instant",
-    start: 105,
-    places: [{ lon: 112.45, lat: 34.62, label: "洛陽" }],
-    importance: 2,
-    source: "https://ja.wikipedia.org/wiki/蔡倫",
-  },
-
   // ── 中世 ────────────────────────────────────────────────
   {
     id: "Q131482",

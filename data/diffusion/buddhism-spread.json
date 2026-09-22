@@ -12,8 +12,8 @@
   "tags": [
     "culture"
   ],
-  "importance": 3,
-  "note": "調査は 2026-09-22 にサブエージェントが Wikipedia の API（plaintext）で記事を取得して行った。本文は調査用の scratchpad（buddhism-spread/*.txt）に保存し、各 stage の summary の (ファイル名:行) はそれを指す。 ／ 到達の定義: その国家への仏教の公伝、または王（国家）による受容・公認の年。場所はその時点の受け入れた国家の都。私的な伝来（商人・渡来人など）は数えない（日本では公伝以前の私的崇拝があった、ja-koden.txt:15）。 ／ 起点: 初転法輪の地サールナート。伝播の始まりを『教えが他者に伝えられ、最初のサンガができたこと』と見て、成道の地ブッダガヤではなくこちらにした（en-buddha.txt:167、en-sarnath.txt:3）。ブッダガヤ（Q176767）にする案もある。 ／ 年代: 仏陀の生没年は諸説あり確定しない（長い年代記 624–544 BCE、ギリシア史料で補正した 566–486 BCE、20 世紀前半の通説 563–483 BCE、短い年代記 448–368 BCE、没年 400 BCE 前後説など。en-buddha.txt:76-79）。start は en: Bodh Gaya の伝統的な年代（563 BCE 生、534 BCE 出家、6 年の苦行の後に成道。en-bodhgaya.txt:8）から計算した成道の年 528 BCE（天文年 -527）で、初転法輪も同じ年として扱った（出典は成道のすぐ後とするだけで、別の年を書いていない）。短い年代記なら 100 年以上遅くなる。 ／ 範囲: 南アジア・東アジア・東南アジアで、出典に年があるもの。end はラーンサーン建国の 1353 年。見送り: スワンナプーム（ソーナとウッタラの伝道。地域が未確定、en-ashoka.txt:178）、ガンダーラへのマッジャンティカの伝道（マウリヤ朝の領内で、国家の受容ではない）、ベトナム・インドネシア（受容した王と年を出典で確かめていない）。 ／ Wikidata の Q7515193（仏教のシルクロード伝播）は P31 が『歴史の一側面』で P580/P582 が無く、北伝だけを扱う項目なので id に使わず slug にした（調査時の wbgetentities の出力）。 ／ 同じ地点・年代の既存項目: アンコール・ワットの完成（Q43473、802 年、importance 3）はヤショーダラプラと同じ座標だが年が違う。パガン王朝（Q888574、849 年）、マウリヤ朝（Q62943、-321 年）も年が違う。",
+  "importance": 2,
+  "note": "調査は 2026-09-22 にサブエージェントが（同日、人の依頼による書き直しを含む） Wikipedia の API（plaintext）で記事を取得して行った。本文は調査用の scratchpad（buddhism-spread/*.txt）に保存し、各 stage の summary の (ファイル名:行) はそれを指す。 ／ 到達の定義: その国家への仏教の公伝、または王（国家）による受容・公認の年。場所はその時点の受け入れた国家の都。私的な伝来（商人・渡来人など）は数えない（日本では公伝以前の私的崇拝があった、ja-koden.txt:15）。 ／ 起点: 初転法輪の地サールナート。伝播の始まりを『教えが他者に伝えられ、最初のサンガができたこと』と見て、成道の地ブッダガヤではなくこちらにした（en-buddha.txt:167、en-sarnath.txt:3）。ブッダガヤ（Q176767）にする案もある。 ／ 年代: 仏陀の生没年は諸説あり確定しない（長い年代記 624–544 BCE、ギリシア史料で補正した 566–486 BCE、20 世紀前半の通説 563–483 BCE、短い年代記 448–368 BCE、没年 400 BCE 前後説など。en-buddha.txt:76-79）。start は en: Bodh Gaya の伝統的な年代（563 BCE 生、534 BCE 出家、6 年の苦行の後に成道。en-bodhgaya.txt:8）から計算した成道の年 528 BCE（天文年 -527）で、初転法輪も同じ年として扱った（出典は成道のすぐ後とするだけで、別の年を書いていない）。短い年代記なら 100 年以上遅くなる。 ／ 範囲: 南アジア・東アジア・東南アジアで、出典に年があるもの。end はラーンサーン建国の 1353 年。見送り: スワンナプーム（ソーナとウッタラの伝道。地域が未確定、en-ashoka.txt:178）、ガンダーラへのマッジャンティカの伝道（マウリヤ朝の領内で、国家の受容ではない）、ベトナム・インドネシア（受容した王と年を出典で確かめていない）。 ／ 書き直し（2026-09-22、人の依頼）: importance を 2 に。伝来元として名前の挙がる国は、同じ定義での受容の年が出典にあるときだけ stage にした。東晋（建康、381 年）を追加。クシャーナ朝（カニシカ、127 年）は改宗しておらず保護にとどまる（en-kanishka.txt:2,60）ので削除。月氏／クシャーナ・ガンダーラ・前秦・タトン・ネパール（リッチャヴィ）は受容の年が出典に無い（前秦の道安の招聘は 379 年で高句麗の 372 年より後、en-former-qin.txt:22）ので stage にしていない。インド・グリーク朝のメナンドロスは伝承上改宗したが（en-menander.txt:39,43）、下流の到達点の伝来元として出典に挙がっていないので入れていない。チベットは 762 年（ティソン・デツェン個人の帰依）から、ソンツェン・ガンポの時代の 641 年（文成公主の到着）に変えた。 ／ Wikidata の Q7515193（仏教のシルクロード伝播）は P31 が『歴史の一側面』で P580/P582 が無く、北伝だけを扱う項目なので id に使わず slug にした（調査時の wbgetentities の出力）。 ／ 同じ地点・年代の既存項目: アンコール・ワットの完成（Q43473、802 年、importance 3）はヤショーダラプラと同じ座標だが年が違う。パガン王朝（Q888574、849 年）、マウリヤ朝（Q62943、-321 年）も年が違う。",
   "start": -527,
   "end": 1353,
   "source": "https://ja.wikipedia.org/wiki/仏教",
@@ -56,24 +56,10 @@
       "labelEn": "Luoyang",
       "from": 0,
       "source": "en: Silk Road transmission of Buddhism § The dream of Emperor Ming; en: White Horse Temple 冒頭",
-      "summary": "後漢の明帝が夢を見て月氏に使者を送り、迦葉摩騰と竺法蘭が経典を携えて来た。『四十二章経』の訳は伝統的に 67 年、都の洛陽に白馬寺が建てられた (en-silk-road.txt:135; en-white-horse.txt:1)",
+      "summary": "後漢の明帝が夢を見て月氏に使者を送り、迦葉摩騰と竺法蘭が経典を携えて来た。『四十二章経』の訳は伝統的に 67 年、都の洛陽に白馬寺が建てられた (en-silk-road.txt:136; en-white-horse.txt:1)",
       "fromBasis": "推測（年代と地理から）",
-      "fromNote": "出典は、使者の行き先を月氏、僧を『インドから来た』とする (en-silk-road.txt:135; en-white-horse.txt:1)。月氏（クシャーナ）の受容はこれより後の stage なので、インドの先行する到達点としてパータリプトラを置いた",
-      "needsCheck": "伝説の年で、史実性に議論がある (en-silk-road.txt:135-139)。使者の年は 60/61/64/68 年と諸説、訳経は実際には 100 年より後とみられる。白馬寺の創建は 68 年 (en-white-horse.txt:1)。仏教の最初の伝来はそれ以前（c. 100 BCE〜1 世紀）の可能性もある (en-silk-road.txt:18)"
-    },
-    {
-      "year": 127,
-      "qid": "Q1113311",
-      "label": "プルシャプラ",
-      "labelEn": "Purushapura (Peshawar)",
-      "from": 0,
-      "source": "en: Kanishka 冒頭; § Kanishka and Buddhism; § Buddhist statuary under Kanishka",
-      "summary": "クシャーナ朝のカニシカ王（c. 127–150 年）は、主都プルシャプラ（ペシャーワル）で仏教を保護し、第 4 回結集を主宰したとされる。即位元年（127 年）の銘のあるカニシカの舎利容器がプルシャプラの仏塔から出た (en-kanishka.txt:1,60,101)",
-      "fromBasis": "推測（年代と地理から）",
-      "fromNote": "アショーカ王がガンダーラへ伝道僧を送った、という伝承はある (en-ashoka.txt:167,171)。それがカニシカの受容につながったという記述は出典に無い",
-      "needsCheck": "カニシカは改宗しておらず、保護・後援にとどまる (en-kanishka.txt:2,60)。『王による受容』の定義に入れるかは人が判断する。即位年も旧説は 78 年 (en-kanishka.txt:3)",
-      "granularity": "fine",
-      "granularityNote": "Wikidata の Q1113311 は P31 に『行政区画』（Q56061）を併せ持ち、規則だと region になる。古代の都の位置として都市の扱いにする。"
+      "fromNote": "出典は、仏教は大月氏（北西インド）から陸路で漢に入ったとする説が有力で (en-silk-road.txt:117)、明帝の使者の行き先も月氏、僧は『インドから来た』とする (en-silk-road.txt:136; en-white-horse.txt:1)。紀元前2年に月氏の使者が経典を伝えたという伝承もある (en-silk-road.txt:131)。月氏／クシャーナには同じ定義での受容の年が出典に無いので stage にできず、インドの先行する到達点としてパータリプトラから引いた。この直線は実際の経路（中央アジア経由のシルクロード）ではない",
+      "needsCheck": "伝説の年で、史実性に議論がある (en-silk-road.txt:136-139)。使者の年は 60/61/64/68 年と諸説、訳経は実際には 100 年より後とみられる。白馬寺の創建は 68 年 (en-white-horse.txt:1)。仏教の最初の伝来はそれ以前（c. 100 BCE〜1 世紀）の可能性もある (en-silk-road.txt:18)"
     },
     {
       "year": 372,
@@ -84,18 +70,30 @@
       "source": "en: Sosurim of Goguryeo; en: Korean Buddhism § Three Kingdoms; ja: 朝鮮の仏教; en: Gungnae City § History",
       "summary": "372 年、前秦の苻堅が僧順道を高句麗の小獣林王のもとへ送り、王が受け入れて寺を建てた (en-sosurim.txt:17; en-korean.txt:38; ja-korea.txt:13)。都は国内城（3 年〜427 年、en-gungnae.txt:6）",
       "fromBasis": "出典に明記",
-      "fromNote": "前秦から、と明記。前秦の都は長安で、洛陽ではない（到達点の定義上、中国の点は後漢の洛陽だけ）"
+      "fromNote": "前秦から、と明記。前秦の都は長安で、洛陽ではない。前秦には 372 年より前の受容の年が出典に無い（苻堅が道安を宮廷に迎えたのは 379 年、en-former-qin.txt:22）ので stage にせず、中国の先行する点（後漢の洛陽）から引いた"
+    },
+    {
+      "year": 381,
+      "qid": "Q1330294",
+      "label": "建康",
+      "labelEn": "Jiankang",
+      "from": 2,
+      "source": "en: Emperor Xiaowu of Jin; en: Eastern Jin",
+      "summary": "東晋の孝武帝は 381 年に仏典を学び始め、宮中に仏教を学ぶ堂を設けて僧を住まわせた (en-xiaowu.txt:16)。東晋の都は建康 (en-eastern-jin.txt:36)",
+      "fromBasis": "推測（年代と地理から）",
+      "fromNote": "中国には 1 世紀から仏教があった (en-eastern-jin.txt:83)、という記述のみ。東晋への具体的な伝来元は出典に無いので、中国の先行する点（後漢の洛陽）から引いた",
+      "needsCheck": "東晋では皇帝の受容より前から仏教が行われていて、381 年は『皇帝が宮中に受け入れた年』。定義に入れるかは人が判断する"
     },
     {
       "year": 384,
       "qid": "Q623880",
       "label": "慰礼城",
       "labelEn": "Wiryeseong",
-      "from": 2,
+      "from": 4,
       "source": "en: Chimnyu of Baekje; en: Korean Buddhism § Three Kingdoms; ja: 朝鮮の仏教; en: Wiryeseong",
       "summary": "384 年、僧摩羅難陀が東晋から百済に来て、枕流王が宮中に迎えた。これが百済への最初の伝来とされる (en-chimnyu.txt:11,16; ja-korea.txt:14)。都は 475 年まで慰礼城（現在のソウル）(en-wiryeseong.txt:1,5)",
       "fromBasis": "出典に明記",
-      "fromNote": "東晋から、と明記。東晋の都は建康で、洛陽ではない",
+      "fromNote": "東晋から、と明記 (en-chimnyu.txt:11,16; ja-korea.txt:14)",
       "needsCheck": "慰礼城は河北・河南の 2 つがあり、この時期の位置は風納土城（Q11282530）とする説が有力 (en-wiryeseong.txt:3)。Q623880 の座標は風納土城とほぼ同じ"
     },
     {
@@ -103,7 +101,7 @@
       "qid": "Q42097",
       "label": "慶州",
       "labelEn": "Gyeongju",
-      "from": 4,
+      "from": 3,
       "source": "ja: 朝鮮の仏教; en: Korean Buddhism § Three Kingdoms; en: Beopheung of Silla; en: Silla § History",
       "summary": "異次頓の殉教を経て、法興王のときに仏教が公認された (ja-korea.txt:15; en-korean.txt:49; en-beopheung.txt:2)。都は現在の慶州 (en-silla.txt:9,19)",
       "fromBasis": "出典に明記",
@@ -113,7 +111,7 @@
     {
       "year": 538,
       "qid": "Q127026",
-      "label": "磯城島金刺宮",
+      "label": "磯城島金刺宮（桜井市付近）",
       "labelEn": "Shikishima no Kanasashi Palace (Sakurai)",
       "from": 5,
       "source": "ja: 仏教公伝 § 公伝年代をめぐる諸説; en: Buddhism in Japan § History; ja: 欽明天皇",
@@ -123,16 +121,16 @@
       "needsCheck": "年が不一致: 『日本書紀』は 552 年、『上宮聖徳法王帝説』『元興寺縁起』は 538 年。en はどちらも信頼できないとする (ja-koden.txt:25-36; en-japan.txt:14)。書紀の紀年では 538 年は欽明の治世（540–571）の外で、宮の特定も確かでない。宮そのものの Wikidata 項目は見つからず（wbsearchentities で 0 件）、座標は桜井市（Q127026）の代表点"
     },
     {
-      "year": 762,
+      "year": 641,
       "qid": "Q5869",
       "label": "ラサ",
       "labelEn": "Lhasa",
-      "from": 0,
-      "source": "en: Trisong Detsen; en: Buddhism in Tibet § First dissemination; en: Songtsen Gampo § Introduction of Mahayana Buddhism",
-      "summary": "吐蕃のティソン・デツェンは 762 年に仏教に帰依し、インドの学僧を招いて国の宗教とした (en-trisong.txt:10; en-tibet.txt:28)。都はラサ（サムイェーは都から離れていた、en-trisong.txt:22）",
-      "fromBasis": "推測（年代と地理から）",
-      "fromNote": "インドからシャーンタラクシタやパドマサンバヴァらを招いた、は明記 (en-trisong.txt:10)。インドのどこからかは出典に無いので、インドの点としてパータリプトラを置いた。中国の禅僧も招かれている (en-trisong.txt:22)",
-      "needsCheck": "定義の選択: 一般に最初の公的な導入とされるのは 7 世紀のソンツェン・ガンポ（ジョカン寺の建立、en-songtsen.txt:1,34）だが、年が出典に無い。ジョカン寺の最古部は 652 年 (en-jokhang.txt:18) とあるが、ソンツェン・ガンポの没年は 650 年 (en-songtsen.txt:1) で食い違う。ここでは年が明記された 762 年を採った"
+      "from": 2,
+      "source": "en: Tibetan Empire § Reign of Songtsen Gampo; ja: チベット仏教 § 吐蕃と仏教伝来; en: Songtsen Gampo § Introduction of Mahayana Buddhism",
+      "summary": "ソンツェン・ガンポ王は、唐とネパールから迎えた 2 人の王妃の勧めで仏教に帰依し、ラサにジョカン寺を建てた (ja-tibet.txt:46; en-tibetan-empire.txt:3; en-songtsen.txt:1,34)。唐の文成公主の到着は 641 年で、伝統的にこれが仏教の最初の伝来とされる (en-tibetan-empire.txt:25)。都はソンツェン・ガンポがラサに移した (en-tibetan-empire.txt:2)",
+      "fromBasis": "出典に明記",
+      "fromNote": "唐から嫁いだ文成公主（と仏教）、と明記 (en-tibetan-empire.txt:25; ja-tibet.txt:46)。唐の都は長安で、洛陽ではない（中国の点は後漢の洛陽）。もう 1 人の王妃ブリクティはネパールのリッチャヴィ朝から来たが (en-jokhang.txt:16)、リッチャヴィ朝の受容の年が出典に無いので stage にしていない",
+      "needsCheck": "641 年は文成公主の到着の年で、王の帰依の年そのものは出典に無い。en は、この時点で仏教が外国人の外に広がったとは考えにくいとする (en-tibetan-empire.txt:25)。国教化はティソン・デツェンの代 (ja-tibet.txt:47; en-tibet.txt:28)。762 年は王個人の帰依 (en-trisong.txt:10)、779 年はチベット人の最初の出家 (en-trisong.txt:11) とサムイェー寺の落慶（767 年または 779 年、en-samye.txt:7）。国教化の年を明記した出典は見つからなかった。ジョカン寺の最古部は 652 年 (en-jokhang.txt:18) とあり、ソンツェン・ガンポの没年 650 年 (en-songtsen.txt:1) と食い違う"
     },
     {
       "year": 1056,
@@ -143,7 +141,7 @@
       "source": "en: Anawrahta § Religious reforms; § Conquest of Thaton",
       "summary": "1056 年、タトン出身のモンの僧シン・アラハンがパガンを訪れ、アノーヤター王を上座部仏教に改宗させた (en-anawrahta.txt:99-100)。1057 年のタトン征服で経典と僧を得た (en-anawrahta.txt:55-57)",
       "fromBasis": "推測（年代と地理から）",
-      "fromNote": "直接の伝来元はタトン（出典に明記）。タトンの受容の年が出典に無いので stage にせず、上座部の本拠スリランカ (en-anawrahta.txt:59,86) の点から引いた",
+      "fromNote": "直接の伝来元はタトン（出典に明記、en-anawrahta.txt:56,99）。タトンの受容の年は出典に無い（ブッダの時代の建国という伝承だけ、en-thaton.txt:5,9）ので stage にせず、上座部の本拠スリランカ (en-anawrahta.txt:59,86) の点から引いた",
       "needsCheck": "タトンの寄与は後世の伝説だとする説がある (en-anawrahta.txt:58)"
     },
     {
