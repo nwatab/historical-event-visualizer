@@ -35,6 +35,8 @@ const out = [
   "> このファイルは `node scripts/wikidata/build-first-records-draft.mjs` が data/first-records.json から作る。手で編集しない（直すのは data/first-records.json）。",
   "> 規則は CLAUDE.md「初出の記録」、選び方と所見は [FINDINGS-R4i.md](FINDINGS-R4i.md)。根拠の「ファイル:行」は data/raw/r4i/texts/ の本文（コミットしない。`node scripts/wikidata/r4i-source-text.mjs` で取り直せる）。",
   "",
+  ...file.about.flatMap((line) => [`- ${line}`]),
+  "",
   "## 件数",
   "",
   `${rows.length} 件（下書き ${rows.filter((x) => x.r.status === "draft").length} 件）。地域は、場所の座標から regions.mjs で決めた。`,

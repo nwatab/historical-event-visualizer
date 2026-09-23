@@ -3,11 +3,13 @@
     "初出の記録（R4i）。年を持たない概念（羅針盤など）を、その概念の「年と場所が特定できる最初の記録」の出来事にした表。規則は CLAUDE.md「初出の記録」。",
     "records の status が draft のものは、人が確認する前の下書き（build-app-data は --with-drafts のときだけ使う）。確認が済んだら confirmed にする。",
     "座標は書かない。place.qid から Wikidata の P625 を引く（pnpm wikidata:fetch-app-extras）。根拠の「ファイル:行」は data/raw/r4i/texts/ の本文（node scripts/wikidata/r4i-source-text.mjs で取り直せる。コミットしない）。",
-    "rejectedByRule は、規則（年の精度・場所）のせいで入らなかった候補（世紀単位の精度の扱いを決める材料）。rejectedOther は、分類外・重複・出典の食い違いなどで落とした候補。"
+    "rejectedByRule は、規則（年の精度・場所）のせいで入らなかった候補（世紀単位の精度の扱いを決める材料）。rejectedOther は、分類外・重複・出典の食い違いなどで落とした候補。",
+    "2026-09-23 に人が確定した（status を confirmed にした）。サハラ以南アフリカの枠の 4 件は、ポルトガルの航海の記録だったので枠から外し、2 件をヨーロッパの枠で数え直して残し、2 件を落とした。",
+    "配分の数え方: アルギン島の商館（1445）とディアスのモッセル湾到達（1488）は、場所はサハラ以南アフリカだが、記録の主体がポルトガルの航海なので、地域の配分ではヨーロッパの枠で数える。サハラ以南アフリカの枠は 0 件（規則を満たす候補が無かった。FINDINGS-R4i.md）。"
   ],
   "records": [
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "croeseid-sardis",
       "title": {
         "ja": "金貨・銀貨の二本位制の初出（クロイソス貨、サルディス）",
@@ -36,12 +38,12 @@
       "sources": [
         "en-croeseid.txt"
       ],
-      "importance": 3,
-      "importanceNote": "貨幣史の基本的な転換点で、アケメネス朝のダレイコス金貨にも受け継がれた（en-croeseid.txt:15,18）。",
+      "importance": 2,
+      "importanceNote": "貨幣史の基本的な転換点で、アケメネス朝のダレイコス金貨にも受け継がれた（en-croeseid.txt:15,18）。 ／ 2026-09-23 に 3 から 2 へ（3 は世界史の教科書の見出しになる水準だけ、という人の判断。前近代は密度による繰り上げが効くので、2 でも世界全体の表示に出る）",
       "needsCheck": "年は「頃」。クロイソスの治世（前561〜前546年）の中の年。これより前に父アリュアッテスが琥珀金貨を鋳造していた（en-croeseid.txt:4）ので、「最初の硬貨」ではなく「最初の純度を揃えた金貨」として扱う。"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "dujiangyan",
       "title": {
         "ja": "都江堰の建設（秦）",
@@ -78,7 +80,7 @@
       "needsCheck": "年は「around 256 BC」の頃付き。着工か完成かも本文では区別されていない"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "lingqu-canal",
       "title": {
         "ja": "霊渠の建設命令（秦）",
@@ -115,7 +117,7 @@
       "needsCheck": "214年は建設を命じた年で、完成年は本文に無い。「世界最初」「最古」は出典の主張のまま（en-lingqu.txt:3,6）"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "tyrian-shekel",
       "title": {
         "ja": "テュロス・シェケル銀貨の発行開始",
@@ -148,7 +150,7 @@
       "needsCheck": "本文は「その形で」前126年から、と書き、それ以前にもテュロスの硬貨があった（en-tyrian-shekel.txt:4）。「初出」ではなく発行開始の出来事として扱う。"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "long-count-chiapa-de-corzo-stela-2",
       "title": {
         "ja": "長期暦とゼロの位取りの初出（チアパ・デ・コルソ石碑2）",
@@ -179,12 +181,12 @@
         "en-0.txt",
         "en-maya-numerals.txt"
       ],
-      "importance": 3,
-      "importanceNote": "長期暦とゼロ（位取りの空位）という、メソアメリカの数学・暦法の中心になる概念の最初の記録。旧世界と独立に成立したゼロの例として、世界史の授業でも言及される",
+      "importance": 2,
+      "importanceNote": "長期暦とゼロ（位取りの空位）という、メソアメリカの数学・暦法の中心になる概念の最初の記録。旧世界と独立に成立したゼロの例として、世界史の授業でも言及される ／ 2026-09-23 に 3 から 2 へ（3 は世界史の教科書の見出しになる水準だけ、という人の判断。前近代は密度による繰り上げが効くので、2 でも世界全体の表示に出る）",
       "needsCheck": "長期暦の記事は、この日付は確かではない（表を参照）と書き添えている。タカリク・アバフの石碑2のほうが古い可能性（紀元前236〜19年の幅）にも触れている（en-mesoamerican-long-count-calendar.txt:16）。月は記事によって12月とだけ書かれ、日は無い。ゼロは長期暦と同じ記録なので、この1件にまとめた（ゼロの概念 Q204 は tags に入れず、concept は長期暦にした）。壁板がもともと立っていた場所（遺跡の中の建物）と、いまの出土地点が同じかは、本文に書かれていない"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "wang-mang-price-agency",
       "title": {
         "ja": "王莽による物価調整機関の設置",
@@ -218,7 +220,7 @@
       "needsCheck": "場所は6か所の官署のうち首都の長安を代表点にした。本文は機関の中国語名を書いていない（名称は付けていない）"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "seismoscope-zhang-heng",
       "title": {
         "ja": "地震計（地動儀）の朝廷への献上（張衡）",
@@ -250,12 +252,12 @@
       "sources": [
         "en-zhang-heng.txt"
       ],
-      "importance": 3,
-      "importanceNote": "地震計の最初の例として世界的に知られる",
+      "importance": 2,
+      "importanceNote": "地震計の最初の例として世界的に知られる ／ 2026-09-23 に 3 から 2 へ（3 は世界史の教科書の見出しになる水準だけ、という人の判断。前近代は密度による繰り上げが効くので、2 でも世界全体の表示に出る）",
       "needsCheck": "洛陽は「都」として書かれ、装置の置き場所を直接「洛陽」と書いた文は無い（都＝洛陽は en-zhang-heng.txt:11 から）"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "canopic-inscription-ptolemy",
       "title": {
         "ja": "プトレマイオスの天体モデルの公開（カノープス碑文）",
@@ -288,7 +290,7 @@
       "needsCheck": "年は 147 年か 148 年（147 を採った）。碑文の項目の QID は見つけていない（record は null）。"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "sudarshana-lake-dam-repair",
       "title": {
         "ja": "スダルシャナ湖の堤防の修復（ルドラダーマン碑文）",
@@ -325,7 +327,7 @@
       "needsCheck": "修復の年（150年）と碑文の年（150年の少し後）の区別が、2 つの記事で表し方が違う。Wikidata の湖の座標（21.5272, 70.5035）が、古代の湖の位置をどの程度正確に指すかは未確認"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "valens-aqueduct",
       "title": {
         "ja": "ヴァレンス水道橋の完成",
@@ -358,7 +360,7 @@
       "needsCheck": "着工年は不明（完成年だけ）。"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "positional-notation-lokavibhaga",
       "title": {
         "ja": "位取り記数法の初出（『ローカヴィバーガ』）",
@@ -396,7 +398,7 @@
       "needsCheck": "場所はカーンチ「近くの村」で、地図上の点はカーンチプラムで近似している。現存の写本は11〜12世紀の貝葉写本（en-lokavibhaga.txt:5）。記事の冒頭は「5世紀の書」とも書く。零の初出との重なりは、概念を位取り記数法にして避けた（零はグワーリヤルの碑文で採っている）"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "kala-wewa-reservoir",
       "title": {
         "ja": "カラー・ウェワ貯水池の建設",
@@ -430,7 +432,7 @@
       "needsCheck": "出典は Wikipedia の短い記事 1 本だけで、年代の根拠（年代記か碑文か）が本文に書かれていない"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "mandsaur-silk-weavers-guild",
       "title": {
         "ja": "絹織工ギルドの碑文（マンダソール）",
@@ -465,41 +467,7 @@
       "needsCheck": "碑文の主題は寺院の建立と改修で、経済の出来事として採るのは、組合の存在と活動の記録という読み方による。碑文自体の Wikidata 項目は見つけていない。436年（建立）を年にする案もある"
     },
     {
-      "status": "draft",
-      "slug": "pancha-siddhantika",
-      "title": {
-        "ja": "『パンチャシッダーンティカー』の成立",
-        "en": "Composition of the Pancha-siddhantika"
-      },
-      "description": "ヴァラーハミヒラが、当時インドにあった5つの天文学派の書を要約した天文書。ギリシア・ローマ系の学派も含み、十進位取りや正弦表を用いている。",
-      "concept": null,
-      "record": {
-        "qid": "Q116788678",
-        "label": "パンチャシッダーンティカー"
-      },
-      "recordKind": "text",
-      "domain": "science",
-      "tags": [
-        "science"
-      ],
-      "year": 505,
-      "yearBasis": "本文がサカ暦427年＝505年に触れ、天文書は成立年に近い年を元期に選ぶ慣行から、505年が成立（または構想）の年とみられるとする（en-pancha-siddhantika.txt:4）",
-      "place": {
-        "qid": "Q200119",
-        "label": "ウッジャイン",
-        "basis": "ヴァラーハミヒラが現在のウッジャインで書いたとする（en-pancha-siddhantika.txt:2）。著者は書中で自らをアヴァンティの人と呼ぶ（en-varahamihira.txt:26）"
-      },
-      "source": "en: Pancha-siddhantika § (導入部)",
-      "sources": [
-        "en-pancha-siddhantika.txt",
-        "en-varahamihira.txt"
-      ],
-      "importance": 2,
-      "importanceNote": "失われた諸学派の内容を伝える比較天文学の書として重要。概念の初出としては採っていないので 2",
-      "needsCheck": "年に異説がある: 505年は著者の生年とする説があり（en-pancha-siddhantika.txt:5）、著者の記事は成立年を575年とも書く（en-varahamihira.txt:6。誤記の可能性があるが本文の食い違いとして残す）。場所は「ウッジャインで書いた」とあるが、著者が住んでいた土地からの推定である可能性がある"
-    },
-    {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "hiti-hadigaun",
       "title": {
         "ja": "石の水場（ヒティ）の初出（カトマンズ、ハディガウン）",
@@ -532,7 +500,7 @@
       "needsCheck": "同じ記事は、ブリシャデーヴァ王（c. 400〜425）を創設者とする最初の記録や、464年頃に動くドゥンゲ・ダーラがあったとする伝説も挙げる（en-dhunge-dhara.txt:6,7）。現存最古の稼働する例はパタンのマンガ・ヒティ（570年、en-dhunge-dhara.txt:8）。概念の QID Q5269891 は英語ラベルが「Lho Hiti (Dhunge Dhara)」で、英語版記事 Dhunge dhara が指す項目だが、ラベルが概念名と完全には一致しない"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "sogdian-embassy-constantinople",
       "title": {
         "ja": "突厥・ソグド使節団のコンスタンティノープル到着（絹の直接交易の提案）",
@@ -566,7 +534,7 @@
       "needsCheck": "外交使節で同盟の提案も含むが、本文の文脈（ソグド人の絹の直接交易）から economy とした。"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "rokoku-asuka",
       "title": {
         "ja": "日本最初の漏刻（飛鳥水落遺跡）",
@@ -604,7 +572,7 @@
       "needsCheck": "水時計の記事（ja-mizudokei.txt:6,29）は671年の天智天皇の漏刻を大きく書き、水落遺跡を「その遺構と言われている」とする。ja-mizuochi.txt は660年の漏刻台とする。遺跡の比定は出典のまま"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "greek-fire-constantinople",
       "title": {
         "ja": "ギリシア火の開発",
@@ -638,7 +606,7 @@
       "needsCheck": "年は「頃」。本文は、カリニコスが来る数年前から火を積んだ船があったというテオファネスの記述も紹介しており（en-greek-fire.txt:11）、開発の年と場所は伝承に依る。場所はコンスタンティノープル到着の記述からの推定。兵器なので分類（technology）の妥当性も確認したい。"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "tsushima-silver",
       "title": {
         "ja": "日本最初の銀の産出（対馬銀山）",
@@ -675,7 +643,7 @@
       "needsCheck": "出典の本文は「天武天皇二年（674年）」と書き、元号の年と西暦が1年ずれて見える（どちらが誤りかは本文だけでは決められない）。674年の銀が樫根の銀山から出たとは明記されず、「同国（対馬）」までしか言っていない"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "fuhonsen",
       "title": {
         "ja": "日本最古の鋳造銭（富本銭）",
@@ -710,7 +678,7 @@
       "needsCheck": "年は「頃」で推定（ja-fuhonsen.txt:2 は「推定される」）。通貨か厭勝銭かに争いがある（ja-fuhonsen.txt:2、en-fuhonsen.txt:2）"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "shibosi-guangzhou",
       "title": {
         "ja": "市舶司の設置（広州）",
@@ -744,7 +712,7 @@
       "needsCheck": "出典は日本語版の短い記事だけ。英語版の対応記事は取得できなかった"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "koganeyama-gold",
       "title": {
         "ja": "日本最初の金の産出（陸奥国の黄金献上）",
@@ -781,7 +749,7 @@
       "needsCheck": "産金地を涌谷の遺跡とすることには、江戸時代以来の否定説があると記事自身が書く（ja-5b5f3daa.txt:4）。発掘で出たのは産金を記念した仏堂の跡で（:5）、採掘跡そのものではない"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "quirigua-stela-e",
       "title": {
         "ja": "キリグア石碑Eの建立（マヤ最大の石材、日食の警告）",
@@ -813,7 +781,7 @@
       "needsCheck": "天文学の記事の「日食の2日後」は 9.17.0.0.2 = 771年1月18日とし（en-maya-astronomy.txt:26）、キリグアの記事の奉献日 771年1月24日（en-quirigu.txt:75）と日がずれる（年は同じ）。主分類を technology（石材）にし、日食の警告は tags の science に回した。日食の記録はサンタ・エレナ・ポコ・ウイニクの石碑3（別の項目）と概念が近いので、1つにまとめるなら、どちらかを外す"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "baghdad-markets-karkh",
       "title": {
         "ja": "バグダードの市場のカルフへの移転",
@@ -846,7 +814,7 @@
       "needsCheck": "本文の該当文は「Although in 773」と文のつながりが不自然で、出典（脚注）を確かめたい。"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "solar-eclipse-santa-elena-poco-uinic-stela-3",
       "title": {
         "ja": "日食の観測記録（サンタ・エレナ・ポコ・ウイニク石碑3）",
@@ -880,7 +848,7 @@
       "needsCheck": "天文学の記事は、石碑の日付を790年7月16日としながら、日食はその3日後の「790年7月16日」と書き、日付が自己矛盾している（en-maya-astronomy.txt:27）。年は790で揃っている。遺跡には ja ラベルが無い"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "bimaristan-baghdad",
       "title": {
         "ja": "総合病院（ビーマーリスターン）の初出（バグダード）",
@@ -914,7 +882,7 @@
       "needsCheck": "本文の別の段落は「おそらく」ハールーンが創設したと書き（en-bimaristan.txt:10,33）、確度に幅がある。707年ダマスカス説は歴史家が否定しているとある（同:9）。872年のフスタート病院（同:38）と981年のアドゥディー病院（同:35）は、同じ概念なので入れていない。"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "kollam-port-founding",
       "title": {
         "ja": "コッラム港の創設",
@@ -948,7 +916,7 @@
       "needsCheck": "創設者の名が記事ごとに違う（マール・サボル（en-kollam.txt:4）、マール・サボルとマール・プロト（en-kollam.txt:25）、マール・アボ（en-kollam-port.txt:5）、都市の創設者としてマルヴァーン・サピル・イーショー（en-kollam.txt:32）)。年の根拠の一つは19世紀の州便覧（en-kollam.txt:4）。コッラムの銅板（849年）と場所と人物が重なる"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "cheonghaejin",
       "title": {
         "ja": "清海鎮の設置（張保皐）",
@@ -983,7 +951,7 @@
       "needsCheck": "軍事拠点でもあり、主分類を economy にしたのは出典が交易の拠点と書くため（en-cheonghaejin.txt:2,5）"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "quilon-syrian-copper-plates",
       "title": {
         "ja": "商人ギルドへの特権状（コッラムのシリア・キリスト教徒銅板）",
@@ -1021,7 +989,7 @@
       "needsCheck": "年は治世年からの換算で 849/850 の幅がある。コッラム港の創設を825年とする記述（en-kollam.txt:16,25,32）とは別の出来事として扱い、こちらは採っていない"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "river-diversion-shivagrha",
       "title": {
         "ja": "プランバナンでの河川の付け替え（シヴァグリハ碑文）",
@@ -1055,7 +1023,7 @@
       "needsCheck": "856年は碑文の年で、工事の年ではない（寺域の完成の後、碑文の年までのどこか）。付け替えた川をオパック川とするのは歴史家の同定（en-shivagrha-inscription.txt:3）。英訳（同:17）の「dam (?)」は訳者の疑問符付き。"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "roda-nilometer",
       "title": {
         "ja": "ローダ島のナイロメーター（ナイル水位計）の建設",
@@ -1092,7 +1060,7 @@
       "needsCheck": "ローダ島の最初のナイロメーターは715年（ウマイヤ朝）に造られた（en-nilometer.txt:17）。「初出」ではなく現存する施設の建設として扱った。715年を採るかは要判断。"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "zero-gwalior-inscription",
       "title": {
         "ja": "零の記号の初出（グワーリヤルの碑文）",
@@ -1129,7 +1097,7 @@
       "needsCheck": "年は寺院の記事では875年（開削）、0 の記事では876年（碑文）。碑文の年を採った。零の使用自体はバクシャーリー写本など、より古い文献にあるとされる（en-chaturbhuj-temple-gwalior.txt:5）"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "el-caracol-chichen-itza",
       "title": {
         "ja": "チチェン・イッツァの天文台エル・カラコルの建設",
@@ -1168,7 +1136,7 @@
       "needsCheck": "「頃」（around AD 906）。天文台だったという用途は「示唆されている」という推定の書き方（en-el-caracol-chichen-itza.txt:5、en-chichen-itza.txt:113 は proto-observatory と理論づけられている、とする）。記事は906年を後古典期と書くが、年代区分の書き方はチチェン・イッツァの記事と揃っていない。record と place が同じ QID"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "flamethrower-langshan",
       "title": {
         "ja": "複動式ピストン火炎放射器の初の実戦使用（狼山江の戦い）",
@@ -1203,7 +1171,7 @@
       "needsCheck": "座標は丘の狼山で、戦場は近くの長江の川面。点火に火薬を使ったかは「かもしれない」とある（en-battle-of-langshan-jiang.txt:6）"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "decimal-fractions-uqlidisi",
       "title": {
         "ja": "小数の初出（ウクリーディシー『インド算術の章の書』）",
@@ -1240,7 +1208,7 @@
       "needsCheck": "ヒジュラ暦341年は952年と953年にまたがる（952を採った）。写本は12世紀の1点だけ。"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "andromeda-book-of-fixed-stars",
       "title": {
         "ja": "アンドロメダ銀河の初出（スーフィー『星座の書』）",
@@ -1276,7 +1244,7 @@
       "needsCheck": "年は「頃」。アンドロメダ銀河の記述は13世紀の写本で確認されたもの（en-book-of-fixed-stars.txt:28）。大マゼラン雲の初出という説は誤解らしいと本文にある（同:29）ので、そちらは採っていない。"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "vietnamese-cash-thai-binh-hung-bao",
       "title": {
         "ja": "ベトナム初の自国鋳造貨幣（太平興宝）の発行",
@@ -1315,7 +1283,7 @@
       "needsCheck": "場所は発行した朝廷の都で、鋳造所の場所は記録に無いと出典が明記している（en-th-i-b-nh-h-ng-b-o.txt:5）。場所を「発行主体の所在地」で採ってよいかは人の判断が要る。同じ銘の銭を前黎朝の初年に鋳たとする説もある（同:6）。"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "pound-lock-qiao-weiyue",
       "title": {
         "ja": "閘門（ポンド式）の最初の記録（喬維岳）",
@@ -1349,7 +1317,7 @@
       "needsCheck": "場所は文脈から（en-pound-lock.txt:8 が淮安付近の問題を書き、:9 が設置を書く。設置地点を「淮安」と明記した文は無い）"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "refraction-law-ibn-sahl",
       "title": {
         "ja": "屈折の法則の初出（イブン・サフル『燃える鏡とレンズについて』）",
@@ -1384,7 +1352,7 @@
       "needsCheck": "人物の記事は「984年頃」と書く。書名の項目の QID は見つけていない（record は null）。"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "mural-sextant-ray",
       "title": {
         "ja": "壁面六分儀の建造（レイ、フジャンディー）",
@@ -1419,7 +1387,7 @@
       "needsCheck": "場所は「レイの近くの観測所」で、代表点はレイの市の座標。"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "jiaozi-government-notes",
       "title": {
         "ja": "政府発行の紙幣の始まり（交子）",
@@ -1456,7 +1424,7 @@
       "needsCheck": "1024年の政府発行の場所を「成都」と明記した文は無い（交子の出現地・交子鋪の所在として成都が書かれている）"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "jalali-calendar-isfahan",
       "title": {
         "ja": "ジャラーリー暦の採用",
@@ -1490,7 +1458,7 @@
       "needsCheck": "観測はエスファハーン・レイ・ニーシャープールで行われた（en-jalali-calendar.txt:2）。採用の場所はエスファハーン。"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "toledan-tables",
       "title": {
         "ja": "トレド天文表の完成",
@@ -1524,7 +1492,7 @@
       "needsCheck": "年は『頃』（around 1080）。原本のアラビア語版は失われ、ラテン語訳だけが残る（en-toledan-tables.txt:6）"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "chain-drive-su-song",
       "title": {
         "ja": "蘇頌の水運儀象台の試作完成（チェーン駆動の最古の記録）",
@@ -1561,7 +1529,7 @@
       "needsCheck": "1088年は試作模型の完成年で、全体の完成は1094年まで（en-su-song.txt:18）。チェーン駆動の記述は1092年成立の『新儀象法要』の図による（en-su-song.txt:3,4）。どの年を出来事の年にするか要判断"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "compass-dream-pool-essays",
       "title": {
         "ja": "方位磁針の初出（『夢渓筆談』）",
@@ -1600,41 +1568,7 @@
       "needsCheck": "本文の「published in 1088」の刊行地は書かれておらず、鎮江は編纂時の住まいの近く。方位磁針の記述がどの年に書かれたかは本文から分けられない"
     },
     {
-      "status": "draft",
-      "slug": "chinampa-culhuacan",
-      "title": {
-        "ja": "チナンパの初出（クルワカン）",
-        "en": "Earliest chinampas (Culhuacan)"
-      },
-      "description": "湖の浅瀬を杭と編み垣で囲み、泥と水草を積み上げて造る細長い耕地チナンパ。水路に囲まれて水を得やすく収量が高く、のちのテノチティトランの食料を支えた。その最初の例が、湖岸の集落クルワカンに求められている。",
-      "concept": {
-        "qid": "Q750176",
-        "label": "チナンパ"
-      },
-      "record": null,
-      "recordKind": "use",
-      "domain": "technology",
-      "tags": [
-        "technology",
-        "economy"
-      ],
-      "year": 1100,
-      "yearBasis": "ナワの集落クルワカンが紀元1100年に最初のチナンパを造ったという証拠がある、とある（en-chinampa.txt:5）",
-      "place": {
-        "qid": "Q11159224",
-        "label": "プエブロ・クルワカン",
-        "basis": "イスタパラパ半島の南側、テスココ湖とソチミルコ湖を分ける所のクルワカンとある（en-chinampa.txt:5）。先コロンブス期の都市国家の QID（Q11680795）には座標が無いので、同じ地名の現在の集落 Pueblo Culhuacán（同じ行で17世紀の遺言書の出所として出てくる）を使った"
-      },
-      "source": "en: Chinampa § 導入部〜History",
-      "sources": [
-        "en-chinampa.txt"
-      ],
-      "importance": 1,
-      "importanceNote": "アステカの農業と都市の食料供給を支えた技術の起点。ただし年の根拠が弱い（needsCheck）",
-      "needsCheck": "同じ記事の History 節は「確実に年代づけられた最古の畑は後古典期中期の1150〜1350年」と範囲で書いていて（en-chinampa.txt:7）、1100年という年は確実な年代とは読みにくい。1100 は切りのよい数で、実質は世紀単位の精度の可能性がある。場所は現在の集落の座標で代用している。主分類は農業技術として technology にしたが、食料生産の仕組みとして economy と読む余地もある"
-    },
-    {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "fire-lance-dean",
       "title": {
         "ja": "火槍の初の実戦使用（徳安の包囲戦）",
@@ -1672,7 +1606,7 @@
       "needsCheck": "火槍そのものの最古の証拠は950年とあるが、場所が書かれていない（en-fire-lance.txt:9）"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "tabula-rogeriana",
       "title": {
         "ja": "イドリースィーの世界地図帳（『ルッジェーロの書』）の完成",
@@ -1701,47 +1635,12 @@
         "en-tabula-rogeriana.txt",
         "en-muhammad-al-idrisi.txt"
       ],
-      "importance": 3,
-      "importanceNote": "中世で最も進んだ世界図の一つとされる（en-muhammad-al-idrisi.txt:2）ので案として3",
+      "importance": 2,
+      "importanceNote": "中世で最も進んだ世界図の一つとされる（en-muhammad-al-idrisi.txt:2）ので案として3 ／ 2026-09-23 に 3 から 2 へ（3 は世界史の教科書の見出しになる水準だけ、という人の判断。前近代は密度による繰り上げが効くので、2 でも世界全体の表示に出る）",
       "needsCheck": "完成した場所としてパレルモを明記した文は無い。宮廷がパレルモにあり、そこで作業したことからの判断（宮廷の所在は en-muhammad-al-idrisi.txt:2）"
     },
     {
-      "status": "draft",
-      "slug": "pakhal-lake",
-      "title": {
-        "ja": "パーカル湖（灌漑用の人造湖）の建設",
-        "en": "Construction of Pakhal Lake"
-      },
-      "description": "カーカティーヤ朝の王ガナパティ・デーヴァの命で、クリシュナ川の支流に築かれた灌漑用の人造湖。王朝の記事も、この王が交易の奨励とあわせて湖を造ったと書く。",
-      "concept": {
-        "qid": "Q3374015",
-        "label": "パーカル湖"
-      },
-      "record": null,
-      "recordKind": "event",
-      "domain": "technology",
-      "tags": [
-        "technology",
-        "economy"
-      ],
-      "year": 1213,
-      "yearBasis": "カーカティーヤ朝のガナパティ・デーヴァが1213年に造らせたとする（en-pakhal-lake.txt:4,5）",
-      "place": {
-        "qid": "Q3374015",
-        "label": "パーカル湖",
-        "basis": "湖そのものの項目（座標あり）。ワランガルの近くにある人造湖とする（en-pakhal-lake.txt:5）"
-      },
-      "source": "en: Pakhal Lake § (導入部)",
-      "sources": [
-        "en-pakhal-lake.txt",
-        "en-kakatiya-dynasty.txt"
-      ],
-      "importance": 1,
-      "importanceNote": "地域の灌漑施設で、知名度は限られるので 1",
-      "needsCheck": "1213年は「と信じられている」という書き方（en-pakhal-lake.txt:5）。記事は観光案内に近い短いもので、年の根拠が本文に無い。王朝の記事は湖に触れるが年は書かない（en-kakatiya-dynasty.txt:42）"
-    },
-    {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "sultan-han-aksaray",
       "title": {
         "ja": "スルタン・ハン（隊商宿）の建設",
@@ -1778,7 +1677,7 @@
       "needsCheck": "隊商宿という概念の初出ではない。同じ概念のリバーテ・シャラフ（1114〜15年）は重複を避けて外した。"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "florin-first-minting",
       "title": {
         "ja": "フローリン金貨の初鋳造",
@@ -1807,12 +1706,12 @@
         "en-florin.txt",
         "en-venetian-ducat.txt"
       ],
-      "importance": 3,
-      "importanceNote": "西欧の標準金貨の始まりで、後続のドゥカートなど交易通貨の基準になった（en-venetian-ducat.txt:9）ため、案として3",
+      "importance": 2,
+      "importanceNote": "西欧の標準金貨の始まりで、後続のドゥカートなど交易通貨の基準になった（en-venetian-ducat.txt:9）ため、案として3 ／ 2026-09-23 に 3 から 2 へ（3 は世界史の教科書の見出しになる水準だけ、という人の判断。前近代は密度による繰り上げが効くので、2 でも世界全体の表示に出る）",
       "needsCheck": "en-florin.txt:6 は同じ1252年にジェノヴァでも最初の鋳造があったと書き、ドゥカートの記事（en-venetian-ducat.txt:9）はジェノヴァの金貨を別名（ジェノヴィーノ）として並べている。起点をフィレンツェ1点にしてよいか。既存データのギルダーは別の通貨として扱い、重複にしなかった"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "maragheh-observatory",
       "title": {
         "ja": "マラーゲ天文台の建設開始",
@@ -1846,7 +1745,7 @@
       "needsCheck": "建設の完了年は3〜5年後で幅がある。ここでは開始の年を採った。"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "gaocheng-observatory",
       "title": {
         "ja": "登封観星台の建設（郭守敬）",
@@ -1880,7 +1779,7 @@
       "needsCheck": "同じ地には周公の日影台の伝承や一行の圭表（729年）もあり（en-gaocheng-astronomical-observatory.txt:2,5,7）、出来事は元の大天文台の建設に限った"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "striking-clock-milan",
       "title": {
         "ja": "時打ち時計の初出（ミラノ、ガルヴァーノ・フィアンマの記述）",
@@ -1914,41 +1813,7 @@
       "needsCheck": "年が出典で食い違う: 時打ち時計の記事は時計の建造を1330年頃、記述を1335年とし（en-striking-clock.txt:11）、計時装置の歴史の記事は『ミラノで1336年に記録』とする（en-history-of-timekeeping-devices.txt:49）。『最も早いものの一つ』で唯一の最初ではない（リチャード・オブ・ウォリングフォードの1327年設計の天文時計も24時を打つ。en-striking-clock.txt:12）。記述した場所（フィアンマの執筆地）は本文に無く、場所は時計の所在"
     },
     {
-      "status": "draft",
-      "slug": "canggu-ferry-charter",
-      "title": {
-        "ja": "渡し場の規則を定めた勅許状（カングー碑文）",
-        "en": "Royal charter regulating river ferries (Canggu inscription)"
-      },
-      "description": "マジャパヒトの王が、ブンガワン・ソロ川とブランタス川の岸にある渡しの村々に免税などの特権を与え、渡し賃や使う舟、船頭の務めを定めた。川を交易と交通の幹線とした内陸の王国の運輸の仕組みが分かる記録。",
-      "concept": null,
-      "record": {
-        "qid": "Q13096199",
-        "label": "Prasasti Canggu（トロウラン第1碑文）"
-      },
-      "recordKind": "text",
-      "domain": "economy",
-      "tags": [
-        "economy",
-        "technology"
-      ],
-      "year": 1358,
-      "yearBasis": "ハヤム・ウルクが発した銅板で、サカ暦1280年＝1358年7月7日とある（id-prasasti-canggu.txt:2）",
-      "place": {
-        "qid": "Q12478323",
-        "label": "カングー（モジョケルト県）",
-        "basis": "勅命は、カングーに住む渡し場の役人パンジ・マルガバヤに、これを銅の勅許状に仕立てるよう命じている（id-prasasti-canggu.txt:9,13）。カングーはマジャパヒトの主要な河港で、現在のモジョケルト県ジェティス郡の村（同:7,8）"
-      },
-      "source": "id: Prasasti Canggu § (導入部), Teks",
-      "sources": [
-        "id-prasasti-canggu.txt"
-      ],
-      "importance": 1,
-      "importanceNote": "マジャパヒトの河川交易の制度を示す一次史料だが、一般の知名度は低い。",
-      "needsCheck": "出典はインドネシア語版の記事だけ（英語版に記事が無い）。別名が「トロウラン第1碑文」なので、発見地はトロウランの可能性があり、場所をカングーにしてよいかは要確認（本文は勅許状をカングーで作らせたと読めるが、発見地の記載は無い）。渡しの村の数（ソロ川44・ブランタス川33）は同:5。"
-    },
-    {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "polar-axis-sundial-damascus",
       "title": {
         "ja": "極軸式日時計の現存最古の例（イブン・シャーティル、ウマイヤ・モスク）",
@@ -1982,7 +1847,7 @@
       "needsCheck": "建造年は 1371/72 年（1371 を採った）。"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "jikji-metal-type",
       "title": {
         "ja": "金属活字の現存最古の印刷本（『直指』）",
@@ -2015,12 +1880,12 @@
         "en-jikji.txt",
         "en-movable-type.txt"
       ],
-      "importance": 3,
-      "importanceNote": "ユネスコ記憶遺産。グーテンベルクより古い金属活字本として広く知られる",
+      "importance": 2,
+      "importanceNote": "ユネスコ記憶遺産。グーテンベルクより古い金属活字本として広く知られる ／ 2026-09-23 に 3 から 2 へ（3 は世界史の教科書の見出しになる水準だけ、という人の判断。前近代は密度による繰り上げが効くので、2 でも世界全体の表示に出る）",
       "needsCheck": "1234年に高麗で金属活字の本が刷られたという記録があるが、現存せず場所も書かれていない（en-movable-type.txt:41）。内容は仏教書だが、出来事は印刷技術として採った"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "citadel-of-the-ho-dynasty",
       "title": {
         "ja": "胡朝の城塞（西都）の築城",
@@ -2054,7 +1919,7 @@
       "needsCheck": "築城の年は記事の本文の1か所だけ（出典の注は取得していない）。胡季犛の記事では、城塞の建設に年が無い（en-h-qu-ly.txt:33）。"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "taula-de-canvi-barcelona",
       "title": {
         "ja": "バルセロナの公立銀行（タウラ・デ・カンビ）の開業",
@@ -2090,7 +1955,7 @@
       "needsCheck": "概念を「中央銀行」（Q66344）にしたのは、記事が『最初の中央銀行と評される』と書いているため（en-taula-de-canvi-de-barcelona.txt:2）。『公立銀行』に当たる概念の QID は見つけていない。市の要請は1400年4月25日（同:4）"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "waegwan-busan",
       "title": {
         "ja": "倭館の始まり（富山浦を日本商船の入港地に指定）",
@@ -2124,7 +1989,7 @@
       "needsCheck": "年は「頃」。入港地は富山浦（釜山）と乃而浦（昌原）の2港で、釜山を代表点にした。富山浦の項目（Q136032782）は座標を持たない"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "chapultepec-aqueduct-first",
       "title": {
         "ja": "チャプルテペク水道（最初の水道）の着工",
@@ -2159,7 +2024,7 @@
       "needsCheck": "年は一方の記事が「1418年に」、もう一方が「1418年頃」（en-chapultepec-aqueduct.txt:4、en-nezahualcoyotl-tlatoani.txt:101）。2本目の水道は、チマルパインによれば1454年着工・1466年完成（クアウティトラン年代記は1463年着工）で（en-nezahualcoyotl-tlatoani.txt:99-100）、年の出典としては2本目の完成（1466年）のほうが、年代記の該当年の記事まで引かれていて強い。どちらを採るかは人の判断。Wikidata の Q5073555（Chapultepec aqueduct）の座標は、植民地期の水道の遺構（メトロ・セビーリャ付近）とみられるので、場所には使わなかった"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "jagyeongnu",
       "title": {
         "ja": "自撃漏の完成（蔣英実）",
@@ -2192,7 +2057,7 @@
       "needsCheck": "水時計そのもの（日本最初の漏刻と同じ概念）とは、自動で時報を出す点で分けた。Q485682（報漏閣自撃漏）は1536年の作り直しの国宝なので record にしていない"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "cheugugi-rain-gauge",
       "title": {
         "ja": "測雨器の試作（朝鮮）",
@@ -2231,7 +2096,7 @@
       "needsCheck": "書雲観の所在を漢城と明記した文は無く、「都」からの推定。翌1442年の全国の制度化を出来事にする案もある（ja-cheugugi.txt:8）"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "arguin-feitoria",
       "title": {
         "ja": "アルギン島のポルトガル商館の設置",
@@ -2262,7 +2127,7 @@
       "needsCheck": "地域の割り当て: モーリタニアは指示の wana の範囲（モロッコ〜リビア）に入らないので subSaharanAfrica に入れたが、島は北緯20.6度のサハラ沿岸で、人の判断が要る。出典は島の記事の1段落だけ。tags の population は奴隷の移送のため（外してもよい）。"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "dike-of-nezahualcoyotl",
       "title": {
         "ja": "ネサワルコヨトルの堤防の完成",
@@ -2296,7 +2161,7 @@
       "needsCheck": "「頃」（c. 1453）。ネサワルコヨトルの記事は「1445年か1449年頃に造られた」とし（en-nezahualcoyotl-tlatoani.txt:93）、出典の間で年が割れている（着工と完成の違いとも読めるが、本文はそう書き分けていない）。場所は湖（Q13700）で、粒度の規則では region になるはず。点にするならテノチティトラン（Q13695）"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "grand-bazaar-cevahir-bedesten",
       "title": {
         "ja": "イスタンブールのグランド・バザール（ジェヴァーヒル・ベデステン）の完成",
@@ -2314,8 +2179,8 @@
         "economy",
         "technology"
       ],
-      "year": 1461,
-      "yearBasis": "本文が核となるベデステンの建設を1455/56年の冬に始め、1460/61年の冬に終えたとする（en-grand-bazaar-istanbul.txt:6,7）",
+      "year": 1460,
+      "yearBasis": "本文が核となるベデステンの建設を1455/56年の冬に始め、1460/61年の冬に終えたとする（en-grand-bazaar-istanbul.txt:6,7）。終わりの冬の始まりの年として1460を採った",
       "place": {
         "qid": "Q505954",
         "label": "グランド・バザール（イスタンブール）",
@@ -2327,42 +2192,10 @@
       ],
       "importance": 2,
       "importanceNote": "世界最大級の屋内市場の始まり。",
-      "needsCheck": "完成は「1460/61年の冬」で、1461 を採った。建設開始（1455/56年）を採る案もある。"
+      "needsCheck": "完成は「1460/61年の冬」で、その冬の始まりの年（1460）を採った。1461 を採る案もある（2026-09-23、人の判断で1460にした）"
     },
     {
-      "status": "draft",
-      "slug": "diogo-cao-congo-mouth",
-      "title": {
-        "ja": "コンゴ川河口への到達（ディオゴ・カン）",
-        "en": "Diogo Cão reaches the mouth of the Congo River"
-      },
-      "description": "ポルトガルの航海者カンが赤道の南のアフリカ西岸を探り、コンゴ川の河口に到達して石柱を立てた。川を少し遡ってコンゴ王国の人々と交易を始め、ポルトガルとコンゴ王国の関係の始まりとなった。",
-      "concept": null,
-      "record": null,
-      "recordKind": "event",
-      "domain": "science",
-      "tags": [
-        "science",
-        "economy"
-      ],
-      "year": 1482,
-      "yearBasis": "1482年8月にコンゴ川の河口に着き、シャーク・ポイントに石柱（パドラン）を立てたとある（en-diogo-c-o.txt:10）。ソヨの記事も、ポルトガル人の到来を1482年とする（en-soyo.txt:5）",
-      "place": {
-        "qid": "Q1015108",
-        "label": "ソヨ",
-        "basis": "カンは河口のシャーク・ポイントに石柱を立て、川を少し遡ってバコンゴの人々と小規模な交易を始めた（en-diogo-c-o.txt:10,11）。ソヨは河口から南に広がるコンゴ王国の州で、1482年にポルトガル人が来たとある（en-soyo.txt:5）"
-      },
-      "source": "en: Diogo Cão § (First voyage), Padrões",
-      "sources": [
-        "en-diogo-c-o.txt",
-        "en-soyo.txt"
-      ],
-      "importance": 1,
-      "importanceNote": "大航海時代のアフリカ西岸の探検の一段階。コロンブスの航海（importance 2）より一段下とした。",
-      "needsCheck": "場所の QID はソヨ市（Q1015108）。本文の「シャーク・ポイント」をポンタ・ド・パドラン（Q21408416、座標あり）と同一視するのは本文に根拠が無いので採らなかった。ソヨは本文では市ではなく州として出てくる。出発は「おそらく1482年の夏至の頃」（en-diogo-c-o.txt:9）で、到達の1482年8月とは別。"
-    },
-    {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "dias-rounds-southern-africa",
       "title": {
         "ja": "アフリカ南端の回航（ディアスのモッセル湾到達）",
@@ -2397,7 +2230,7 @@
       "needsCheck": "日付が出典で1日ずれる（ディアスの記事は2月4日、モッセル湾の記事は2月3日）。年は一致。喜望峰そのものを見たのは帰路の1488年5月（en-bartolomeu-dias.txt:15）なので、場所を喜望峰にしなかった。最遠到達点はクワイフーク（同:14）。"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "double-entry-summa-de-arithmetica",
       "title": {
         "ja": "複式簿記の最初の刊行された記述（『スムマ』）",
@@ -2435,7 +2268,7 @@
       "needsCheck": "複式簿記そのものの現存最古の記録は、フィレンツェ商人ファロルフィ商会の1299〜1300年の帳簿（en-double-entry-bookkeeping.txt:33。年が範囲で、場所はニームの本店か不明なため rejectedByRule）。1458年のコトルリの手稿も記述を含むが刊行は1573年（同:35、en-summa-de-arithmetica.txt:16）。この項目は『刊行された最初の記述』として扱う"
     },
     {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "adalaj-stepwell",
       "title": {
         "ja": "アダラジの階段井戸の建設",
@@ -2472,42 +2305,7 @@
       "needsCheck": "同じ段落に「1499年、マフムード・ベガダの治世に建てられた」とも書かれている（en-adalaj-stepwell.txt:12）。碑文の年（1498）を採った。階段井戸の概念の初出ではなく、年記のある代表的な実例として採っている"
     },
     {
-      "status": "draft",
-      "slug": "malindi-trade-agreement-pilot",
-      "title": {
-        "ja": "マリンディでの通商協定と水先案内人の雇い入れ（ヴァスコ・ダ・ガマ）",
-        "en": "Trade agreement and hiring of a monsoon pilot at Malindi (Vasco da Gama)"
-      },
-      "description": "モンバサで敵対されたポルトガルの船隊が、友好的なマリンディで通商の取り決めを結び、季節風に詳しいグジャラートの水先案内人を雇った。この案内でインド洋を横断し、翌月カリカット（コーリコード）に着いた。",
-      "concept": null,
-      "record": {
-        "qid": "Q42840468",
-        "label": "ヴァスコ・ダ・ガマの石柱"
-      },
-      "recordKind": "event",
-      "domain": "economy",
-      "tags": [
-        "economy",
-        "science"
-      ],
-      "year": 1498,
-      "yearBasis": "1498年4月14日にマリンディに着いたとある（en-vasco-da-gama.txt:33）。マリンディの記事も1498年とする（en-malindi.txt:13）",
-      "place": {
-        "qid": "Q271411",
-        "label": "マリンディ",
-        "basis": "ダ・ガマがマリンディの支配者と会って通商の協定を結び、インドへの案内人を雇い、石柱を立てた（en-malindi.txt:13、en-vasco-da-gama.txt:33）"
-      },
-      "source": "en: Malindi § History; en: Vasco da Gama § Malindi",
-      "sources": [
-        "en-malindi.txt",
-        "en-vasco-da-gama.txt"
-      ],
-      "importance": 1,
-      "importanceNote": "ダ・ガマの航海の中の一段階。航海全体はカリカット到着（南アジア）で立つ可能性が高いので、ここは 1 とした。",
-      "needsCheck": "他の地域の担当がダ・ガマの航海（カリカット到着、1498年）を採っていれば重なる。水先案内人をイブン・マージドとする話は否定的に書かれている（en-vasco-da-gama.txt:33）。石柱（Q42840468）を立てたのは往路か、帰路の1499年1月か、記事で揃っていない（en-vasco-da-gama.txt:40 は帰路に許可を得たと書く）。"
-    },
-    {
-      "status": "draft",
+      "status": "confirmed",
       "slug": "sea-route-to-india-calicut",
       "title": {
         "ja": "ヨーロッパからインドへの航路の開通（ヴァスコ・ダ・ガマのカリカット到着）",
@@ -3500,6 +3298,23 @@
       "region": "wana",
       "concept": "ムカッダスィー『諸地域の知識に関する最良の区分』の編纂",
       "reason": "（候補として出した後に落とした）場所が特定できない: 本文はシーラーズで編纂を決めたとだけ書き、完成した場所が無い"
+    },
+    {
+      "region": "latinAmerica",
+      "concept": "チナンパの初出（クルワカン）",
+      "qid": "Q750176",
+      "reason": "年が年の精度か怪しい: 同じ記事が、確実に年代づけられた最古の畑を1150〜1350年の範囲とする（2026-09-23、人の判断で落とした）"
+    },
+    {
+      "region": "southAsia",
+      "concept": "パーカル湖（灌漑用の人造湖）の建設",
+      "qid": "Q3374015",
+      "reason": "年の根拠が弱い: 出典が「1213年に造られたと信じられている」と書くだけで、根拠を示していない（2026-09-23、人の判断で落とした）"
+    },
+    {
+      "region": "southAsia",
+      "concept": "『パンチャシッダーンティカー』の成立",
+      "reason": "年が成立年ではない可能性: 505年は暦の元期で、著者の生年とする説もある（2026-09-23、人の判断で落とした）"
     }
   ],
   "rejectedOther": [
@@ -3822,6 +3637,21 @@
       "region": "wana",
       "concept": "イルハン朝の紙幣（チャーオ）の発行",
       "reason": "（候補として出した後に落とした）概念の重複（紙幣 Q47433 は 1024 年の交子を採った）。場所も使節の所在からの推定"
+    },
+    {
+      "region": "subSaharanAfrica",
+      "concept": "コンゴ川河口への到達（ディオゴ・カン）",
+      "reason": "サハラ以南アフリカの枠から外した後、ヨーロッパの航海の記録としては弱いので落とした（ポルトガルの西岸探検の一区間で、場所もソヨ「州」の同定にとどまる。2026-09-23、人の判断による見直し）"
+    },
+    {
+      "region": "subSaharanAfrica",
+      "concept": "マリンディでの通商協定と水先案内人の雇い入れ（ヴァスコ・ダ・ガマ）",
+      "reason": "同じ航海（ヴァスコ・ダ・ガマ、1498年）のカリカット到着を採ったので、重複として落とした（2026-09-23、人の判断による見直し）"
+    },
+    {
+      "region": "southeastAsia",
+      "concept": "渡し場の規則を定めた勅許状（カングー碑文）",
+      "reason": "出典がインドネシア語版の記事 1 本だけで、碑文の発見地と作られた場所の区別も確かめられない（2026-09-23、人の判断で落とした）"
     }
   ]
 }
