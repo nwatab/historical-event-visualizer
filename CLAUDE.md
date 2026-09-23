@@ -207,6 +207,7 @@ Wikidata の概念（羅針盤、無理数など）は時間のプロパティ�
   根拠の書き方の機械的な確認（引いた行が実在し、年の数字がその行にあるか、場所に座標があるか）は `node scripts/wikidata/r4i-verify.mjs --final`。
 - 空き具合の表は `node scripts/wikidata/r4i-gaps.mjs`、再現率と分類の比率の確認は `node scripts/wikidata/r4i-check.mjs`（いまの public/data/events/ を数える）。
 - R4i の選び方・件数・確認の結果は `scripts/wikidata/FINDINGS-R4i.md`。
+- 確定の性質: 66 件は 2026-09-23 に確定したが、確認は主導者（Claude）の機械的な検査と 10 件の抜き取りによるもので、人は個々の出典の本文と突き合わせていない。`needsCheck` はデータに残してある（ロカヴィバーガ、ハディガウンの水場、太平興宝、カラー・ウェワが最も弱い）。
 
 ## 年の扱い
 

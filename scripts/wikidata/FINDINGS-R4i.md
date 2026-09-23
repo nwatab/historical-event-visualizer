@@ -3,6 +3,8 @@
 表の全体（項目ごとの根拠・要確認、規則のせいで入らなかった候補）は [first-records.draft.md](first-records.draft.md)、データは `data/first-records.json`。
 規則は CLAUDE.md「初出の記録（R4i）」。2026-09-23 に人が確定し（下の「確定（2026-09-23）」）、66 件が `status: "confirmed"` になって生成データに入っている。
 
+**確定の性質**: 66 件は 2026-09-23 に確定したが、確認は主導者（Claude）の機械的な検査と 10 件の抜き取りによるもので、人は個々の出典の本文と突き合わせていない。`needsCheck` はデータに残してある（ロカヴィバーガ、ハディガウンの水場、太平興宝、カラー・ウェワが最も弱い）。
+
 **出所の書き方**: 断りが無いかぎり、数値は 2026-09-23 に次のスクリプトで出したもの。
 `node scripts/wikidata/r4i-gaps.mjs`（段階 1 の表）、`node scripts/wikidata/build-first-records-draft.mjs`（件数）、`node scripts/wikidata/r4i-check.mjs`（再現率と分類の比率。
 main の e83c399 に、この PR の変更を加えた状態で数えた。確定の前は 72 件を `--with-drafts` で、確定の後は 66 件を通常の生成で）。「推測」と書いたものは、データで確かめていない。
