@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-09-22T15:56:06.538Z",
+ "generatedAt": "2026-09-23T01:00:55.752Z",
  "sources": {
   "wikidata": {
    "license": "CC0",
@@ -96,27 +96,31 @@
   "diffusion": {
    "dir": "data/diffusion",
    "count": 6
+  },
+  "firstRecords": {
+   "file": "data/first-records.json",
+   "count": 66
   }
  },
- "total": 19790,
+ "total": 19856,
  "byDomain": {
   "conflict": 14818,
   "culture": 958,
-  "economy": 320,
+  "economy": 343,
   "polity": 990,
   "population": 2180,
-  "science": 117,
-  "technology": 407
+  "science": 135,
+  "technology": 432
  },
  "byImportance": {
-  "1": 13457,
-  "2": 5504,
-  "3": 829
+  "1": 13474,
+  "2": 5549,
+  "3": 833
  },
  "byPlaceKind": {
   "none": 425,
   "origin": 12,
-  "point": 19353
+  "point": 19419
  },
  "byTitlePredicate": {
   "completion": 254,
@@ -132,8 +136,8 @@
  },
  "placesByGranularity": {
   "country": 1054,
-  "fine": 18340,
-  "region": 1398
+  "fine": 18404,
+  "region": 1400
  },
  "countryOnlyEvents": 793,
  "files": [
@@ -169,29 +173,29 @@
    "file": "-1000.json",
    "from": -1000,
    "to": -500,
-   "count": 68,
-   "bytes": 19166
+   "count": 69,
+   "bytes": 19863
   },
   {
    "file": "-500.json",
    "from": -500,
    "to": 0,
-   "count": 594,
-   "bytes": 169632
+   "count": 598,
+   "bytes": 172144
   },
   {
    "file": "0.json",
    "from": 0,
    "to": 100,
-   "count": 49,
-   "bytes": 14566
+   "count": 50,
+   "bytes": 15100
   },
   {
    "file": "100.json",
    "from": 100,
    "to": 200,
-   "count": 40,
-   "bytes": 15450
+   "count": 43,
+   "bytes": 17412
   },
   {
    "file": "200.json",
@@ -204,85 +208,85 @@
    "file": "300.json",
    "from": 300,
    "to": 400,
-   "count": 81,
-   "bytes": 27799
+   "count": 82,
+   "bytes": 28422
   },
   {
    "file": "400.json",
    "from": 400,
    "to": 500,
-   "count": 91,
-   "bytes": 30861
+   "count": 94,
+   "bytes": 32903
   },
   {
    "file": "500.json",
    "from": 500,
    "to": 600,
-   "count": 111,
-   "bytes": 37206
+   "count": 113,
+   "bytes": 38650
   },
   {
    "file": "600.json",
    "from": 600,
    "to": 700,
-   "count": 167,
-   "bytes": 54644
+   "count": 171,
+   "bytes": 56917
   },
   {
    "file": "700.json",
    "from": 700,
    "to": 800,
-   "count": 122,
-   "bytes": 41370
+   "count": 127,
+   "bytes": 44799
   },
   {
    "file": "800.json",
    "from": 800,
    "to": 900,
-   "count": 152,
-   "bytes": 45545
+   "count": 159,
+   "bytes": 50261
   },
   {
    "file": "900.json",
    "from": 900,
    "to": 1000,
-   "count": 123,
-   "bytes": 38210
+   "count": 131,
+   "bytes": 43571
   },
   {
    "file": "1000.json",
    "from": 1000,
    "to": 1100,
-   "count": 217,
-   "bytes": 63240
+   "count": 222,
+   "bytes": 66285
   },
   {
    "file": "1100.json",
    "from": 1100,
    "to": 1200,
-   "count": 283,
-   "bytes": 80558
+   "count": 285,
+   "bytes": 81848
   },
   {
    "file": "1200.json",
    "from": 1200,
    "to": 1300,
-   "count": 411,
-   "bytes": 115543
+   "count": 415,
+   "bytes": 117969
   },
   {
    "file": "1300.json",
    "from": 1300,
    "to": 1400,
-   "count": 469,
-   "bytes": 135462
+   "count": 473,
+   "bytes": 138151
   },
   {
    "file": "1400.json",
    "from": 1400,
    "to": 1500,
-   "count": 544,
-   "bytes": 157625
+   "count": 556,
+   "bytes": 165753
   },
   {
    "file": "1500.json",
@@ -348,19 +352,11 @@
     1
    ],
    [
-    -285,
+    -283,
     2
    ],
    [
-    -274,
-    1
-   ],
-   [
-    -248,
-    2
-   ],
-   [
-    -247,
+    -277,
     1
    ],
    [
@@ -372,7 +368,7 @@
     1
    ],
    [
-    -23,
+    -22,
     2
    ],
    [
@@ -380,7 +376,7 @@
     1
    ],
    [
-    554,
+    558,
     2
    ],
    [
@@ -388,7 +384,7 @@
     1
    ],
    [
-    1511,
+    1508,
     0
    ],
    [

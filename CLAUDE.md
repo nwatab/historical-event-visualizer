@@ -177,6 +177,38 @@ Wikidata には伝播の経路のデータが無いので、diffusion のデー�
     いま `granularity` を書いている場所は無い。
 - 表の誤り（年が start〜end の外、時系列順でない、`from` が自分より後ろを指す、座標が取れない、場所が大陸・海洋）は、生成を止める。
 
+## 初出の記録（R4i）
+
+Wikidata の概念（羅針盤、無理数など）は時間のプロパティを持たないことが多く、前近代の科学・技術・経済はパイプラインの規則を直しても埋まらない
+（R4g。`scripts/wikidata/FINDINGS-R4g.md`）。そこで、Wikidata に頼らず、出典で年と場所が言える出来事を人が選ぶ。
+
+### 規則
+
+- 年を持たない概念は、その概念の「**年と場所が特定できる最初の記録**」を出来事にする。例: 現存最古の記述がある文献の成立、年記のある現存最古の遺物、最初の製造・使用の記録。
+  年と場所が出典で特定できる出来事そのもの（最初の政府発行の紙幣、港の開設など）でもよい。
+- **年は、文献・遺物の年（年の精度のもの）だけを使う。** 世紀単位・範囲の推定しか無いものは入れない（`rejectedByRule` に理由付きで残す。世紀単位の精度の扱いは保留で、R4g の案 3 つは FINDINGS-R4g.md）。
+  「頃」の付く年は採ってよいが needsCheck に書く。古代の慣用の年代学の年は、出典が特定の年を書いていれば採り、年代学の不確かさを needsCheck に書く（2026-09-23、人の判断）。
+- **場所は、その記録が作られた（その出来事が起きた）地点で、その年にそこで行われたことが出典の本文で言えるものだけ。**
+  著者の生地・住まい・一般的な勤務先・発見地・現在の所蔵先からの推定は採らない（R4h と同じ考え方）。宮廷・都での作業と本文が書いていれば、その都を採る。
+- title は「〇〇の初出（『書名』）」のように、何の年かが読めるようにする。
+- **記憶で書かない。** 年・場所・書名・QID は、取得した出典の本文で確かめる。本文は `node scripts/wikidata/r4i-source-text.mjs <lang> "記事名"` で
+  data/raw/r4i/texts/ に 1 段落 1 行で保存し（コミットしない）、根拠を「ファイル:行」で書く。QID は同じスクリプトの `qid` モードでラベルと座標を照合する。
+- 分類は science / technology / economy だけ（文化・宗教・食べ物・遊戯は入れない）。同じ概念を 2 件入れない（`concept.qid` の重複は生成を止める）。
+- 国ごとの顕彰の色が強い一覧記事（List of X inventions）の主張は、別の記事（概念・書名・遺物の記事）でも確かめられたものだけ入れる。
+
+### データの置き場と作り方
+
+- `data/first-records.json`（コミットする）。形は `scripts/wikidata/first-records.mjs` の `FirstRecordsFile`。`records` の各項目に、出典（`source`）、要旨（`description`。自分の言葉）、
+  年・場所の根拠（`yearBasis`・`place.basis`）、`needsCheck`、importance の案（`importance`・`importanceNote`）を書く。座標は書かず、`place.qid` から引く
+  （place-overrides.json・diffusion と同じ経路。`pnpm wikidata:fetch-places` と `pnpm wikidata:fetch-app-extras`）。
+- `status` が `"draft"` の項目は、人が確認する前の下書き。`pnpm wikidata:build-app-data` はデータに入れない（`--with-drafts` のときだけ入れる。その出力はコミットしない）。
+  確認が済んだら `"confirmed"` にする。生成データの id は `first-record-<slug>`、kind は instant。
+- 人が確認するための表は `node scripts/wikidata/build-first-records-draft.mjs` が `scripts/wikidata/first-records.draft.md` に作る。
+  根拠の書き方の機械的な確認（引いた行が実在し、年の数字がその行にあるか、場所に座標があるか）は `node scripts/wikidata/r4i-verify.mjs --final`。
+- 空き具合の表は `node scripts/wikidata/r4i-gaps.mjs`、再現率と分類の比率の確認は `node scripts/wikidata/r4i-check.mjs`（いまの public/data/events/ を数える）。
+- R4i の選び方・件数・確認の結果は `scripts/wikidata/FINDINGS-R4i.md`。
+- 確定の性質: 66 件は 2026-09-23 に確定したが、確認は主導者（Claude）の機械的な検査と 10 件の抜き取りによるもので、人は個々の出典の本文と突き合わせていない。`needsCheck` はデータに残してある（ロカヴィバーガ、ハディガウンの水場、太平興宝、カラー・ウェワが最も弱い）。
+
 ## 年の扱い
 
 - 年は **天文年方式の整数**（`Year = number`）で扱う。紀元前1年 = `0`、紀元前2年 = `-1`、紀元前 N 年 = `1 - N`。

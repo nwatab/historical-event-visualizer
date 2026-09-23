@@ -5,7 +5,7 @@
 //   1. 母集団の各項目の、日本語版・英語版 Wikipedia の記事名（出典 URL 用。SPARQL の schema:about）
 //   2. places の場所（P276 などの先の項目）のラベル（地名の表示用）
 //   3. 日本語・英語のラベルが無い項目の、多言語共通ラベル（mul）
-//   4. place-overrides.json（人が承認した地点・起点）の places[].from の座標と、data/diffusion/*.json の起点・到達点の座標
+//   4. place-overrides.json（人が承認した地点・起点）の places[].from の座標と、data/diffusion/*.json の起点・到達点、data/first-records.json の場所の座標
 // 取得済みの分は問い合わせない。クエリは直列で、間隔を空ける（sparql.mjs の runQuery）。
 import { mkdir, writeFile } from "node:fs/promises";
 import {
@@ -17,6 +17,7 @@ import {
   PLACE_OVERRIDES_PATH,
 } from "./config.mjs";
 import { diffusionPlaceRefs, loadDiffusionFiles } from "./diffusion.mjs";
+import { firstRecordPlaceRef, loadFirstRecords } from "./first-records.mjs";
 import { loadAnalysis, readJson, readJsonOr } from "./load-analysis.mjs";
 import { placeKey } from "./place-overrides.mjs";
 import {
@@ -104,10 +105,12 @@ await fillCache(MUL_LABELS_PATH, unlabeled, 300, async (batch) => {
 const overrides = await readJson(PLACE_OVERRIDES_PATH);
 // 広がる出来事（diffusion）の起点・到達点も、同じ方法（QID → P625）で引く。下書き（status: "draft"）のぶんも取る
 const diffusionPlaces = (await loadDiffusionFiles()).flatMap(({ data }) => diffusionPlaceRefs(data));
+// 初出の記録（data/first-records.json）の場所も同じ方法で引く。下書きのぶんも取る
+const firstRecordPlaces = (await loadFirstRecords()).records.map(firstRecordPlaceRef);
 const overridePlaces = [
-  ...new Map([...overrides.overrides.flatMap((o) => o.places ?? []), ...diffusionPlaces].map((pl) => [placeKey(pl), pl])).values(),
+  ...new Map([...overrides.overrides.flatMap((o) => o.places ?? []), ...diffusionPlaces, ...firstRecordPlaces].map((pl) => [placeKey(pl), pl])).values(),
 ];
-console.log(`[4/4] place-overrides と diffusion の座標（${overridePlaces.length} か所）`);
+console.log(`[4/4] place-overrides・diffusion・初出の記録の座標（${overridePlaces.length} か所）`);
 const placeByKey = new Map(overridePlaces.map((pl) => [placeKey(pl), pl]));
 await fillCache(OVERRIDE_PLACES_PATH, [...placeByKey.keys()], 1, async ([key]) => {
   const place = /** @type {import("./place-overrides.mjs").OverridePlace} */ (placeByKey.get(key));
